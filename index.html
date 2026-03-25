@@ -84,6 +84,35 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .og{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px}
 @media(max-width:900px){.cg2,.cg3{grid-template-columns:1fr}.hdr{padding:12px 16px;flex-direction:column;gap:10px}.ctn{padding:14px}.time-bar{gap:4px}.time-btn{padding:6px 12px;font-size:11px}}
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* BACKLOG MODAL */
+.bk-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:200;justify-content:center;align-items:flex-start;padding-top:60px}
+.bk-overlay.open{display:flex}
+.bk-modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:680px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.bk-hdr{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--border)}
+.bk-hdr h2{font-size:16px;font-weight:800;color:var(--green);display:flex;align-items:center;gap:8px}
+.bk-close{background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.2s}
+.bk-close:hover{color:var(--red);background:var(--redA)}
+.bk-body{padding:16px 22px;overflow-y:auto;flex:1}
+.bk-add{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.bk-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:12px;font-family:inherit}
+.bk-input:focus{outline:none;border-color:var(--green)}
+.bk-input.desc{flex:1;min-width:200px}
+.bk-sel{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer}
+.bk-sel:focus{outline:none;border-color:var(--green)}
+.bk-abtn{background:var(--green);color:#000;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;transition:.2s;white-space:nowrap}
+.bk-abtn:hover{opacity:.85}
+.bk-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(26,26,26,.5);transition:.15s}
+.bk-item:hover{background:var(--bg3);border-radius:8px}
+.bk-item .num{color:var(--text3);font-size:11px;font-weight:700;min-width:22px}
+.bk-item .desc{flex:1;font-size:13px;color:var(--text)}
+.bk-item .desc input{background:transparent;border:none;color:var(--text);font-size:13px;font-family:inherit;width:100%;outline:none}
+.bk-item .status{font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;cursor:pointer;white-space:nowrap}
+.bk-item .prio{font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.bk-item .act{display:flex;gap:4px}
+.bk-item .act button{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:4px;font-size:13px;transition:.2s}
+.bk-item .act button:hover{background:var(--bg3)}
+.bk-item .act .del:hover{background:var(--redA);color:var(--red)}
+.bk-empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
 </style>
 </head>
 <body>
@@ -96,6 +125,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
     <div class="rate-badge">EUR/BRL <span class="cur">R$ 6,14</span></div>
     <div class="rate-badge">USDT/BRL <span class="cur">R$ 5,25</span></div>
     <a class="sheets-btn" href="https://docs.google.com/spreadsheets/" target="_blank">📊 Google Sheets</a>
+    <div class="sheets-btn" onclick="toggleBacklog()" style="cursor:pointer;position:relative">📋 Backlog <span id="bk-count" style="background:var(--green);color:#000;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:800;margin-left:2px">0</span></div>
     <span class="upd" id="upd"></span>
   </div>
 </div>
@@ -105,7 +135,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tab" onclick="sp('hist',this)">📆 HISTÓRICO</div>
   <div class="tab" onclick="sp('fin',this)">💰 FINANCEIRO</div>
   <div class="tab" onclick="sp('soc',this)">👥 SÓCIOS</div>
-  <div class="tab" onclick="sp('back',this)">📋 BACKLOG</div>
   <div class="tab" onclick="sp('afil',this)">🤝 AFILIADOS <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
   <div class="tab" onclick="sp('caixa',this)">🏦 CAIXA <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
 </div>
@@ -205,24 +234,19 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <tbody id="atb"></tbody></table></div>
 </div>
 
-<!-- ═══ PAGE: BACKLOG ═══ -->
-<div id="pg-back" class="page">
-<p class="sec">Backlog · Melhorias & Próximos Passos</p>
-<div class="tb">
-<div class="th"><h3>📋 Itens do Backlog</h3></div>
-<table><thead><tr>
-<th style="width:40px">#</th><th>Item</th><th style="width:100px">Status</th><th style="width:100px">Prioridade</th>
-</tr></thead>
-<tbody id="bktb">
-<tr><td>1</td><td>Integrar dados de afiliados (comissões, cliques, conversão)</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--red);font-weight:700">Alta</span></td></tr>
-<tr><td>2</td><td>Módulo Caixa — controle de entradas/saídas USDT e BRL</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--red);font-weight:700">Alta</span></td></tr>
-<tr><td>3</td><td>Conectar Google Sheets para atualização automática de dados</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--gold);font-weight:700">Média</span></td></tr>
-<tr><td>4</td><td>Cotação EUR/BRL e USDT/BRL em tempo real (API)</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--gold);font-weight:700">Média</span></td></tr>
-<tr><td>5</td><td>Importação automática de relatórios Phoenix (.xlsx)</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--gold);font-weight:700">Média</span></td></tr>
-<tr><td>6</td><td>Alertas de performance (NGR negativo, queda FTD)</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--text2);font-weight:700">Baixa</span></td></tr>
-<tr><td>7</td><td>Relatório PDF exportável por período</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--text2);font-weight:700">Baixa</span></td></tr>
-<tr><td>8</td><td>Dark/Light mode toggle</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--text2);font-weight:700">Baixa</span></td></tr>
-</tbody></table>
+<!-- ═══ BACKLOG MODAL ═══ -->
+<div id="bk-overlay" class="bk-overlay" onclick="if(event.target===this)toggleBacklog()">
+<div class="bk-modal">
+  <div class="bk-hdr"><h2>📋 Backlog</h2><button class="bk-close" onclick="toggleBacklog()">✕</button></div>
+  <div class="bk-body">
+    <div class="bk-add">
+      <input class="bk-input desc" id="bk-new-desc" placeholder="Descrição do item..." onkeydown="if(event.key==='Enter')addBkItem()">
+      <select class="bk-sel" id="bk-new-status"><option value="Planejado">Planejado</option><option value="Em andamento">Em andamento</option><option value="Concluído">Concluído</option></select>
+      <select class="bk-sel" id="bk-new-prio"><option value="Alta">🔴 Alta</option><option value="Média">🟡 Média</option><option value="Baixa">⚪ Baixa</option></select>
+      <button class="bk-abtn" onclick="addBkItem()">+ Adicionar</button>
+    </div>
+    <div id="bk-list"></div>
+  </div>
 </div>
 </div>
 
@@ -657,6 +681,78 @@ function rSoc(){
   document.getElementById('atb').innerHTML=pd.map(p=>`<tr><td><strong>${p.mes}</strong></td><td>${fR(p.lucro)}</td><td>${fR(p.AFFBR||0)}</td>
     <td>${fR(p.A_Bruno||0)}</td><td style="color:var(--gold);font-weight:700">${fR(p.A_Harrison||0)}</td>
     <td>${fR(p.A_Neja||0)}</td><td>${fR(p['A_Gregório']||p.A_AFFBR_op||0)}</td></tr>`).join('')}
+
+// ═══ BACKLOG CRUD ═══
+const BK_KEY='jg_backlog';
+const BK_DEFAULT=[
+  {id:1,desc:'Integrar dados de afiliados (comissões, cliques, conversão)',status:'Planejado',prio:'Alta'},
+  {id:2,desc:'Módulo Caixa — controle de entradas/saídas USDT e BRL',status:'Planejado',prio:'Alta'},
+  {id:3,desc:'Conectar Google Sheets para atualização automática de dados',status:'Planejado',prio:'Média'},
+  {id:4,desc:'Cotação EUR/BRL e USDT/BRL em tempo real (API)',status:'Planejado',prio:'Média'},
+  {id:5,desc:'Importação automática de relatórios Phoenix (.xlsx)',status:'Planejado',prio:'Média'},
+  {id:6,desc:'Alertas de performance (NGR negativo, queda FTD)',status:'Planejado',prio:'Baixa'},
+  {id:7,desc:'Relatório PDF exportável por período',status:'Planejado',prio:'Baixa'},
+  {id:8,desc:'Dark/Light mode toggle',status:'Planejado',prio:'Baixa'}
+];
+let bkItems=[];
+try{const s=localStorage.getItem(BK_KEY);bkItems=s?JSON.parse(s):JSON.parse(JSON.stringify(BK_DEFAULT))}catch(e){bkItems=JSON.parse(JSON.stringify(BK_DEFAULT))}
+function saveBk(){try{localStorage.setItem(BK_KEY,JSON.stringify(bkItems))}catch(e){} updBkCount()}
+function updBkCount(){const c=bkItems.filter(i=>i.status!=='Concluído').length;document.getElementById('bk-count').textContent=c}
+function toggleBacklog(){document.getElementById('bk-overlay').classList.toggle('open');renderBk()}
+function prioColor(p){return p==='Alta'?'var(--red)':p==='Média'?'var(--gold)':'var(--text2)'}
+function prioIcon(p){return p==='Alta'?'🔴':p==='Média'?'🟡':'⚪'}
+function statusStyle(s){
+  if(s==='Em andamento')return'background:var(--blueA);color:var(--blue)';
+  if(s==='Concluído')return'background:var(--greenA);color:var(--green)';
+  return'background:var(--greenB);color:var(--green)';
+}
+function renderBk(){
+  const el=document.getElementById('bk-list');
+  if(!bkItems.length){el.innerHTML='<div class="bk-empty">Nenhum item no backlog. Adicione um acima.</div>';return}
+  el.innerHTML=bkItems.map((it,i)=>`<div class="bk-item" data-id="${it.id}">
+    <span class="num">${i+1}</span>
+    <div class="desc"><input value="${it.desc.replace(/"/g,'&quot;')}" onchange="editBkDesc(${it.id},this.value)" onfocus="this.select()"></div>
+    <span class="status" style="${statusStyle(it.status)}" onclick="cycleBkStatus(${it.id})">${it.status}</span>
+    <span class="prio" style="color:${prioColor(it.prio)}" onclick="cycleBkPrio(${it.id})">${prioIcon(it.prio)} ${it.prio}</span>
+    <div class="act">
+      <button onclick="moveBk(${it.id},-1)" title="Mover para cima">▲</button>
+      <button onclick="moveBk(${it.id},1)" title="Mover para baixo">▼</button>
+      <button class="del" onclick="delBk(${it.id})" title="Excluir">🗑</button>
+    </div>
+  </div>`).join('');
+}
+function addBkItem(){
+  const desc=document.getElementById('bk-new-desc').value.trim();
+  if(!desc)return;
+  const status=document.getElementById('bk-new-status').value;
+  const prio=document.getElementById('bk-new-prio').value;
+  const maxId=bkItems.reduce((m,i)=>Math.max(m,i.id),0);
+  bkItems.push({id:maxId+1,desc,status,prio});
+  document.getElementById('bk-new-desc').value='';
+  saveBk();renderBk();
+}
+function editBkDesc(id,val){const it=bkItems.find(i=>i.id===id);if(it){it.desc=val;saveBk()}}
+function cycleBkStatus(id){
+  const it=bkItems.find(i=>i.id===id);if(!it)return;
+  const cycle=['Planejado','Em andamento','Concluído'];
+  it.status=cycle[(cycle.indexOf(it.status)+1)%3];
+  saveBk();renderBk();
+}
+function cycleBkPrio(id){
+  const it=bkItems.find(i=>i.id===id);if(!it)return;
+  const cycle=['Alta','Média','Baixa'];
+  it.prio=cycle[(cycle.indexOf(it.prio)+1)%3];
+  saveBk();renderBk();
+}
+function moveBk(id,dir){
+  const idx=bkItems.findIndex(i=>i.id===id);
+  const ni=idx+dir;
+  if(ni<0||ni>=bkItems.length)return;
+  [bkItems[idx],bkItems[ni]]=[bkItems[ni],bkItems[idx]];
+  saveBk();renderBk();
+}
+function delBk(id){bkItems=bkItems.filter(i=>i.id!==id);saveBk();renderBk()}
+updBkCount();
 
 // ═══ NAV ═══
 const RD={};
