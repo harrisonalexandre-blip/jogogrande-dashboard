@@ -306,7 +306,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="aff-view-btn" onclick="setAffView('weekly',this)">📆 Semana a Semana</div>
 </div>
 <div class="cg cg2" style="margin-bottom:18px">
-  <div class="cb"><div class="ct"><span class="dot g"></span> Depósitos por Afiliado (Top 10)</div><canvas id="c-affdep"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot g"></span> ROI por Afiliado — Net P&L vs Comissão (Top 10)</div><canvas id="c-affroi"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot gl"></span> Registros & FTDs por Mês</div><canvas id="c-affm"></canvas></div>
 </div>
 <div class="cg cg2" style="margin-bottom:18px">
@@ -828,50 +828,99 @@ function rSoc(){
 
 
 // ═══ AFILIADOS ═══
-let affView='ranking';
+var affView='ranking';
 function setAffView(v,el){
   affView=v;
-  document.querySelectorAll('.aff-view-btn').forEach(b=>b.classList.remove('active'));
+  var btns=document.querySelectorAll('.aff-view-btn');
+  for(var i=0;i<btns.length;i++)btns[i].classList.remove('active');
   if(el)el.classList.add('active');
   renderAffTable();
 }
 
+// Filtra dados de afiliados baseado no período global
+function getFilteredAffData(){
+  var fml=getFilteredMonthLabels();
+  var fMonths=AFF.months.filter(function(m){return fml.indexOf(m.ml)>=0});
+  var fWeeks=AFF.weeks;// weeks não filtram facilmente por período
+  // Recalcular totais dos afiliados filtrados por mês via affMonths
+  var fAffs=[];
+  for(var i=0;i<AFF.affs.length;i++){
+    var a=AFF.affs[i];
+    var am=AFF.affMonths[a.n];
+    if(am){
+      var fa={n:a.n,rg:0,ftd:0,fr:0,dc:0,da:0,wa:0,nd:0,np:0,cpa:0,rs:0,cm:0,bn:0,vol:0,ops:0,pf:0,cb:0,fda:0};
+      var fmk=filteredData.map(function(d){return d.month});
+      var fmset={};for(var j=0;j<fmk.length;j++)fmset[fmk[j]]=true;
+      for(var j=0;j<am.length;j++){
+        if(fmset[am[j].k]){
+          fa.rg+=am[j].rg;fa.ftd+=am[j].ftd;fa.da+=am[j].da;fa.wa+=am[j].wa;
+          fa.nd+=am[j].nd;fa.vol+=am[j].vol;fa.pf+=am[j].pf;fa.cm+=am[j].cm;
+        }
+      }
+      fa.fr=fa.rg>0?Math.round(fa.ftd/fa.rg*1000)/10:0;
+      fa.np=fa.nd-fa.cm;// approximate
+      if(fa.rg>0||fa.da>0)fAffs.push(fa);
+    } else {
+      // Afiliado sem breakdown mensal — usar dados totais quando lifetime
+      if(currentPeriod==='lifetime')fAffs.push(a);
+    }
+  }
+  fAffs.sort(function(a,b){return b.da-a.da});
+  // Recalcular summary
+  var s={totalAffs:fAffs.length,totalRegs:0,totalFtd:0,ftdRate:0,totalDep:0,totalWdr:0,totalNd:0,totalVol:0,totalProfit:0,totalComm:0,totalCpa:0,totalRs:0,totalNp:0};
+  for(var i=0;i<fAffs.length;i++){
+    s.totalRegs+=fAffs[i].rg;s.totalFtd+=fAffs[i].ftd;s.totalDep+=fAffs[i].da;
+    s.totalWdr+=fAffs[i].wa;s.totalNd+=fAffs[i].nd;s.totalVol+=fAffs[i].vol;
+    s.totalComm+=fAffs[i].cm;s.totalNp+=fAffs[i].np;
+  }
+  s.ftdRate=s.totalRegs>0?Math.round(s.totalFtd/s.totalRegs*1000)/10:0;
+  return {affs:fAffs,months:fMonths,weeks:fWeeks,summary:s};
+}
+
 function rAfil(){
-  const s=AFF.summary;
+  var fd=(currentPeriod==='lifetime')?AFF:getFilteredAffData();
+  var s=fd.summary;
+  var pLabel=getPeriodLabel(currentPeriod);
   document.getElementById('kaff').innerHTML=[
-    {i:'👥',l:'Afiliados',v:fN(s.totalAffs),s:'Ativos na plataforma',c:''},
+    {i:'👥',l:'Afiliados',v:fN(s.totalAffs),s:pLabel,c:''},
     {i:'📝',l:'Registros',v:fN(s.totalRegs),s:'Total cadastros',c:'blue'},
     {i:'💰',l:'FTDs',v:fN(s.totalFtd),s:'Taxa: '+fP(s.ftdRate),c:'gold'},
     {i:'💳',l:'Depósitos',v:fR(s.totalDep),s:'Volume total',c:'cyan'},
     {i:'💸',l:'Saques',v:fR(s.totalWdr),s:'Withdrawals',c:'red'},
     {i:'🏦',l:'Net Deposits',v:fR(s.totalNd),s:'Dep - Saques',c:s.totalNd>=0?'':'red'},
     {i:'📊',l:'Net P&L',v:fR(s.totalNp),s:'Lucro após comissões',c:s.totalNp>=0?'':'red'},
-    {i:'💼',l:'Comissões',v:fR(s.totalComm),s:'CPA: '+fR(s.totalCpa)+' + RS: '+fR(s.totalRs),c:'purple'},
-    {i:'🎮',l:'Volume',v:fR(s.totalVol),s:'Volume total apostado',c:'gold'},
-  ].map(k=>'<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>').join('');
+    {i:'💼',l:'Comissões',v:fR(s.totalComm),s:'Pago a afiliados',c:'purple'},
+    {i:'📈',l:'Margem',v:fP(s.totalNp>0&&s.totalComm>0?(s.totalNp/(s.totalNp+s.totalComm)*100):0),s:'Net P&L / (P&L + Comm)',c:'gold'},
+  ].map(function(k){return '<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>'}).join('');
 
-  var top10=AFF.affs.slice(0,10);
-  mc('c-affdep',{type:'bar',data:{labels:top10.map(function(a){return a.n.length>18?a.n.substring(0,18)+'…':a.n}),datasets:[
-    {label:'Depósitos R$',data:top10.map(function(a){return a.da}),backgroundColor:C.gA,borderColor:C.g,borderWidth:2,borderRadius:5},
-    {label:'Saques R$',data:top10.map(function(a){return a.wa}),backgroundColor:C.rA,borderColor:C.r,borderWidth:1.5,borderRadius:5}
+  // ROI por Afiliado (Net P&L vs Comissão = Margem)
+  var top10roi=fd.affs.slice().sort(function(a,b){return b.np-a.np}).slice(0,10);
+  var roiLabels=top10roi.map(function(a){return a.n.length>15?a.n.substring(0,15)+'…':a.n});
+  mc('c-affroi',{type:'bar',data:{labels:roiLabels,datasets:[
+    {label:'Net P&L R$',data:top10roi.map(function(a){return a.np}),backgroundColor:top10roi.map(function(a){return a.np>=0?C.gA:C.rA}),borderColor:top10roi.map(function(a){return a.np>=0?C.g:C.r}),borderWidth:2,borderRadius:5},
+    {label:'Comissão R$',data:top10roi.map(function(a){return a.cm}),backgroundColor:'rgba(187,134,252,.25)',borderColor:'#BB86FC',borderWidth:1.5,borderRadius:5}
   ]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:function(v){return fR(v)}}},y:{...CD.scales.x,ticks:{font:{size:10}}}}}});
 
-  var ml=AFF.months.map(function(m){return m.ml});
+  // Registros & FTDs por Mês
+  var ml=fd.months.map(function(m){return m.ml});
   mc('c-affm',{type:'bar',data:{labels:ml,datasets:[
-    {label:'Registros',data:AFF.months.map(function(m){return m.rg}),backgroundColor:C.bA,borderColor:C.b,borderWidth:1.5,borderRadius:4},
-    {label:'FTDs',data:AFF.months.map(function(m){return m.ftd}),backgroundColor:C.gA,borderColor:C.g,borderWidth:1.5,borderRadius:4}
+    {label:'Registros',data:fd.months.map(function(m){return m.rg}),backgroundColor:C.bA,borderColor:C.b,borderWidth:1.5,borderRadius:4},
+    {label:'FTDs',data:fd.months.map(function(m){return m.ftd}),backgroundColor:C.gA,borderColor:C.g,borderWidth:1.5,borderRadius:4}
   ]},options:CD});
 
-  var top10np=AFF.affs.slice().sort(function(a,b){return b.np-a.np}).slice(0,10);
-  mc('c-affnpl',{type:'bar',data:{labels:top10np.map(function(a){return a.n.length>18?a.n.substring(0,18)+'…':a.n}),datasets:[
+  // Net P&L por Afiliado
+  var top10np=fd.affs.slice().sort(function(a,b){return b.np-a.np}).slice(0,10);
+  mc('c-affnpl',{type:'bar',data:{labels:top10np.map(function(a){return a.n.length>15?a.n.substring(0,15)+'…':a.n}),datasets:[
     {label:'Net P&L R$',data:top10np.map(function(a){return a.np}),
       backgroundColor:top10np.map(function(a){return a.np>=0?C.gA:C.rA}),borderColor:top10np.map(function(a){return a.np>=0?C.g:C.r}),borderWidth:2,borderRadius:5}
   ]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:function(v){return fR(v)}}},y:{...CD.scales.x,ticks:{font:{size:10}}}}}});
 
+  // Comissões por Mês
   mc('c-affcomm',{type:'bar',data:{labels:ml,datasets:[
-    {label:'Comissões R$',data:AFF.months.map(function(m){return m.cm}),backgroundColor:'rgba(187,134,252,.35)',borderColor:'#BB86FC',borderWidth:2,borderRadius:5}
+    {label:'Comissões R$',data:fd.months.map(function(m){return m.cm}),backgroundColor:'rgba(187,134,252,.35)',borderColor:'#BB86FC',borderWidth:2,borderRadius:5}
   ]},options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:function(v){return fR(v)}}}}}});
 
+  window._affFiltered=fd;
   renderAffTable();
 }
 
@@ -879,18 +928,23 @@ function renderAffTable(){
   var tbody=document.getElementById('aff-tbody');
   var tfoot=document.getElementById('aff-tfoot');
   var title=document.getElementById('aff-table-title');
-  var sortBy=document.getElementById('aff-sort').value;
-  var search=(document.getElementById('aff-search').value||'').toLowerCase();
+  if(!tbody||!tfoot||!title)return;
+  var sortEl=document.getElementById('aff-sort');
+  var searchEl=document.getElementById('aff-search');
+  var sortBy=sortEl?sortEl.value:'da';
+  var search=searchEl?(searchEl.value||'').toLowerCase():'';
+  var fd=window._affFiltered||AFF;
 
   if(affView==='ranking'){
-    title.textContent='🏆 Ranking de Afiliados — Todos os Períodos';
-    var data=AFF.affs.slice();
+    title.textContent='🏆 Ranking de Afiliados — '+getPeriodLabel(currentPeriod);
+    var data=fd.affs.slice();
     if(search)data=data.filter(function(a){return a.n.toLowerCase().indexOf(search)>=0});
     data.sort(function(a,b){return (b[sortBy]||0)-(a[sortBy]||0)});
     var t={rg:0,ftd:0,da:0,wa:0,nd:0,np:0,cpa:0,rs:0,cm:0,vol:0};
     tbody.innerHTML=data.map(function(a,i){
-      t.rg+=a.rg;t.ftd+=a.ftd;t.da+=a.da;t.wa+=a.wa;t.nd+=a.nd;t.np+=a.np;t.cpa+=a.cpa;t.rs+=a.rs;t.cm+=a.cm;t.vol+=a.vol;
+      t.rg+=a.rg;t.ftd+=a.ftd;t.da+=a.da;t.wa+=a.wa;t.nd+=a.nd;t.np+=a.np;t.cpa+=(a.cpa||0);t.rs+=(a.rs||0);t.cm+=a.cm;t.vol+=a.vol;
       var rc=i<3?['t1','t2','t3'][i]:'';
+      var margin=a.np+a.cm>0?Math.round(a.np/(a.np+a.cm)*100):0;
       return '<tr><td><span class="aff-rank '+rc+'">'+(i+1)+'</span></td>'
         +'<td style="font-weight:700">'+a.n+'</td>'
         +'<td class="num">'+fN(a.rg)+'</td><td class="num">'+fN(a.ftd)+'</td><td class="num">'+fP(a.fr)+'</td>'
@@ -898,7 +952,7 @@ function renderAffTable(){
         +'<td class="num" style="color:var(--red)">'+fR(a.wa)+'</td>'
         +'<td class="num '+(a.nd>=0?'pos':'neg')+'">'+fR(a.nd)+'</td>'
         +'<td class="num '+(a.np>=0?'pos':'neg')+'" style="font-weight:700">'+fR(a.np)+'</td>'
-        +'<td class="num">'+fR(a.cpa)+'</td><td class="num">'+fR(a.rs)+'</td>'
+        +'<td class="num">'+fR(a.cpa||0)+'</td><td class="num">'+fR(a.rs||0)+'</td>'
         +'<td class="num" style="color:var(--purple);font-weight:700">'+fR(a.cm)+'</td>'
         +'<td class="num">'+fR(a.vol)+'</td></tr>';
     }).join('');
@@ -909,8 +963,8 @@ function renderAffTable(){
       +'<td class="num">'+fR(t.cpa)+'</td><td class="num">'+fR(t.rs)+'</td>'
       +'<td class="num" style="color:var(--purple)">'+fR(t.cm)+'</td><td class="num">'+fR(t.vol)+'</td></tr>';
   } else if(affView==='monthly'){
-    title.textContent='📅 Dados Mensais — Evolução por Mês';
-    var data=AFF.months;
+    title.textContent='📅 Dados Mensais — '+getPeriodLabel(currentPeriod);
+    var data=fd.months;
     tbody.innerHTML=data.map(function(m,i){return '<tr><td><span class="aff-rank">'+(i+1)+'</span></td>'
       +'<td style="font-weight:700">'+m.ml+'</td>'
       +'<td class="num">'+fN(m.rg)+'</td><td class="num">'+fN(m.ftd)+'</td><td class="num">'+(m.rg>0?fP(m.ftd/m.rg*100):'-')+'</td>'
@@ -918,7 +972,8 @@ function renderAffTable(){
       +'<td class="num '+(m.nd>=0?'pos':'neg')+'">'+fR(m.nd)+'</td><td class="num '+(m.pf>=0?'pos':'neg')+'" style="font-weight:700">'+fR(m.pf)+'</td>'
       +'<td class="num" colspan="2">—</td>'
       +'<td class="num" style="color:var(--purple)">'+fR(m.cm)+'</td><td class="num">'+fR(m.vol)+'</td></tr>'}).join('');
-    var tt=data.reduce(function(a,m){return{rg:a.rg+m.rg,ftd:a.ftd+m.ftd,da:a.da+m.da,wa:a.wa+m.wa,nd:a.nd+m.nd,pf:a.pf+m.pf,cm:a.cm+m.cm,vol:a.vol+m.vol}},{rg:0,ftd:0,da:0,wa:0,nd:0,pf:0,cm:0,vol:0});
+    var tt={rg:0,ftd:0,da:0,wa:0,nd:0,pf:0,cm:0,vol:0};
+    for(var i=0;i<data.length;i++){tt.rg+=data[i].rg;tt.ftd+=data[i].ftd;tt.da+=data[i].da;tt.wa+=data[i].wa;tt.nd+=data[i].nd;tt.pf+=data[i].pf;tt.cm+=data[i].cm;tt.vol+=data[i].vol;}
     tfoot.innerHTML='<tr style="font-weight:800;border-top:2px solid var(--green)"><td></td><td style="color:var(--green)">TOTAL</td>'
       +'<td class="num">'+fN(tt.rg)+'</td><td class="num">'+fN(tt.ftd)+'</td><td class="num">'+(tt.rg>0?fP(tt.ftd/tt.rg*100):'-')+'</td>'
       +'<td class="num" style="color:var(--gold)">'+fR(tt.da)+'</td><td class="num" style="color:var(--red)">'+fR(tt.wa)+'</td>'
@@ -926,8 +981,8 @@ function renderAffTable(){
       +'<td class="num" colspan="2">—</td>'
       +'<td class="num" style="color:var(--purple)">'+fR(tt.cm)+'</td><td class="num">'+fR(tt.vol)+'</td></tr>';
   } else if(affView==='weekly'){
-    title.textContent='📆 Dados Semanais — Evolução por Semana';
-    var data=AFF.weeks;
+    title.textContent='📆 Dados Semanais';
+    var data=fd.weeks;
     tbody.innerHTML=data.map(function(w,i){return '<tr><td><span class="aff-rank">'+(i+1)+'</span></td>'
       +'<td style="font-weight:700">'+w.k+'</td>'
       +'<td class="num">'+fN(w.rg)+'</td><td class="num">'+fN(w.ftd)+'</td><td class="num">'+(w.rg>0?fP(w.ftd/w.rg*100):'-')+'</td>'
@@ -935,7 +990,8 @@ function renderAffTable(){
       +'<td class="num '+(w.nd>=0?'pos':'neg')+'">'+fR(w.nd)+'</td><td class="num '+(w.pf>=0?'pos':'neg')+'" style="font-weight:700">'+fR(w.pf)+'</td>'
       +'<td class="num" colspan="2">—</td>'
       +'<td class="num" style="color:var(--purple)">'+fR(w.cm)+'</td><td class="num">'+fR(w.vol)+'</td></tr>'}).join('');
-    var tt=data.reduce(function(a,w){return{rg:a.rg+w.rg,ftd:a.ftd+w.ftd,da:a.da+w.da,wa:a.wa+w.wa,nd:a.nd+w.nd,pf:a.pf+w.pf,cm:a.cm+w.cm,vol:a.vol+w.vol}},{rg:0,ftd:0,da:0,wa:0,nd:0,pf:0,cm:0,vol:0});
+    var tt={rg:0,ftd:0,da:0,wa:0,nd:0,pf:0,cm:0,vol:0};
+    for(var i=0;i<data.length;i++){tt.rg+=data[i].rg;tt.ftd+=data[i].ftd;tt.da+=data[i].da;tt.wa+=data[i].wa;tt.nd+=data[i].nd;tt.pf+=data[i].pf;tt.cm+=data[i].cm;tt.vol+=data[i].vol;}
     tfoot.innerHTML='<tr style="font-weight:800;border-top:2px solid var(--green)"><td></td><td style="color:var(--green)">TOTAL</td>'
       +'<td class="num">'+fN(tt.rg)+'</td><td class="num">'+fN(tt.ftd)+'</td><td class="num">'+(tt.rg>0?fP(tt.ftd/tt.rg*100):'-')+'</td>'
       +'<td class="num" style="color:var(--gold)">'+fR(tt.da)+'</td><td class="num" style="color:var(--red)">'+fR(tt.wa)+'</td>'
