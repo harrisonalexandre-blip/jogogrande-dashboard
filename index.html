@@ -930,25 +930,21 @@ function getFilteredAffData(){
   // Filter days
   var fDays=AFF.days.filter(function(d){return d.d>=range.from&&d.d<=range.to});
   var fAffs=[];
-  if(isLifetime){
-    fAffs=AFF.affs.slice();
-  } else {
-    // Filtrar por datas usando affDays
-    for(var i=0;i<AFF.affs.length;i++){
-      var a=AFF.affs[i];
-      var ad=AFF.affDays[a.n];
-      if(ad){
-        var fa={n:a.n,rg:0,ftd:0,fr:0,dc:0,da:0,wa:0,nd:0,np:0,npc:0,nps:0,cpa:0,rs:0,cm:0,bn:0,vol:0,ops:0,cb:0,fda:0,bal:a.bal||0,vc:0};
-        for(var j=0;j<ad.length;j++){
-          if(ad[j].d>=range.from&&ad[j].d<=range.to){
-            fa.rg+=ad[j].rg||0;fa.ftd+=ad[j].ftd||0;fa.dc+=ad[j].dc||0;fa.da+=ad[j].da||0;fa.wa+=ad[j].wa||0;
-            fa.np+=ad[j].np||0;fa.cm+=ad[j].cm||0;fa.vol+=ad[j].vol||0;fa.ops+=ad[j].ops||0;fa.vc+=ad[j].vc||0;
-          }
+  // Sempre agregar a partir dos dados diários (affDays) para consistência
+  for(var i=0;i<AFF.affs.length;i++){
+    var a=AFF.affs[i];
+    var ad=AFF.affDays[a.n];
+    if(ad){
+      var fa={n:a.n,rg:0,ftd:0,fr:0,dc:0,da:0,wa:0,nd:0,np:0,npc:0,nps:0,cpa:0,rs:0,cm:0,bn:0,vol:0,ops:0,cb:0,fda:0,bal:a.bal||0,vc:0};
+      for(var j=0;j<ad.length;j++){
+        if(ad[j].d>=range.from&&ad[j].d<=range.to){
+          fa.rg+=ad[j].rg||0;fa.ftd+=ad[j].ftd||0;fa.dc+=ad[j].dc||0;fa.da+=ad[j].da||0;fa.wa+=ad[j].wa||0;
+          fa.np+=ad[j].np||0;fa.cm+=ad[j].cm||0;fa.vol+=ad[j].vol||0;fa.ops+=ad[j].ops||0;fa.vc+=ad[j].vc||0;
         }
-        fa.nd=fa.da-fa.wa;
-        fa.fr=fa.rg>0?Math.round(fa.ftd/fa.rg*1000)/10:0;
-        if(fa.rg>0||fa.da>0||fa.np!==0)fAffs.push(fa);
       }
+      fa.nd=fa.da-fa.wa;
+      fa.fr=fa.rg>0?Math.round(fa.ftd/fa.rg*1000)/10:0;
+      if(fa.rg>0||fa.da>0||fa.np!==0)fAffs.push(fa);
     }
   }
   fAffs.sort(function(a,b){return b.np-a.np});
