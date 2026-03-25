@@ -87,10 +87,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 
 /* AFFILIATES */
-.aff-view-btns{display:flex;gap:6px;margin-bottom:14px}
-.aff-view-btn{padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);transition:.2s}
-.aff-view-btn.active{background:var(--greenA);border-color:var(--green);color:var(--green)}
-.aff-view-btn:hover{border-color:rgba(14,165,90,.3)}
 .aff-table{width:100%;border-collapse:collapse;font-size:11px}
 .aff-table th{text-align:left;padding:8px 8px;border-bottom:1px solid var(--border);color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;white-space:nowrap;user-select:none;position:sticky;top:0;background:var(--bg2);z-index:2}
 .aff-table th:hover{color:var(--text)}
@@ -300,11 +296,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <div id="pg-afil" class="page">
 <p class="sec">Afiliados — Smartico Analytics</p>
 <div class="kg" id="kaff"></div>
-<div class="aff-view-btns">
-  <div class="aff-view-btn active" onclick="setAffView('ranking',this)">🏆 Ranking Geral</div>
-  <div class="aff-view-btn" onclick="setAffView('monthly',this)">📅 Mês a Mês</div>
-  <div class="aff-view-btn" onclick="setAffView('weekly',this)">📆 Semana a Semana</div>
-</div>
 <div class="cg cg2" style="margin-bottom:18px">
   <div class="cb"><div class="ct"><span class="dot g"></span> ROI por Afiliado — Net P&L vs Comissão (Top 10)</div><canvas id="c-affroi"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot gl"></span> Registros & FTDs por Mês</div><canvas id="c-affm"></canvas></div>
@@ -829,13 +820,6 @@ function rSoc(){
 
 // ═══ AFILIADOS ═══
 var affView='ranking';
-function setAffView(v,el){
-  affView=v;
-  var btns=document.querySelectorAll('.aff-view-btn');
-  for(var i=0;i<btns.length;i++)btns[i].classList.remove('active');
-  if(el)el.classList.add('active');
-  renderAffTable();
-}
 
 // Filtra dados de afiliados baseado no período global
 function getFilteredAffData(){
