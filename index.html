@@ -163,11 +163,18 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
     <span style="font-size:10px;color:var(--text2);letter-spacing:3px;text-transform:uppercase">Business Intelligence Dashboard</span>
   </div>
   <div class="time-bar" id="global-time-bar">
-    <div class="time-btn active" onclick="setTime('yesterday',this)">Ontem</div>
-    <div class="time-btn" onclick="setTime('week',this)">Esta Semana</div>
+    <div class="time-btn" onclick="setTime('yesterday',this)">Ontem</div>
+    <div class="time-btn active" onclick="setTime('week',this)">Esta Semana</div>
     <div class="time-btn" onclick="setTime('month',this)">Este Mês</div>
     <div class="time-btn" onclick="setTime('year',this)">2026</div>
     <div class="time-btn" onclick="setTime('lifetime',this)">Life Time</div>
+    <div class="time-btn" onclick="toggleCustomPeriod(this)" id="btn-custom">📅 Personalizado</div>
+    <div id="custom-period" style="display:none;align-items:center;gap:6px;margin-left:4px">
+      <input type="date" id="date-from" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:11px;font-family:inherit">
+      <span style="color:var(--text3);font-size:10px">até</span>
+      <input type="date" id="date-to" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:11px;font-family:inherit">
+      <button onclick="applyCustomPeriod()" style="background:var(--green);color:#000;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Aplicar</button>
+    </div>
   </div>
   <div class="hdr-r">
     <div class="rate-badge">EUR/BRL <span class="cur">R$ 6,14</span></div>
@@ -448,7 +455,38 @@ function getFilteredData(period){
   }
 }
 
-let filteredData=getFilteredData('yesterday');
+let filteredData=getFilteredData('week');
+
+function toggleCustomPeriod(el){
+  var cp=document.getElementById('custom-period');
+  if(cp.style.display==='none'||cp.style.display===''){
+    cp.style.display='flex';
+    // Set defaults
+    var last=D[D.length-1].date;
+    document.getElementById('date-to').value=last;
+    var from=new Date(last+'T12:00:00');from.setDate(from.getDate()-7);
+    document.getElementById('date-from').value=from.toISOString().substring(0,10);
+  } else {
+    cp.style.display='none';
+  }
+}
+function applyCustomPeriod(){
+  var from=document.getElementById('date-from').value;
+  var to=document.getElementById('date-to').value;
+  if(!from||!to)return;
+  window._affFrom=from;window._affTo=to;
+  currentPeriod='custom';
+  document.querySelectorAll('.time-btn').forEach(function(b){b.classList.remove('active')});
+  document.getElementById('btn-custom').classList.add('active');
+  // Filter D by custom range
+  filteredData=D.filter(function(d){return d.date>=from&&d.date<=to});
+  if(filteredData.length===0)filteredData=[D[D.length-1]];
+  Object.keys(RD).forEach(function(k){RD[k]=false});
+  var ap=document.querySelector('.page.active');
+  if(ap){var id=ap.id.replace('pg-','');RD[id]=true;
+    if(id==='ov')renderOverview();else if(id==='perf')rPerf();
+    else if(id==='hist')rHist();else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='afil')rAfil();else if(id==='crm')rCRM();}
+}
 
 function getPeriodLabel(period){
   const last=D[D.length-1];
@@ -462,14 +500,22 @@ function getPeriodLabel(period){
     case 'month': return months[last.month]||last.month;
     case 'year': return '2026';
     case 'lifetime': return 'Life Time (Nov/25 → Atual)';
+    case 'custom': {
+      var f=window._affFrom||'';var t=window._affTo||'';
+      if(f&&t)return f.substring(8,10)+'/'+f.substring(5,7)+' → '+t.substring(8,10)+'/'+t.substring(5,7);
+      return 'Personalizado';
+    }
     default: return '';
   }
 }
 
 function setTime(period,el){
   currentPeriod=period;
-  document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.time-btn').forEach(function(b){b.classList.remove('active')});
   if(el)el.classList.add('active');
+  // Esconder date picker se outro período
+  var cp=document.getElementById('custom-period');
+  if(cp&&period!=='custom')cp.style.display='none';
   filteredData=getFilteredData(period);
   // Reset render flags e re-renderizar aba ativa
   Object.keys(RD).forEach(k=>{RD[k]=false});
@@ -857,26 +903,49 @@ function rSoc(){
 var affView='ranking';
 
 // Filtra dados de afiliados baseado no período global
+function getAffDateRange(){
+  // Determina range de datas baseado no período selecionado
+  if(!AFF.days||!AFF.days.length)return{from:'',to:''};
+  var allDates=AFF.days.map(function(d){return d.d}).sort();
+  var lastDate=allDates[allDates.length-1];
+  if(currentPeriod==='custom'&&window._affFrom&&window._affTo){
+    return{from:window._affFrom,to:window._affTo};
+  }
+  if(currentPeriod==='lifetime')return{from:allDates[0],to:lastDate};
+  if(currentPeriod==='yesterday')return{from:lastDate,to:lastDate};
+  if(currentPeriod==='week'){
+    var ld=new Date(lastDate+'T12:00:00');var dow=ld.getDay();var diff=dow===0?6:dow-1;
+    var wStart=new Date(ld);wStart.setDate(ld.getDate()-diff);
+    var ws=wStart.toISOString().substring(0,10);
+    return{from:ws,to:lastDate};
+  }
+  if(currentPeriod==='month')return{from:lastDate.substring(0,8)+'01',to:lastDate};
+  if(currentPeriod==='year')return{from:'2026-01-01',to:lastDate};
+  return{from:lastDate,to:lastDate};
+}
 function getFilteredAffData(){
-  var fml=getFilteredMonthLabels();
+  var range=getAffDateRange();
   var isLifetime=(currentPeriod==='lifetime');
+  // Filter months
+  var fml=getFilteredMonthLabels();
   var fMonths=isLifetime?AFF.months:AFF.months.filter(function(m){return fml.indexOf(m.ml)>=0});
   var fWeeks=AFF.weeks;
+  // Filter days
+  var fDays=AFF.days.filter(function(d){return d.d>=range.from&&d.d<=range.to});
   var fAffs=[];
   if(isLifetime){
-    // Lifetime: usar dados totais direto
     fAffs=AFF.affs.slice();
   } else {
-    // Filtrar por período usando affMonths
+    // Filtrar por datas usando affDays
     for(var i=0;i<AFF.affs.length;i++){
       var a=AFF.affs[i];
-      var am=AFF.affMonths[a.n];
-      if(am){
+      var ad=AFF.affDays[a.n];
+      if(ad){
         var fa={n:a.n,rg:0,ftd:0,fr:0,dc:0,da:0,wa:0,nd:0,np:0,npc:0,nps:0,cpa:0,rs:0,cm:0,bn:0,vol:0,ops:0,cb:0,fda:0,bal:a.bal||0,vc:0};
-        for(var j=0;j<am.length;j++){
-          if(fml.indexOf(am[j].ml)>=0){
-            fa.rg+=am[j].rg||0;fa.ftd+=am[j].ftd||0;fa.dc+=am[j].dc||0;fa.da+=am[j].da||0;fa.wa+=am[j].wa||0;
-            fa.np+=am[j].np||0;fa.cm+=am[j].cm||0;fa.vol+=am[j].vol||0;fa.ops+=am[j].ops||0;fa.vc+=am[j].vc||0;
+        for(var j=0;j<ad.length;j++){
+          if(ad[j].d>=range.from&&ad[j].d<=range.to){
+            fa.rg+=ad[j].rg||0;fa.ftd+=ad[j].ftd||0;fa.dc+=ad[j].dc||0;fa.da+=ad[j].da||0;fa.wa+=ad[j].wa||0;
+            fa.np+=ad[j].np||0;fa.cm+=ad[j].cm||0;fa.vol+=ad[j].vol||0;fa.ops+=ad[j].ops||0;fa.vc+=ad[j].vc||0;
           }
         }
         fa.nd=fa.da-fa.wa;
@@ -886,7 +955,7 @@ function getFilteredAffData(){
     }
   }
   fAffs.sort(function(a,b){return b.np-a.np});
-  return {affs:fAffs,months:fMonths,weeks:fWeeks};
+  return{affs:fAffs,months:fMonths,weeks:fWeeks,days:fDays};
 }
 
 function rAfil(){
@@ -1187,6 +1256,7 @@ function renderBk(){
     <span class="status" style="${statusStyle(it.status)}" onclick="cycleBkStatus(${it.id})">${it.status}</span>
     <span class="prio" style="color:${prioColor(it.prio)}" onclick="cycleBkPrio(${it.id})">${prioIcon(it.prio)} ${it.prio}</span>
     <div class="act">
+      <button onclick="completeBk(${it.id})" title="Concluir" style="${it.status==='Concluído'?'opacity:.3':''}">${it.status==='Concluído'?'✅':'☑️'}</button>
       <button onclick="moveBk(${it.id},-1)" title="Mover para cima">▲</button>
       <button onclick="moveBk(${it.id},1)" title="Mover para baixo">▼</button>
       <button class="del" onclick="delBk(${it.id})" title="Excluir">🗑</button>
@@ -1204,6 +1274,7 @@ function addBkItem(){
   saveBk();renderBk();
 }
 function editBkDesc(id,val){const it=bkItems.find(i=>i.id===id);if(it){it.desc=val;saveBk()}}
+function completeBk(id){const it=bkItems.find(i=>i.id===id);if(it){it.status='Concluído';saveBk();renderBk()}}
 function cycleBkStatus(id){
   const it=bkItems.find(i=>i.id===id);if(!it)return;
   const cycle=['Planejado','Em andamento','Concluído'];
