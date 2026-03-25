@@ -105,6 +105,9 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tab" onclick="sp('hist',this)">📆 HISTÓRICO</div>
   <div class="tab" onclick="sp('fin',this)">💰 FINANCEIRO</div>
   <div class="tab" onclick="sp('soc',this)">👥 SÓCIOS</div>
+  <div class="tab" onclick="sp('back',this)">📋 BACKLOG</div>
+  <div class="tab" onclick="sp('afil',this)">🤝 AFILIADOS <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
+  <div class="tab" onclick="sp('caixa',this)">🏦 CAIXA <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
 </div>
 <div class="ctn">
 
@@ -200,6 +203,47 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <div class="tb"><div class="th"><h3>👤 Detalhamento AFFBR (Membros)</h3></div>
 <table><thead><tr><th>Mês</th><th>Lucro Total</th><th>AFFBR Total</th><th>Bruno (4,75%)</th><th>Harrison (10,68%)</th><th>Neja (10,68%)</th><th>Gregório/Op</th></tr></thead>
 <tbody id="atb"></tbody></table></div>
+</div>
+
+<!-- ═══ PAGE: BACKLOG ═══ -->
+<div id="pg-back" class="page">
+<p class="sec">Backlog · Melhorias & Próximos Passos</p>
+<div class="tb">
+<div class="th"><h3>📋 Itens do Backlog</h3></div>
+<table><thead><tr>
+<th style="width:40px">#</th><th>Item</th><th style="width:100px">Status</th><th style="width:100px">Prioridade</th>
+</tr></thead>
+<tbody id="bktb">
+<tr><td>1</td><td>Integrar dados de afiliados (comissões, cliques, conversão)</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--red);font-weight:700">Alta</span></td></tr>
+<tr><td>2</td><td>Módulo Caixa — controle de entradas/saídas USDT e BRL</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--red);font-weight:700">Alta</span></td></tr>
+<tr><td>3</td><td>Conectar Google Sheets para atualização automática de dados</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--gold);font-weight:700">Média</span></td></tr>
+<tr><td>4</td><td>Cotação EUR/BRL e USDT/BRL em tempo real (API)</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--gold);font-weight:700">Média</span></td></tr>
+<tr><td>5</td><td>Importação automática de relatórios Phoenix (.xlsx)</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--gold);font-weight:700">Média</span></td></tr>
+<tr><td>6</td><td>Alertas de performance (NGR negativo, queda FTD)</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--text2);font-weight:700">Baixa</span></td></tr>
+<tr><td>7</td><td>Relatório PDF exportável por período</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--text2);font-weight:700">Baixa</span></td></tr>
+<tr><td>8</td><td>Dark/Light mode toggle</td><td><span class="bp">Planejado</span></td><td><span style="color:var(--text2);font-weight:700">Baixa</span></td></tr>
+</tbody></table>
+</div>
+</div>
+
+<!-- ═══ PAGE: AFILIADOS (Em Construção) ═══ -->
+<div id="pg-afil" class="page">
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;gap:16px">
+<div style="font-size:64px">🤝</div>
+<h2 style="font-size:22px;font-weight:900;color:var(--green)">AFILIADOS</h2>
+<p style="color:var(--text2);font-size:14px;max-width:400px">Módulo de gestão de afiliados em construção.<br>Em breve: comissões, cliques, conversão, ranking e performance por afiliado.</p>
+<div style="background:var(--greenA);border:1px solid rgba(14,165,90,.3);padding:10px 20px;border-radius:8px;color:var(--green);font-size:12px;font-weight:700">🚧 EM CONSTRUÇÃO</div>
+</div>
+</div>
+
+<!-- ═══ PAGE: CAIXA (Em Construção) ═══ -->
+<div id="pg-caixa" class="page">
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;gap:16px">
+<div style="font-size:64px">🏦</div>
+<h2 style="font-size:22px;font-weight:900;color:var(--green)">CAIXA</h2>
+<p style="color:var(--text2);font-size:14px;max-width:400px">Módulo de controle de caixa em construção.<br>Em breve: entradas/saídas USDT e BRL, saldo consolidado, histórico de movimentações e conciliação.</p>
+<div style="background:var(--greenA);border:1px solid rgba(14,165,90,.3);padding:10px 20px;border-radius:8px;color:var(--green);font-size:12px;font-weight:700">🚧 EM CONSTRUÇÃO</div>
+</div>
 </div>
 
 </div>
