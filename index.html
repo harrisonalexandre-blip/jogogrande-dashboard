@@ -297,7 +297,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <p class="sec">Afiliados — Smartico Analytics</p>
 <div class="kg" id="kaff"></div>
 <div class="cg cg2" style="margin-bottom:18px">
-  <div class="cb"><div class="ct"><span class="dot g"></span> ROI por Afiliado — Net P&L vs Comissão (Top 10)</div><canvas id="c-affroi"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot g"></span> Margem por Afiliado — (Net P&L − Comissão) Top 10</div><canvas id="c-affroi"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot gl"></span> Registros & FTDs por Mês</div><canvas id="c-affm"></canvas></div>
 </div>
 <div class="cg cg2" style="margin-bottom:18px">
@@ -877,12 +877,16 @@ function rAfil(){
     {i:'📈',l:'Margem',v:fP(s.totalNp>0&&s.totalComm>0?(s.totalNp/(s.totalNp+s.totalComm)*100):0),s:'Net P&L / (P&L + Comm)',c:'gold'},
   ].map(function(k){return '<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>'}).join('');
 
-  // ROI por Afiliado (Net P&L vs Comissão = Margem)
-  var top10roi=fd.affs.slice().sort(function(a,b){return b.np-a.np}).slice(0,10);
-  var roiLabels=top10roi.map(function(a){return a.n.length>15?a.n.substring(0,15)+'…':a.n});
-  mc('c-affroi',{type:'bar',data:{labels:roiLabels,datasets:[
-    {label:'Net P&L R$',data:top10roi.map(function(a){return a.np}),backgroundColor:top10roi.map(function(a){return a.np>=0?C.gA:C.rA}),borderColor:top10roi.map(function(a){return a.np>=0?C.g:C.r}),borderWidth:2,borderRadius:5},
-    {label:'Comissão R$',data:top10roi.map(function(a){return a.cm}),backgroundColor:'rgba(187,134,252,.25)',borderColor:'#BB86FC',borderWidth:1.5,borderRadius:5}
+  // Margem por Afiliado (Net P&L - Comissão)
+  var affMargins=fd.affs.map(function(a){return {n:a.n,margem:a.np-a.cm}});
+  affMargins.sort(function(a,b){return b.margem-a.margem});
+  var top10m=affMargins.slice(0,10);
+  var mLabels=top10m.map(function(a){return a.n.length>15?a.n.substring(0,15)+'…':a.n});
+  var mData=top10m.map(function(a){return a.margem});
+  var mBg=top10m.map(function(a){return a.margem>=0?C.gA:C.rA});
+  var mBd=top10m.map(function(a){return a.margem>=0?C.g:C.r});
+  mc('c-affroi',{type:'bar',data:{labels:mLabels,datasets:[
+    {label:'Margem R$',data:mData,backgroundColor:mBg,borderColor:mBd,borderWidth:2,borderRadius:5}
   ]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:function(v){return fR(v)}}},y:{...CD.scales.x,ticks:{font:{size:10}}}}}});
 
   // Registros & FTDs por Mês
