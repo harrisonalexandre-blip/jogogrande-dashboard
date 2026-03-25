@@ -84,6 +84,35 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .og{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px}
 @media(max-width:900px){.cg2,.cg3{grid-template-columns:1fr}.hdr{padding:12px 16px;flex-direction:column;gap:10px}.ctn{padding:14px}.time-bar{gap:3px;justify-content:center}.time-btn{padding:4px 10px;font-size:10px}}
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* CRM */
+.crm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.crm-stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.crm-stat .val{font-size:28px;font-weight:900;margin:6px 0}
+.crm-stat .lbl{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.crm-stat .sub{font-size:11px;color:var(--text3);margin-top:4px}
+.cli-list{max-height:600px;overflow-y:auto}
+.cli-row{display:grid;grid-template-columns:40px 1fr 100px 100px 100px 80px 60px;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(26,26,26,.5);font-size:12px;transition:.15s}
+.cli-row:hover{background:rgba(255,255,255,.02)}
+.cli-row.hdr{position:sticky;top:0;background:var(--bg2);font-size:10px;color:var(--text3);text-transform:uppercase;font-weight:700;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.cli-row .rank{color:var(--text3);font-weight:700;font-size:11px}
+.cli-row .name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cli-row .val{text-align:right;font-weight:700}
+.cli-row .val.pos{color:var(--green)}.cli-row .val.neg{color:var(--red)}
+.cli-row .status-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.cli-row .status-dot.active{background:#0f0}.cli-row .status-dot.warn{background:#fa0}.cli-row .status-dot.churned{background:#f44}
+.wa-btn{background:#25D366;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s}
+.wa-btn:hover{opacity:.8}
+.crm-filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.crm-filter{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:.2s}
+.crm-filter.active{background:var(--greenA);border-color:var(--green);color:var(--green)}
+.crm-filter:hover{border-color:rgba(14,165,90,.3)}
+/* Movimentações internas table */
+.mi-table{width:100%;border-collapse:collapse;font-size:12px}
+.mi-table th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text3);font-size:10px;text-transform:uppercase}
+.mi-table td{padding:8px 10px;border-bottom:1px solid rgba(26,26,26,.5)}
+.mi-table tr:hover td{background:rgba(187,134,252,.05)}
+@media(max-width:900px){.crm-stats{grid-template-columns:1fr}.cli-row{grid-template-columns:30px 1fr 80px 80px 60px;font-size:11px}}
 /* BACKLOG MODAL */
 .bk-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:200;justify-content:center;align-items:flex-start;padding-top:60px}
 .bk-overlay.open{display:flex}
@@ -142,7 +171,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tab" onclick="sp('hist',this)">📆 HISTÓRICO</div>
   <div class="tab" onclick="sp('fin',this)">💰 FINANCEIRO</div>
   <div class="tab" onclick="sp('soc',this)">👥 SÓCIOS</div>
-  <div class="tab" onclick="sp('afil',this)">🤝 AFILIADOS <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
+  <div class="tab" onclick="sp('crm',this)">📱 CRM</div>
   <div class="tab" onclick="sp('caixa',this)">🏦 CAIXA <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
 </div>
 <div class="ctn">
@@ -251,12 +280,26 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 </div>
 
 <!-- ═══ PAGE: AFILIADOS (Em Construção) ═══ -->
-<div id="pg-afil" class="page">
-<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;gap:16px">
-<div style="font-size:64px">🤝</div>
-<h2 style="font-size:22px;font-weight:900;color:var(--green)">AFILIADOS</h2>
-<p style="color:var(--text2);font-size:14px;max-width:400px">Módulo de gestão de afiliados em construção.<br>Em breve: comissões, cliques, conversão, ranking e performance por afiliado.</p>
-<div style="background:var(--greenA);border:1px solid rgba(14,165,90,.3);padding:10px 20px;border-radius:8px;color:var(--green);font-size:12px;font-weight:700">🚧 EM CONSTRUÇÃO</div>
+<div id="pg-crm" class="page">
+<p class="sec">CRM — Gestão de Players</p>
+<div class="crm-stats" id="crm-kpis"></div>
+<div class="cg cg2" style="margin-bottom:18px">
+  <div class="cb"><div class="ct"><span class="dot g"></span> Churn Rate por Período</div><canvas id="c-churn"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot gl"></span> Distribuição de Players</div><canvas id="c-dist"></canvas></div>
+</div>
+<div class="tb">
+  <div class="th">
+    <h3>📱 Lista de Clientes — Top 100 por Depósito</h3>
+    <div class="crm-filters">
+      <div class="crm-filter active" onclick="filterCRM('all',this)">Todos</div>
+      <div class="crm-filter" onclick="filterCRM('active',this)">🟢 Ativos (7d)</div>
+      <div class="crm-filter" onclick="filterCRM('warm',this)">🟡 Mornos (30d)</div>
+      <div class="crm-filter" onclick="filterCRM('churned',this)">🔴 Churned (>30d)</div>
+    </div>
+  </div>
+  <div class="cli-list" id="cli-list">
+    <div class="cli-row hdr"><span>#</span><span>Cliente</span><span style="text-align:right">Depósitos</span><span style="text-align:right">Saques</span><span style="text-align:right">NGR</span><span style="text-align:right">Status</span><span></span></div>
+  </div>
 </div>
 </div>
 
@@ -276,6 +319,10 @@ const D=[{"date": "2025-11-01", "df": "01/11", "month": "2025-11", "ml": "NOV/25
 const M=[{"ngr": 102103.39, "nr": 4768, "ftd": 1148, "ds": 589711.34, "ws": 344210.61, "uap": 106, "nd": 4015, "nw": 1178, "cg": 101668.59, "sg": 434.81, "nc": 245500.73, "mi": 76056.69, "cnt": 30, "ml": "NOV/25", "month": "2025-11", "tk": 146.88}, {"ngr": 268794.75, "nr": 4772, "ftd": 2312, "ds": 1217219.85, "ws": 702619.76, "uap": 240, "nd": 10781, "nw": 3989, "cg": 265402.61, "sg": 3392.13, "nc": 514600.09, "mi": 260000.0, "cnt": 31, "ml": "DEZ/25", "month": "2025-12", "tk": 112.9}, {"ngr": 343534.98, "nr": 5899, "ftd": 1645, "ds": 1228389.28, "ws": 535888.49, "uap": 237, "nd": 9367, "nw": 3019, "cg": 300478.46, "sg": 43072.18, "nc": 692500.79, "mi": 320000.0, "cnt": 31, "ml": "JAN/26", "month": "2026-01", "tk": 131.14}, {"ngr": 362707.26, "nr": 6550, "ftd": 2298, "ds": 973022.1, "ws": 410875.22, "uap": 279, "nd": 8756, "nw": 1881, "cg": 350089.94, "sg": 12617.31, "nc": 562146.88, "mi": 253194.76, "cnt": 28, "ml": "FEV/26", "month": "2026-02", "tk": 111.13}, {"ngr": 227786.95, "nr": 5098, "ftd": 1786, "ds": 879624.29, "ws": 459482.34, "uap": 258, "nd": 6301, "nw": 1447, "cg": 221373.67, "sg": 6424.0, "nc": 420141.95, "mi": 170691.48, "cnt": 23, "ml": "MAR/26", "month": "2026-03", "tk": 139.6}];
 const O=[{"mes": "NOV/25", "traf": 45423.29, "mkt_inf": 2500.0, "mkt_promo": 0.0, "crm": 2400.0, "tec": 120.0, "afiliados": 0.0, "inv_acoes": 50443.29, "eq_com": 0.0, "serv": 0.0, "folha": 5500.0, "plat_fee": 17785.7532, "gw_fee": 19144.94635, "variaveis": 0.0, "inv_op": 42430.69955, "inv_total": 92873.98955, "ncl": 144246.9437, "ggr": 98809.74, "lucro": 5935.750452}, {"mes": "DEZ/25", "traf": 73249.66, "mkt_inf": 0.0, "mkt_promo": 0.0, "crm": 2400.0, "tec": 7701.0, "afiliados": 0.0, "inv_acoes": 83350.66, "eq_com": 0.0, "serv": 2000.0, "folha": 5500.0, "plat_fee": 58264.3154, "gw_fee": 19738.1324, "variaveis": 0.0, "inv_op": 85502.4478, "inv_total": 168853.1078, "ncl": 246387.18, "ggr": 256841.22, "lucro": 77534.0722}, {"mes": "JAN/26", "traf": 78286.66, "mkt_inf": 0.0, "mkt_promo": 0.0, "crm": 2400.0, "tec": 11678.0, "afiliados": 0.0, "inv_acoes": 92364.66, "eq_com": 0.0, "serv": 0.0, "folha": 5500.0, "plat_fee": 66594.2, "gw_fee": 37629.942, "variaveis": 0.0, "inv_op": 109724.142, "inv_total": 202088.802, "ncl": 322530.0, "ggr": 446776.588, "lucro": 120441.198}, {"mes": "FEV/26", "traf": 41705.0, "mkt_inf": 0.0, "mkt_promo": 0.0, "crm": 2400.0, "tec": 0, "afiliados": 0, "inv_acoes": 0, "eq_com": 0.0, "serv": 0.0, "folha": 5500.0, "plat_fee": 66594.2, "gw_fee": 28538.0, "variaveis": 0.0, "inv_op": 100632.2, "inv_total": 100632.2, "ncl": 279154.7255, "ggr": 362707.254, "lucro": 178522.5255}];
 const S=[{"dt": "2026-01-14", "name": "Saque 14.01", "usdt": 0, "tp": "cripto"}, {"dt": "2026-01-31", "name": "Saque 31.01", "usdt": 0, "tp": "cripto"}, {"dt": "2026-02-23", "name": "Saque 23.02", "usdt": 0, "tp": "cripto"}, {"dt": "2026-03-16", "name": "Saque 16.03", "usdt": 0, "tp": "cripto"}];
+const CRYPTO=[{"d": "2025-11-19", "v": 51250.0, "t": 1250.0, "c": "59591421"}, {"d": "2025-11-19", "v": 2050.0, "t": 50.0, "c": "747e6758"}, {"d": "2025-11-28", "v": 24537.82, "t": 481.13, "c": "72b69d2a"}, {"d": "2025-12-01", "v": 51000.0, "t": 1000.0, "c": "a302c964"}, {"d": "2025-12-08", "v": 51000.0, "t": 1000.0, "c": "d9e6ccef"}, {"d": "2025-12-12", "v": 25500.0, "t": 500.0, "c": "aa62e7bb"}, {"d": "2025-12-17", "v": 25500.0, "t": 500.0, "c": "62437eb0"}, {"d": "2025-12-22", "v": 40800.0, "t": 800.0, "c": "4d225b9d"}, {"d": "2025-12-23", "v": 10200.0, "t": 200.0, "c": "bd0068fc"}, {"d": "2025-12-26", "v": 30600.0, "t": 600.0, "c": "bd8cfb0d"}, {"d": "2025-12-31", "v": 30600.0, "t": 600.0, "c": "d4741e04"}, {"d": "2026-01-07", "v": 56100.0, "t": 1100.0, "c": "e48a37d2"}, {"d": "2026-01-08", "v": 25500.0, "t": 500.0, "c": "e7d1862b"}, {"d": "2026-01-14", "v": 25500.0, "t": 500.0, "c": "1aa7c2d9"}, {"d": "2026-01-16", "v": 25500.0, "t": 500.0, "c": "98990d8b"}, {"d": "2026-01-19", "v": 40800.0, "t": 800.0, "c": "07326040"}, {"d": "2026-01-22", "v": 20400.0, "t": 400.0, "c": "9791c069"}, {"d": "2026-01-23", "v": 25500.0, "t": 500.0, "c": "8cb77d31"}, {"d": "2026-01-26", "v": 40800.0, "t": 800.0, "c": "157becd2"}, {"d": "2026-01-27", "v": 20400.0, "t": 400.0, "c": "3940f8d5"}, {"d": "2026-01-29", "v": 20400.0, "t": 400.0, "c": "ae106184"}, {"d": "2026-01-30", "v": 25500.0, "t": 500.0, "c": "f702b6f3"}, {"d": "2026-02-05", "v": 25500.0, "t": 500.0, "c": "84af129d"}, {"d": "2026-02-10", "v": 10200.0, "t": 200.0, "c": "1f1351b4"}, {"d": "2026-02-11", "v": 42739.72, "t": 838.03, "c": "e1e6cc93"}, {"d": "2026-02-12", "v": 7680.6, "t": 150.6, "c": "e6428a1e"}, {"d": "2026-02-16", "v": 6505.63, "t": 127.56, "c": "6049d87d"}, {"d": "2026-02-19", "v": 25500.0, "t": 500.0, "c": "a8ddbb28"}, {"d": "2026-02-23", "v": 51000.0, "t": 1000.0, "c": "dc68724b"}, {"d": "2026-02-24", "v": 12632.7, "t": 247.7, "c": "00a6d557"}, {"d": "2026-02-24", "v": 25500.0, "t": 500.0, "c": "561892df"}, {"d": "2026-02-26", "v": 25500.0, "t": 500.0, "c": "e7d0925e"}, {"d": "2026-02-27", "v": 25500.0, "t": 500.0, "c": "d9ead94d"}, {"d": "2026-03-04", "v": 20400.0, "t": 400.0, "c": "392de122"}, {"d": "2026-03-05", "v": 7351.63, "t": 144.15, "c": "910e89ce"}, {"d": "2026-03-10", "v": 5695.68, "t": 111.68, "c": "bbabe51f"}, {"d": "2026-03-12", "v": 9078.0, "t": 178.0, "c": "05fb5413"}, {"d": "2026-03-13", "v": 3060.0, "t": 60.0, "c": "78d156d2"}, {"d": "2026-03-16", "v": 20400.0, "t": 400.0, "c": "32983b16"}, {"d": "2026-03-17", "v": 7140.0, "t": 140.0, "c": "e0298fb8"}, {"d": "2026-03-18", "v": 66300.0, "t": 1300.0, "c": "f5aff284"}, {"d": "2026-03-19", "v": 22440.0, "t": 440.0, "c": "9a098e52"}, {"d": "2026-03-20", "v": 12240.0, "t": 240.0, "c": "b3fb9a1d"}, {"d": "2026-03-24", "v": 6120.0, "t": 120.0, "c": "88e1022c"}];
+const CLI=[{"n": "LUCIANA MARIA TORRES SEQUEIRA", "dc": 126, "dt": 83937.59, "sc": 28, "st": 63429.14, "ngr": 20508.45, "fd": "2025-11-19", "ld": "2026-03-15", "ad": 57, "di": 9}, {"n": "MARCELO TORRES", "dc": 15, "dt": 83013.7, "sc": 12, "st": 86445.81, "ngr": -3432.11, "fd": "2025-11-17", "ld": "2026-03-13", "ad": 19, "di": 11}, {"n": "Valeria de Lima", "dc": 21, "dt": 71780.8, "sc": 0, "st": 0.0, "ngr": 71780.8, "fd": "2026-01-20", "ld": "2026-03-08", "ad": 13, "di": 16}, {"n": "Antonio Cl\u00e1udio Costa", "dc": 353, "dt": 67505.93, "sc": 0, "st": 0.0, "ngr": 67505.93, "fd": "2025-12-14", "ld": "2026-03-24", "ad": 82, "di": 0}, {"n": "JAILSON MAXIMO DE MACEDO", "dc": 20, "dt": 58203.58, "sc": 123, "st": 58920.41, "ngr": -716.83, "fd": "2025-12-20", "ld": "2026-03-24", "ad": 52, "di": 0}, {"n": "CELIO DE OLIVEIRA", "dc": 38, "dt": 56955.66, "sc": 45, "st": 30133.22, "ngr": 26822.44, "fd": "2025-11-15", "ld": "2026-03-21", "ad": 62, "di": 3}, {"n": "Antoniel Andrade Da Silva", "dc": 80, "dt": 55192.02, "sc": 0, "st": 0.0, "ngr": 55192.02, "fd": "2025-11-13", "ld": "2026-03-09", "ad": 41, "di": 15}, {"n": "Maria Aparecida Alves Pereira", "dc": 17, "dt": 54742.72, "sc": 0, "st": 0.0, "ngr": 54742.72, "fd": "2026-01-27", "ld": "2026-03-18", "ad": 10, "di": 6}, {"n": "Wellerson Matheus Gomes da Silva", "dc": 236, "dt": 53197.99, "sc": 64, "st": 38929.73, "ngr": 14268.26, "fd": "2025-11-14", "ld": "2026-02-12", "ad": 79, "di": 40}, {"n": "Adriano Campelo de Abreu", "dc": 5, "dt": 49299.01, "sc": 1, "st": 10140.0, "ngr": 39159.01, "fd": "2026-01-06", "ld": "2026-01-07", "ad": 2, "di": 76}, {"n": "INARA SOUZA ALMEIDA", "dc": 40, "dt": 41632.53, "sc": 35, "st": 17003.11, "ngr": 24629.42, "fd": "2025-11-15", "ld": "2026-02-11", "ad": 15, "di": 41}, {"n": "Robisson Galv\u00e3o de Sousa", "dc": 24, "dt": 41129.92, "sc": 4, "st": 4774.44, "ngr": 36355.48, "fd": "2025-11-19", "ld": "2026-03-22", "ad": 17, "di": 2}, {"n": "ROMARIO BASSO", "dc": 43, "dt": 38648.9, "sc": 44, "st": 42585.0, "ngr": -3936.1, "fd": "2025-11-24", "ld": "2026-02-25", "ad": 35, "di": 27}, {"n": "Josiwelderson Philipe Cardoso Magalhaes", "dc": 12, "dt": 35496.0, "sc": 26, "st": 5536.44, "ngr": 29959.56, "fd": "2025-12-24", "ld": "2026-02-23", "ad": 26, "di": 29}, {"n": "MARIA APARECIDA ALVES PEREIRA", "dc": 11, "dt": 35200.2, "sc": 28, "st": 90983.18, "ngr": -55782.98, "fd": "2026-01-21", "ld": "2026-03-24", "ad": 29, "di": 0}, {"n": "IAN VICTOR LACERDA DA SILVA", "dc": 26, "dt": 33691.62, "sc": 0, "st": 0.0, "ngr": 33691.62, "fd": "2026-01-18", "ld": "2026-01-30", "ad": 6, "di": 53}, {"n": "VALDNEI NASCIMENTO SANTOS", "dc": 21, "dt": 29647.0, "sc": 0, "st": 0.0, "ngr": 29647.0, "fd": "2026-01-21", "ld": "2026-01-22", "ad": 2, "di": 61}, {"n": "ROBERTO DE ALMEIDA ALVES", "dc": 244, "dt": 28532.45, "sc": 65, "st": 31216.19, "ngr": -2683.74, "fd": "2025-11-17", "ld": "2026-03-24", "ad": 76, "di": 0}, {"n": "ELIONARDO FREIRE FERREIRA", "dc": 93, "dt": 26366.47, "sc": 33, "st": 25981.73, "ngr": 384.74, "fd": "2025-12-28", "ld": "2026-03-22", "ad": 38, "di": 2}, {"n": "Fernanda Moreira Gonzaga", "dc": 557, "dt": 25263.11, "sc": 93, "st": 17251.02, "ngr": 8012.09, "fd": "2025-11-24", "ld": "2026-02-11", "ad": 42, "di": 41}, {"n": "MARCOS VINICIUS CRUZ SILVA", "dc": 71, "dt": 25112.1, "sc": 34, "st": 9621.21, "ngr": 15490.89, "fd": "2025-12-07", "ld": "2026-01-03", "ad": 20, "di": 80}, {"n": "Kelvyn Andrade Do Espirito Santo", "dc": 3, "dt": 23592.0, "sc": 0, "st": 0.0, "ngr": 23592.0, "fd": "2025-11-19", "ld": "2025-11-19", "ad": 1, "di": 125}, {"n": "Geovane Goncalves Da Silva", "dc": 93, "dt": 23543.4, "sc": 85, "st": 17065.46, "ngr": 6477.94, "fd": "2025-11-24", "ld": "2026-03-22", "ad": 42, "di": 2}, {"n": "ANTONIO FABIO SILVA DE ALMEIDA", "dc": 36, "dt": 23246.48, "sc": 29, "st": 13312.56, "ngr": 9933.92, "fd": "2025-12-01", "ld": "2026-03-24", "ad": 40, "di": 0}, {"n": "VALERIA DE LIMA", "dc": 7, "dt": 22668.14, "sc": 52, "st": 79693.83, "ngr": -57025.69, "fd": "2026-01-22", "ld": "2026-03-24", "ad": 24, "di": 0}, {"n": "Vanderlei Pereira Cesar", "dc": 105, "dt": 22285.92, "sc": 0, "st": 0.0, "ngr": 22285.92, "fd": "2025-11-13", "ld": "2026-03-19", "ad": 59, "di": 5}, {"n": "Sebastiao Leandro Bastos", "dc": 8, "dt": 22155.42, "sc": 1, "st": 40.56, "ngr": 22114.86, "fd": "2025-12-14", "ld": "2026-03-24", "ad": 8, "di": 0}, {"n": "GESSICA MARTINS OLIVEIRA", "dc": 39, "dt": 21331.26, "sc": 15, "st": 17643.6, "ngr": 3687.66, "fd": "2025-12-06", "ld": "2026-03-17", "ad": 22, "di": 7}, {"n": "Marlene Ferreira de Araujo", "dc": 30, "dt": 20707.84, "sc": 0, "st": 0.0, "ngr": 20707.84, "fd": "2026-03-23", "ld": "2026-03-24", "ad": 2, "di": 0}, {"n": "LUAN MATHEUS AMARAL RABELO", "dc": 138, "dt": 20588.52, "sc": 57, "st": 14897.75, "ngr": 5690.77, "fd": "2025-11-20", "ld": "2026-03-10", "ad": 49, "di": 14}, {"n": "Luis Guilherme Alves", "dc": 24, "dt": 20063.32, "sc": 12, "st": 14648.18, "ngr": 5415.14, "fd": "2025-11-21", "ld": "2025-12-27", "ad": 9, "di": 87}, {"n": "ANTONIO CLAUDIO COSTA", "dc": 78, "dt": 19535.56, "sc": 115, "st": 41538.51, "ngr": -22002.95, "fd": "2025-12-14", "ld": "2026-03-24", "ad": 68, "di": 0}, {"n": "Josiel Oliveira dos Santos", "dc": 30, "dt": 19130.38, "sc": 42, "st": 26312.45, "ngr": -7182.07, "fd": "2025-12-28", "ld": "2026-03-16", "ad": 29, "di": 8}, {"n": "Diego Oliveira da Silva", "dc": 4, "dt": 19029.8, "sc": 1, "st": 7098.0, "ngr": 11931.8, "fd": "2026-03-20", "ld": "2026-03-24", "ad": 3, "di": 0}, {"n": "Marcio Carvalho Da Silva", "dc": 14, "dt": 18855.23, "sc": 14, "st": 16591.07, "ngr": 2264.16, "fd": "2026-01-16", "ld": "2026-03-24", "ad": 19, "di": 0}, {"n": "Guilherme Cursino de Sousa", "dc": 135, "dt": 18805.85, "sc": 55, "st": 9277.39, "ngr": 9528.46, "fd": "2025-11-14", "ld": "2026-01-10", "ad": 37, "di": 73}, {"n": "KELZILENE SILVA SANTOS", "dc": 16, "dt": 18440.84, "sc": 2, "st": 7110.0, "ngr": 11330.84, "fd": "2025-11-18", "ld": "2026-01-17", "ad": 11, "di": 66}, {"n": "JULIANA MOREIRA BERRIEL", "dc": 47, "dt": 18079.25, "sc": 20, "st": 8414.94, "ngr": 9664.31, "fd": "2025-11-26", "ld": "2026-01-27", "ad": 20, "di": 56}, {"n": "MARIO SERGIO GOMES FRAGA", "dc": 23, "dt": 17752.94, "sc": 26, "st": 11539.34, "ngr": 6213.6, "fd": "2025-12-02", "ld": "2026-01-10", "ad": 14, "di": 73}, {"n": "Edmundo Francisco Dos Santos", "dc": 30, "dt": 17425.09, "sc": 0, "st": 0.0, "ngr": 17425.09, "fd": "2025-11-18", "ld": "2026-01-21", "ad": 20, "di": 62}, {"n": "Daniel Alves do Nascimento", "dc": 113, "dt": 17405.71, "sc": 59, "st": 13631.56, "ngr": 3774.15, "fd": "2025-11-14", "ld": "2026-01-27", "ad": 35, "di": 56}, {"n": "Elson Araujo dos Santos Filho", "dc": 86, "dt": 17067.28, "sc": 14, "st": 6058.79, "ngr": 11008.49, "fd": "2026-01-05", "ld": "2026-03-14", "ad": 22, "di": 10}, {"n": "Jonathan Martins de Melo", "dc": 101, "dt": 16890.13, "sc": 16, "st": 8710.26, "ngr": 8179.87, "fd": "2025-12-16", "ld": "2026-02-22", "ad": 40, "di": 30}, {"n": "JAIR ANTONIO DA SILVA", "dc": 45, "dt": 16687.69, "sc": 5, "st": 4602.55, "ngr": 12085.14, "fd": "2025-11-22", "ld": "2026-03-07", "ad": 25, "di": 17}, {"n": "GERALDO VIEIRA DE MELO", "dc": 38, "dt": 16313.17, "sc": 5, "st": 1216.95, "ngr": 15096.22, "fd": "2025-12-08", "ld": "2026-03-23", "ad": 26, "di": 1}, {"n": "Edmilson Pereira Lopes", "dc": 61, "dt": 16201.89, "sc": 16, "st": 9613.15, "ngr": 6588.74, "fd": "2025-11-14", "ld": "2026-03-08", "ad": 41, "di": 16}, {"n": "CINTIA DA SILVA MARCOLINO LOCKS", "dc": 174, "dt": 16194.88, "sc": 22, "st": 16021.2, "ngr": 173.68, "fd": "2026-01-23", "ld": "2026-03-15", "ad": 37, "di": 9}, {"n": "RAFAEL SERAPHIM", "dc": 105, "dt": 15999.24, "sc": 10, "st": 2742.89, "ngr": 13256.35, "fd": "2026-01-08", "ld": "2026-01-28", "ad": 16, "di": 55}, {"n": "Kauan Ant\u00f4nio Silva", "dc": 100, "dt": 15545.98, "sc": 0, "st": 0.0, "ngr": 15545.98, "fd": "2025-11-28", "ld": "2026-02-13", "ad": 41, "di": 39}, {"n": "Norberto Paulino de Oliveira", "dc": 43, "dt": 15460.27, "sc": 10, "st": 2946.68, "ngr": 12513.59, "fd": "2025-11-18", "ld": "2026-03-24", "ad": 42, "di": 0}, {"n": "Gabriel De Almeida Nascimento", "dc": 328, "dt": 15385.52, "sc": 101, "st": 12932.0, "ngr": 2453.52, "fd": "2026-01-20", "ld": "2026-03-12", "ad": 50, "di": 12}, {"n": "KELVYN ANDRADE DO ESPIRITO SANTO", "dc": 15, "dt": 14896.61, "sc": 0, "st": 0.0, "ngr": 14896.61, "fd": "2025-11-19", "ld": "2026-02-16", "ad": 6, "di": 36}, {"n": "MARIA IZABEL VIEIRA DE LAIA", "dc": 22, "dt": 14747.56, "sc": 0, "st": 0.0, "ngr": 14747.56, "fd": "2025-12-07", "ld": "2026-03-19", "ad": 18, "di": 5}, {"n": "MARCIA CRISTINA NAMBA", "dc": 11, "dt": 14274.5, "sc": 3, "st": 7114.13, "ngr": 7160.37, "fd": "2025-11-17", "ld": "2026-01-02", "ad": 10, "di": 81}, {"n": "DANIEL DOS SANTOS FREITAS", "dc": 54, "dt": 13951.9, "sc": 20, "st": 9808.21, "ngr": 4143.69, "fd": "2025-12-17", "ld": "2026-02-04", "ad": 22, "di": 48}, {"n": "LUIS CARLOS DA SILVA", "dc": 20, "dt": 13700.0, "sc": 7, "st": 9612.72, "ngr": 4087.28, "fd": "2025-11-14", "ld": "2026-01-07", "ad": 15, "di": 76}, {"n": "Marivaldo da Silva Costa", "dc": 56, "dt": 13407.15, "sc": 0, "st": 0.0, "ngr": 13407.15, "fd": "2025-11-23", "ld": "2026-02-11", "ad": 23, "di": 41}, {"n": "OSEAS OLIVEIRA DOS SANTOS", "dc": 23, "dt": 13379.39, "sc": 9, "st": 7000.04, "ngr": 6379.35, "fd": "2025-11-19", "ld": "2026-01-25", "ad": 21, "di": 58}, {"n": "DANILO DE ARAUJO LOPES", "dc": 13, "dt": 13271.56, "sc": 10, "st": 6895.2, "ngr": 6376.36, "fd": "2025-12-19", "ld": "2026-01-22", "ad": 12, "di": 61}, {"n": "PAULO ROBERTO DE JESUS PINON", "dc": 154, "dt": 13161.64, "sc": 45, "st": 6738.38, "ngr": 6423.26, "fd": "2025-11-13", "ld": "2026-03-21", "ad": 99, "di": 3}, {"n": "ATAIDE S DA SILVA JUNIOR", "dc": 19, "dt": 13150.0, "sc": 0, "st": 0.0, "ngr": 13150.0, "fd": "2025-11-14", "ld": "2026-03-21", "ad": 18, "di": 3}, {"n": "Victor de S\u00e1 da Silva", "dc": 3, "dt": 13015.2, "sc": 0, "st": 0.0, "ngr": 13015.2, "fd": "2026-03-20", "ld": "2026-03-24", "ad": 3, "di": 0}, {"n": "ELSSON BATISTA RIBEIRO", "dc": 79, "dt": 12985.9, "sc": 35, "st": 13128.18, "ngr": -142.28, "fd": "2025-11-21", "ld": "2026-03-21", "ad": 53, "di": 3}, {"n": "LAUDIELY DOS SANTOS SOUZA", "dc": 36, "dt": 12970.28, "sc": 0, "st": 0.0, "ngr": 12970.28, "fd": "2025-11-26", "ld": "2026-03-17", "ad": 16, "di": 7}, {"n": "DIOGO DANTAS DE MENDONCA", "dc": 26, "dt": 12900.87, "sc": 23, "st": 12808.78, "ngr": 92.09, "fd": "2026-02-26", "ld": "2026-03-22", "ad": 19, "di": 2}, {"n": "Jose Antonio da Silva", "dc": 59, "dt": 12838.82, "sc": 43, "st": 13337.97, "ngr": -499.15, "fd": "2025-11-14", "ld": "2026-03-19", "ad": 35, "di": 5}, {"n": "Jo\u00e3o Pedro Pawlak", "dc": 26, "dt": 12687.78, "sc": 0, "st": 0.0, "ngr": 12687.78, "fd": "2025-12-06", "ld": "2026-03-20", "ad": 13, "di": 4}, {"n": "Ranoy Pinho da Silva", "dc": 404, "dt": 12518.24, "sc": 139, "st": 11791.33, "ngr": 726.91, "fd": "2025-12-24", "ld": "2026-01-28", "ad": 14, "di": 55}, {"n": "AGLAIA RUAS DOS SANTOS", "dc": 40, "dt": 12188.37, "sc": 21, "st": 7498.56, "ngr": 4689.81, "fd": "2025-11-18", "ld": "2026-03-21", "ad": 38, "di": 3}, {"n": "RODRIGO FERNANDO ZUCCHI", "dc": 14, "dt": 11906.14, "sc": 8, "st": 5561.89, "ngr": 6344.25, "fd": "2025-11-26", "ld": "2026-03-24", "ad": 14, "di": 0}, {"n": "THIAGO DANTAS DA SILVA", "dc": 22, "dt": 11902.73, "sc": 6, "st": 3656.82, "ngr": 8245.91, "fd": "2025-11-25", "ld": "2026-02-03", "ad": 18, "di": 49}, {"n": "VICTORIA DA SILVA CUNHA", "dc": 2, "dt": 11832.0, "sc": 3, "st": 24336.0, "ngr": -12504.0, "fd": "2026-03-20", "ld": "2026-03-24", "ad": 4, "di": 0}, {"n": "LEANDRO FLORES VIEIRA", "dc": 14, "dt": 11784.93, "sc": 22, "st": 5569.29, "ngr": 6215.64, "fd": "2025-11-14", "ld": "2026-03-10", "ad": 17, "di": 14}, {"n": "JOSE DE JESUS BRITO DE SOUSA", "dc": 14, "dt": 11743.26, "sc": 7, "st": 10618.61, "ngr": 1124.65, "fd": "2026-01-07", "ld": "2026-03-21", "ad": 10, "di": 3}, {"n": "Robson Almeida", "dc": 54, "dt": 11652.01, "sc": 0, "st": 0.0, "ngr": 11652.01, "fd": "2025-11-14", "ld": "2026-03-24", "ad": 43, "di": 0}, {"n": "LEONARDO LONGO ANDRADE", "dc": 12, "dt": 11503.6, "sc": 16, "st": 8000.46, "ngr": 3503.14, "fd": "2025-11-26", "ld": "2026-02-04", "ad": 6, "di": 48}, {"n": "Suelen Neves Domingues", "dc": 39, "dt": 11291.57, "sc": 2, "st": 3045.0, "ngr": 8246.57, "fd": "2025-11-21", "ld": "2026-03-23", "ad": 35, "di": 1}, {"n": "Expedito Ronney Sousa Fonseca", "dc": 98, "dt": 11229.93, "sc": 23, "st": 8916.06, "ngr": 2313.87, "fd": "2025-11-26", "ld": "2026-03-17", "ad": 38, "di": 7}, {"n": "LUIS CLAUDIO ALVES", "dc": 35, "dt": 11182.88, "sc": 20, "st": 14671.83, "ngr": -3488.95, "fd": "2025-12-07", "ld": "2026-03-14", "ad": 26, "di": 10}, {"n": "MARIO FRANCISCO DE CARVALHO", "dc": 181, "dt": 10878.43, "sc": 0, "st": 0.0, "ngr": 10878.43, "fd": "2026-02-21", "ld": "2026-03-15", "ad": 21, "di": 9}, {"n": "Antonio Dhonata dos Santos Pereira", "dc": 178, "dt": 10704.25, "sc": 20, "st": 5228.51, "ngr": 5475.74, "fd": "2025-11-28", "ld": "2026-02-25", "ad": 43, "di": 27}, {"n": "ADRIANA APARECIDA DE LIMA ADAO", "dc": 23, "dt": 10593.76, "sc": 1, "st": 40.68, "ngr": 10553.08, "fd": "2025-12-05", "ld": "2026-02-05", "ad": 19, "di": 47}, {"n": "FABRICIO MARTINS RIBEIRINHA", "dc": 38, "dt": 10500.0, "sc": 21, "st": 5840.27, "ngr": 4659.73, "fd": "2025-12-03", "ld": "2026-03-24", "ad": 49, "di": 0}, {"n": "MARCOS FELIPPE GOMES DA SILVA", "dc": 16, "dt": 10303.7, "sc": 17, "st": 6595.75, "ngr": 3707.95, "fd": "2026-02-19", "ld": "2026-03-24", "ad": 13, "di": 0}, {"n": "CLEBERSON DE SOUZA MELO", "dc": 15, "dt": 10254.4, "sc": 30, "st": 5140.98, "ngr": 5113.42, "fd": "2025-12-27", "ld": "2026-02-20", "ad": 29, "di": 32}, {"n": "Diogenes Pereira Da Silva Junior", "dc": 37, "dt": 10172.93, "sc": 37, "st": 11408.03, "ngr": -1235.1, "fd": "2025-11-19", "ld": "2026-03-15", "ad": 35, "di": 9}, {"n": "Rudeilton Lima Sousa J\u00fanior", "dc": 85, "dt": 10135.62, "sc": 27, "st": 7569.82, "ngr": 2565.8, "fd": "2026-01-08", "ld": "2026-03-22", "ad": 33, "di": 2}, {"n": "ROGER ALEX MIGLIOLLI", "dc": 15, "dt": 10002.95, "sc": 3, "st": 2371.22, "ngr": 7631.73, "fd": "2025-11-17", "ld": "2026-03-23", "ad": 17, "di": 1}, {"n": "AILTON HENRIQUE DE LISBOA", "dc": 60, "dt": 9928.97, "sc": 20, "st": 16274.7, "ngr": -6345.73, "fd": "2026-02-27", "ld": "2026-03-24", "ad": 18, "di": 0}, {"n": "ROSILENE DOS SANTOS 95882812615", "dc": 113, "dt": 9903.1, "sc": 0, "st": 0.0, "ngr": 9903.1, "fd": "2026-01-19", "ld": "2026-03-16", "ad": 28, "di": 8}, {"n": "LEANDRO MOLINA MARTINS", "dc": 26, "dt": 9885.74, "sc": 11, "st": 7458.03, "ngr": 2427.71, "fd": "2025-11-23", "ld": "2026-03-24", "ad": 22, "di": 0}, {"n": "Rafael Barreto Bispo", "dc": 2, "dt": 9860.0, "sc": 1, "st": 8112.0, "ngr": 1748.0, "fd": "2026-03-19", "ld": "2026-03-19", "ad": 1, "di": 5}, {"n": "VANDERLEI PEREIRA CESAR", "dc": 52, "dt": 9821.51, "sc": 6, "st": 3399.9, "ngr": 6421.61, "fd": "2025-11-14", "ld": "2026-03-13", "ad": 37, "di": 11}, {"n": "Cleverson Antunes de Lima", "dc": 11, "dt": 9712.71, "sc": 5, "st": 1299.78, "ngr": 8412.93, "fd": "2025-11-20", "ld": "2026-03-20", "ad": 12, "di": 4}, {"n": "EDVALDO DE FREITAS COSTA", "dc": 25, "dt": 9699.88, "sc": 0, "st": 0.0, "ngr": 9699.88, "fd": "2026-02-06", "ld": "2026-03-22", "ad": 16, "di": 2}, {"n": "Gustavo Pedro Pontes Borges", "dc": 23, "dt": 9697.17, "sc": 3, "st": 911.58, "ngr": 8785.59, "fd": "2025-12-17", "ld": "2026-02-26", "ad": 16, "di": 26}, {"n": "MARLY DOS SANTOS", "dc": 35, "dt": 9681.96, "sc": 12, "st": 8533.14, "ngr": 1148.82, "fd": "2025-11-28", "ld": "2026-03-16", "ad": 19, "di": 8}, {"n": "EDNEY COSTA DE ALMEIDA", "dc": 62, "dt": 9414.33, "sc": 14, "st": 8288.44, "ngr": 1125.89, "fd": "2026-03-04", "ld": "2026-03-22", "ad": 19, "di": 2}, {"n": "THIAGO DE LIMA BRAGA", "dc": 28, "dt": 9356.58, "sc": 25, "st": 8627.78, "ngr": 728.8, "fd": "2025-11-14", "ld": "2026-03-14", "ad": 22, "di": 10}, {"n": "RAFAEL JESUS DOS SANTOS", "dc": 58, "dt": 9182.16, "sc": 16, "st": 4707.36, "ngr": 4474.8, "fd": "2025-11-13", "ld": "2026-02-20", "ad": 31, "di": 32}];
+const CHURN={"total": 9694, "a7": 1541, "a30": 3344, "a90": 7996, "c7": 8153, "c30": 6350, "c90": 1698, "r7": 84.1, "r30": 65.5, "r90": 17.5};
+
 const PD=[{"mes": "NOV/25", "lucro": 5935.750452, "key": "bf", "AFFBR": 2819.48, "Cadão": 741.97, "Ravani": 1187.15, "Pedro": 1187.15, "A_Bruno": 281.95, "A_Harrison": 633.94, "A_Neja": 633.94, "A_Gregório": 633.94, "A_AFFBR_op": 635.72}, {"mes": "DEZ/25", "lucro": 77534.0722, "key": "bf", "AFFBR": 36828.68, "Cadão": 9691.76, "Ravani": 15506.81, "Pedro": 15506.81, "A_Bruno": 3682.87, "A_Harrison": 8280.64, "A_Neja": 8280.64, "A_Gregório": 8280.64, "A_AFFBR_op": 8303.9}, {"mes": "JAN/26", "lucro": 120441.198, "key": "bf", "AFFBR": 57209.57, "Cadão": 15055.15, "Ravani": 24088.24, "Pedro": 24088.24, "A_Bruno": 5720.96, "A_Harrison": 12863.12, "A_Neja": 12863.12, "A_Gregório": 12863.12, "A_AFFBR_op": 12899.25}, {"mes": "FEV/26", "lucro": 178522.5255, "key": "ff", "AFFBR": 84798.2, "Cadão": 41381.52, "Ravani": 17852.25, "Pedro": 35704.51, "A_Bruno": 8479.82, "A_Harrison": 19066.21, "A_Neja": 19066.21, "A_AFFBR_op": 38185.97}];
 const PS={"bf": {"AFFBR": 47.5, "Cadão": 12.5, "Ravani": 20, "Pedro": 20}, "ff": {"AFFBR": 47.5, "Cadão": 23.18, "Ravani": 10, "Pedro": 20}, "fm": {"AFFBR": 47.5, "Cadão": 23.18, "Ravani": 10, "Pedro": 20, "Mauricio_Robô": 10}};
 const AM={"bf": {"Bruno": 4.75, "Harrison": 10.68, "Neja": 10.68, "Gregório": 10.68, "AFFBR_op": 10.71}, "ff": {"Bruno": 4.75, "Harrison": 10.68, "Neja": 10.68, "AFFBR_op": 21.39}, "fm": {"Bruno": 4.75, "Harrison": 10.68, "Neja": 10.68, "AFFBR_op": 21.39}};
@@ -357,7 +404,7 @@ function setTime(period,el){
   const ap=document.querySelector('.page.active');
   if(ap){const id=ap.id.replace('pg-','');RD[id]=true;
     if(id==='ov')renderOverview();else if(id==='perf')rPerf();
-    else if(id==='hist')rHist();else if(id==='fin')rFin();else if(id==='soc')rSoc();}
+    else if(id==='hist')rHist();else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='crm')rCRM();}
 }
 
 function calcKPIs(data,period){
@@ -400,14 +447,21 @@ function renderOverview(){
   const data=filteredData;
   const k=calcKPIs(data,currentPeriod);
   const pLabel=getPeriodLabel(currentPeriod);
+  const depSaqPct=k.ds>0?((k.ws-k.mi)/k.ds*100):0;
+  const volPct=k.ds>0?((k.ds/(k.ds+(k.ws-k.mi)))*100):0;
   document.getElementById('kov').innerHTML=[
     {i:'💰',l:'NGR',v:fR(k.ngr),s:pLabel,c:''},
     {i:'💳',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold'},
-    {i:'🏦',l:'NetCash',v:fR(k.nc),s:'Dep − Saques (sem mov. interna)',c:k.nc>=0?'':'red'},
+    {i:'💸',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`Saques reais (sem mov. interna)`,c:'red'},
+    {i:'📊',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red'},
+    {i:'🏦',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red'},
     {i:'🔄',l:'Mov. Interna',v:fR(k.mi),s:'Saques cripto → Wallet',c:k.mi>0?'purple':''},
     {i:'👤',l:'Novos Cadastros',v:fN(k.nr),s:`FTD: ${fN(k.ftd)}`,c:'blue'},
     {i:'🎯',l:'Conv. Reg→FTD',v:fP(k.conv),s:'Taxa conversão',c:'cyan'},
     {i:'🎮',l:'UAP Médio/Dia',v:fN(k.uap),s:`${k.days} dias`,c:'purple'},
+    {i:'📉',l:'Churn 7d',v:fP(CHURN.r7),s:`${fN(CHURN.c7)} de ${fN(CHURN.total)} players`,c:'red'},
+    {i:'📉',l:'Churn 30d',v:fP(CHURN.r30),s:`${fN(CHURN.c30)} inativos >30d`,c:CHURN.r30>50?'red':'gold'},
+    {i:'📉',l:'Churn 90d',v:fP(CHURN.r90),s:`${fN(CHURN.c90)} inativos >90d`,c:CHURN.r90>30?'red':'gold'},
     {i:'🎰',l:'Casino GGR',v:fR(k.cg),s:'Gross Gaming Revenue',c:'gold'},
     {i:'⚽',l:'Sportsbook GGR',v:fR(k.sg),s:'Esportes',c:'blue'},
   ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
@@ -596,6 +650,23 @@ function rFin(){
   const sm=Object.keys(saqM).sort();
   mc('c-saq',{type:'bar',data:{labels:sm,datasets:[{label:'Saques USDT',data:sm.map(k=>saqM[k]),
     backgroundColor:C.rA,borderColor:C.r,borderWidth:2,borderRadius:5}]},options:CD});
+  // Movimentações Internas (Crypto)
+  const fCrypto=CRYPTO.filter(c=>{const cm=c.d.substring(0,7);return fMonths.has(cm)});
+  const miTb=document.getElementById('mi-tbody');
+  if(miTb){
+    const totalMI=fCrypto.reduce((a,c)=>a+c.v,0);
+    const totalTx=fCrypto.reduce((a,c)=>a+c.t,0);
+    miTb.innerHTML=fCrypto.map(c=>{
+      const dt=c.d.split('-');const df=dt[2]+'/'+dt[1]+'/'+dt[0].substring(2);
+      return `<tr><td>${df}</td><td style="color:var(--purple);font-weight:700">${fR(c.v)}</td><td style="color:var(--red)">${fR(c.t)}</td><td style="color:var(--green);font-weight:700">${fR(c.v-c.t)}</td><td style="color:var(--text3)">${c.c}</td></tr>`;
+    }).join('');
+    const miSum=document.getElementById('mi-summary');
+    if(miSum)miSum.innerHTML=`
+      <div><span style="color:var(--text3);font-size:10px;text-transform:uppercase;font-weight:700">Total Bruto</span><br><span style="color:var(--purple);font-size:18px;font-weight:900">${fR(totalMI)}</span></div>
+      <div><span style="color:var(--text3);font-size:10px;text-transform:uppercase;font-weight:700">Total Taxas</span><br><span style="color:var(--red);font-size:18px;font-weight:900">${fR(totalTx)}</span></div>
+      <div><span style="color:var(--text3);font-size:10px;text-transform:uppercase;font-weight:700">Líquido Wallet</span><br><span style="color:var(--green);font-size:18px;font-weight:900">${fR(totalMI-totalTx)}</span></div>
+      <div><span style="color:var(--text3);font-size:10px;text-transform:uppercase;font-weight:700">Transações</span><br><span style="color:var(--cyan);font-size:18px;font-weight:900">${fCrypto.length}</span></div>`;
+  }
 }
 
 // ═══ SÓCIOS (com seletor) ═══
@@ -708,6 +779,69 @@ function rSoc(){
     <td>${fR(p.A_Bruno||0)}</td><td style="color:var(--gold);font-weight:700">${fR(p.A_Harrison||0)}</td>
     <td>${fR(p.A_Neja||0)}</td><td>${fR(p['A_Gregório']||p.A_AFFBR_op||0)}</td></tr>`).join('')}
 
+
+// ═══ CRM ═══
+let crmFilter='all';
+function filterCRM(f,el){
+  crmFilter=f;
+  document.querySelectorAll('.crm-filter').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderCRMList();
+}
+
+function rCRM(){
+  // KPIs
+  document.getElementById('crm-kpis').innerHTML=[
+    {v:fN(CHURN.total),l:'Total Players',s:'Cadastros únicos',cl:'var(--green)'},
+    {v:fN(CHURN.a7),l:'Ativos 7d',s:`${fP(CHURN.a7/CHURN.total*100)} do total`,cl:'var(--green)'},
+    {v:fN(CHURN.a30),l:'Ativos 30d',s:`${fP(CHURN.a30/CHURN.total*100)} do total`,cl:'var(--gold)'},
+    {v:fN(CHURN.c30),l:'Churned >30d',s:`${fP(CHURN.r30)} de churn`,cl:'var(--red)'},
+    {v:fN(CHURN.c90),l:'Churned >90d',s:`${fP(CHURN.r90)} perdidos`,cl:'var(--red)'},
+    {v:fR(CLI.reduce((a,c)=>a+c.dt,0)),l:'Vol. Depósitos Top100',s:'Maiores depositantes',cl:'var(--cyan)'},
+  ].map(k=>`<div class="crm-stat"><div class="lbl">${k.l}</div><div class="val" style="color:${k.cl}">${k.v}</div><div class="sub">${k.s}</div></div>`).join('');
+
+  // Churn chart
+  mc('c-churn',{type:'bar',data:{labels:['7 dias','30 dias','90 dias'],datasets:[
+    {label:'Ativos',data:[CHURN.a7,CHURN.a30,CHURN.a90],backgroundColor:C.gA,borderColor:C.g,borderWidth:2,borderRadius:5},
+    {label:'Churned',data:[CHURN.c7,CHURN.c30,CHURN.c90],backgroundColor:C.rA,borderColor:C.r,borderWidth:2,borderRadius:5}
+  ]},options:{...CD,scales:{...CD.scales,x:{...CD.scales.x,stacked:false},y:{...CD.scales.y,stacked:false}}}});
+
+  // Distribution doughnut
+  mc('c-dist',{type:'doughnut',data:{
+    labels:['Ativos (≤7d)','Mornos (8-30d)','Frios (31-90d)','Perdidos (>90d)'],
+    datasets:[{data:[CHURN.a7,CHURN.a30-CHURN.a7,CHURN.a90-CHURN.a30,CHURN.c90],
+      backgroundColor:['rgba(14,165,90,.6)','rgba(255,215,64,.6)','rgba(255,68,68,.4)','rgba(255,68,68,.7)'],borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'#888',usePointStyle:true}}}}});
+
+  renderCRMList();
+}
+
+function renderCRMList(){
+  const list=document.getElementById('cli-list');
+  if(!list)return;
+  let data=CLI;
+  if(crmFilter==='active')data=CLI.filter(c=>c.di<=7);
+  else if(crmFilter==='warm')data=CLI.filter(c=>c.di>7&&c.di<=30);
+  else if(crmFilter==='churned')data=CLI.filter(c=>c.di>30);
+
+  const hdr='<div class="cli-row hdr"><span>#</span><span>Cliente</span><span style="text-align:right">Depósitos</span><span style="text-align:right">Saques</span><span style="text-align:right">NGR</span><span style="text-align:right">Status</span><span></span></div>';
+  list.innerHTML=hdr+data.map((c,i)=>{
+    const st=c.di<=7?'active':c.di<=30?'warn':'churned';
+    const stTxt=c.di<=7?'Ativo':c.di<=30?c.di+'d':'Inativo '+c.di+'d';
+    const ngrCls=c.ngr>=0?'pos':'neg';
+    const waName=encodeURIComponent(c.n);
+    return `<div class="cli-row">
+      <span class="rank">${i+1}</span>
+      <span class="name" title="${c.n}">${c.n}</span>
+      <span class="val" style="color:var(--gold)">${fR(c.dt)}</span>
+      <span class="val" style="color:var(--red)">${fR(c.st)}</span>
+      <span class="val ${ngrCls}">${fR(c.ngr)}</span>
+      <span style="text-align:right"><span class="status-dot ${st}"></span> <span style="font-size:10px;color:var(--text3)">${stTxt}</span></span>
+      <span><a href="https://wa.me/?text=Olá ${waName}" target="_blank" class="wa-btn">💬 Zap</a></span>
+    </div>`;
+  }).join('');
+  if(data.length===0)list.innerHTML+=`<div style="text-align:center;padding:40px;color:var(--text3)">Nenhum cliente nesta categoria</div>`;
+}
 // ═══ BACKLOG CRUD ═══
 const BK_KEY='jg_backlog';
 const BK_DEFAULT=[
@@ -790,7 +924,7 @@ function sp(n,el){
   // Sempre re-renderizar para respeitar o período selecionado
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
-  else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc()}
+  else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='crm')rCRM()}
 
 document.addEventListener('DOMContentLoaded',()=>{
   const n=new Date();
