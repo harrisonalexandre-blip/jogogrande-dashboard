@@ -329,7 +329,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ═══ PAGE: AFILIADOS ═══ -->
 <div id="pg-afil" class="page">
-<p class="sec">Afiliados — Smartico Analytics</p>
+<p class="sec">Afiliados — Smartico Analytics <span id="smartico-sync" style="font-size:10px;color:var(--text3);font-weight:400;margin-left:12px"></span></p>
 <div class="kg" id="kaff"></div>
 <div class="cg cg2" style="margin-bottom:18px">
   <div class="cb"><div class="ct"><span class="dot g"></span> Margem por Afiliado — (Net P&L − Comissão) Top 10</div><canvas id="c-affroi"></canvas></div>
@@ -859,47 +859,50 @@ var affView='ranking';
 // Filtra dados de afiliados baseado no período global
 function getFilteredAffData(){
   var fml=getFilteredMonthLabels();
-  var fMonths=AFF.months.filter(function(m){return fml.indexOf(m.ml)>=0});
-  var fWeeks=AFF.weeks;// weeks não filtram facilmente por período
-  // Recalcular totais dos afiliados filtrados por mês via affMonths
+  var isLifetime=(currentPeriod==='lifetime');
+  var fMonths=isLifetime?AFF.months:AFF.months.filter(function(m){return fml.indexOf(m.ml)>=0});
+  var fWeeks=AFF.weeks;
   var fAffs=[];
-  for(var i=0;i<AFF.affs.length;i++){
-    var a=AFF.affs[i];
-    var am=AFF.affMonths[a.n];
-    if(am){
-      var fa={n:a.n,rg:0,ftd:0,fr:0,dc:0,da:0,wa:0,nd:0,np:0,cpa:0,rs:0,cm:0,bn:0,vol:0,ops:0,pf:0,cb:0,fda:0};
-      var fmk=filteredData.map(function(d){return d.month});
-      var fmset={};for(var j=0;j<fmk.length;j++)fmset[fmk[j]]=true;
-      for(var j=0;j<am.length;j++){
-        if(fmset[am[j].k]){
-          fa.rg+=am[j].rg;fa.ftd+=am[j].ftd;fa.da+=am[j].da;fa.wa+=am[j].wa;
-          fa.nd+=am[j].nd;fa.vol+=am[j].vol;fa.pf+=am[j].pf;fa.cm+=am[j].cm;
+  if(isLifetime){
+    // Lifetime: usar dados totais direto
+    fAffs=AFF.affs.slice();
+  } else {
+    // Filtrar por período usando affMonths
+    for(var i=0;i<AFF.affs.length;i++){
+      var a=AFF.affs[i];
+      var am=AFF.affMonths[a.n];
+      if(am){
+        var fa={n:a.n,rg:0,ftd:0,fr:0,dc:0,da:0,wa:0,nd:0,np:0,npc:0,nps:0,cpa:0,rs:0,cm:0,bn:0,vol:0,ops:0,cb:0,fda:0,bal:a.bal||0,vc:0};
+        for(var j=0;j<am.length;j++){
+          if(fml.indexOf(am[j].ml)>=0){
+            fa.rg+=am[j].rg||0;fa.ftd+=am[j].ftd||0;fa.dc+=am[j].dc||0;fa.da+=am[j].da||0;fa.wa+=am[j].wa||0;
+            fa.np+=am[j].np||0;fa.cm+=am[j].cm||0;fa.vol+=am[j].vol||0;fa.ops+=am[j].ops||0;fa.vc+=am[j].vc||0;
+          }
         }
+        fa.nd=fa.da-fa.wa;
+        fa.fr=fa.rg>0?Math.round(fa.ftd/fa.rg*1000)/10:0;
+        if(fa.rg>0||fa.da>0||fa.np!==0)fAffs.push(fa);
       }
-      fa.fr=fa.rg>0?Math.round(fa.ftd/fa.rg*1000)/10:0;
-      fa.np=fa.nd-fa.cm;// approximate
-      if(fa.rg>0||fa.da>0)fAffs.push(fa);
-    } else {
-      // Afiliado sem breakdown mensal — usar dados totais quando lifetime
-      if(currentPeriod==='lifetime')fAffs.push(a);
     }
   }
-  fAffs.sort(function(a,b){return b.da-a.da});
-  // Recalcular summary
-  var s={totalAffs:fAffs.length,totalRegs:0,totalFtd:0,ftdRate:0,totalDep:0,totalWdr:0,totalNd:0,totalVol:0,totalProfit:0,totalComm:0,totalCpa:0,totalRs:0,totalNp:0};
-  for(var i=0;i<fAffs.length;i++){
-    s.totalRegs+=fAffs[i].rg;s.totalFtd+=fAffs[i].ftd;s.totalDep+=fAffs[i].da;
-    s.totalWdr+=fAffs[i].wa;s.totalNd+=fAffs[i].nd;s.totalVol+=fAffs[i].vol;
-    s.totalComm+=fAffs[i].cm;s.totalNp+=fAffs[i].np;
-  }
-  s.ftdRate=s.totalRegs>0?Math.round(s.totalFtd/s.totalRegs*1000)/10:0;
-  return {affs:fAffs,months:fMonths,weeks:fWeeks,summary:s};
+  fAffs.sort(function(a,b){return b.np-a.np});
+  return {affs:fAffs,months:fMonths,weeks:fWeeks};
 }
 
 function rAfil(){
-  var fd=(currentPeriod==='lifetime')?AFF:getFilteredAffData();
-  var s=fd.summary;
+  var fd=(currentPeriod==='lifetime')?getFilteredAffData():getFilteredAffData();
+  // Build summary from affs
+  var s={totalAffs:fd.affs.length,totalRegs:0,totalFtd:0,ftdRate:0,totalDep:0,totalWdr:0,totalNd:0,totalVol:0,totalProfit:0,totalComm:0,totalCpa:0,totalRs:0,totalNp:0};
+  for(var i=0;i<fd.affs.length;i++){
+    s.totalRegs+=fd.affs[i].rg;s.totalFtd+=fd.affs[i].ftd;s.totalDep+=fd.affs[i].da;
+    s.totalWdr+=fd.affs[i].wa;s.totalNd+=(fd.affs[i].da-fd.affs[i].wa);s.totalVol+=fd.affs[i].vol;
+    s.totalComm+=fd.affs[i].cm;s.totalNp+=fd.affs[i].np;
+  }
+  s.ftdRate=s.totalRegs>0?Math.round(s.totalFtd/s.totalRegs*1000)/10:0;
   var pLabel=getPeriodLabel(currentPeriod);
+  // Show sync timestamp
+  var syncEl=document.getElementById('smartico-sync');
+  if(syncEl&&AFF.syncAt)syncEl.innerHTML='🔄 Última sync Smartico: '+AFF.syncAt;
   document.getElementById('kaff').innerHTML=[
     {i:'👥',l:'Afiliados',v:fN(s.totalAffs),s:pLabel,c:''},
     {i:'📝',l:'Registros',v:fN(s.totalRegs),s:'Total cadastros',c:'blue'},
