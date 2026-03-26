@@ -376,8 +376,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
     </div>
   </div>
   <div class="hdr-r">
-    <div class="rate-badge">EUR/BRL <span class="cur">R$ 6,14</span></div>
-    <div class="rate-badge">USDT/BRL <span class="cur">R$ 5,25</span></div>
     <a class="sheets-btn" href="https://docs.google.com/spreadsheets/d/1ccyDzg1dGVwXkhZWN04eXVBrAobq0JvBNAH9Xp8fyhg/edit" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>Google Sheets</a>
     <div class="sheets-btn" onclick="toggleBacklog()" style="cursor:pointer;position:relative"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path d="M9 7h6M9 11h6M9 15h6"></path></svg>Backlog <span id="bk-count" style="background:var(--green);color:#000;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:800;margin-left:2px">0</span></div>
     <span class="upd" id="upd"></span>
@@ -1883,7 +1881,7 @@ function rRecon(){
 // ═══ COHORT ANALYSIS ═══
 function getCohortData(){
   const months={};
-  D.forEach(d=>{
+  const fd=filteredData&&filteredData.length?filteredData:D;fd.forEach(d=>{
     const m=d.month;if(!m)return;
     if(!months[m])months[m]={ml:d.ml,nr:0,ftd:0,uap:0,c_uap:0,sb_uap:0,ds:0,ws:0,ngr:0,cg:0,sg:0,days:0};
     months[m].nr+=d.nr;months[m].ftd+=d.ftd;months[m].uap+=d.uap;months[m].c_uap+=d.c_uap;
@@ -1996,7 +1994,7 @@ function rSaldos(){
   const net30=dep30-saq30;
   const pressao30=dep30>0?Math.round(saq30/dep30*100):0;
   // Max single day withdrawal
-  const maxSaqDay=last30.reduce((m,d)=>d.ws>m.v?{v:d.ws,dt:d.date}:m,{v:0,dt:''});
+  const maxSaqDay=fd.reduce((m,d)=>d.ws>m.v?{v:d.ws,dt:d.date}:m,{v:0,dt:''});
   document.getElementById('kp-saldos').innerHTML=[
     {l:'SALDO ACUMULADO',v:fR(netBalance),s:'Dep - Saq historico',c:netBalance>=0?'green':'red'},
     {l:'DEP 30 DIAS',v:fR(dep30),s:'Entradas recentes',c:'cyan'},
@@ -2007,24 +2005,24 @@ function rSaldos(){
   ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
   // Chart 1: Cumulative balance
   let running=0;const cumData=[];
-  D.forEach(d=>{running+=(d.ds-d.ws);cumData.push({dt:d.df,v:running});});
+  fd.forEach(d=>{running+=(d.ds-d.ws);cumData.push({dt:d.df,v:running});});
   const cum30=cumData.slice(-30);
   mc('c-sal-acum',{type:'line',data:{labels:cum30.map(d=>d.dt),datasets:[{label:'Saldo Acumulado',data:cum30.map(d=>d.v),
     borderColor:'#0EA55A',backgroundColor:'rgba(14,165,90,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:2}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
   // Chart 2: Withdrawal pressure
-  const press=last30.map(d=>({dt:d.df,v:d.ds>0?Math.round(d.ws/d.ds*100):0}));
+  const press=fd.map(d=>({dt:d.df,v:d.ds>0?Math.round(d.ws/d.ds*100):0}));
   mc('c-sal-press',{type:'bar',data:{labels:press.map(d=>d.dt),datasets:[{label:'Saq/Dep %',data:press.map(d=>d.v),
     backgroundColor:press.map(d=>d.v>100?'rgba(255,68,68,.6)':d.v>70?'rgba(255,215,64,.5)':'rgba(14,165,90,.4)'),
     borderWidth:0,borderRadius:4},{label:'Zona 100%',data:press.map(()=>100),type:'line',borderColor:'rgba(255,68,68,.3)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false}]},
     options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
   // Chart 3: Dep vs Saq daily
-  mc('c-sal-depvsaq',{type:'bar',data:{labels:last30.map(d=>d.df),datasets:[
-    {label:'Depositos',data:last30.map(d=>d.ds),backgroundColor:'rgba(0,229,255,.5)',borderRadius:4,borderWidth:0},
-    {label:'Saques',data:last30.map(d=>-d.ws),backgroundColor:'rgba(255,68,68,.5)',borderRadius:4,borderWidth:0}
+  mc('c-sal-depvsaq',{type:'bar',data:{labels:fd.map(d=>d.df),datasets:[
+    {label:'Depositos',data:fd.map(d=>d.ds),backgroundColor:'rgba(0,229,255,.5)',borderRadius:4,borderWidth:0},
+    {label:'Saques',data:fd.map(d=>-d.ws),backgroundColor:'rgba(255,68,68,.5)',borderRadius:4,borderWidth:0}
   ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,stacked:true,ticks:{...CD.scales.y.ticks,callback:v=>fR(Math.abs(v),false)}}},x:{...CD.scales.x,stacked:true}}});
   // Chart 4: Monthly net deposits
-  const months={};D.forEach(d=>{const m=d.month;if(!months[m])months[m]={dep:0,saq:0};months[m].dep+=d.ds;months[m].saq+=d.ws;});
+  const months={};fd.forEach(d=>{const m=d.month;if(!months[m])months[m]={dep:0,saq:0};months[m].dep+=d.ds;months[m].saq+=d.ws;});
   const mKeys=Object.keys(months).sort();
   mc('c-sal-monthly',{type:'bar',data:{labels:mKeys.map(m=>m.substring(2)),datasets:[
     {label:'Dep',data:mKeys.map(m=>months[m].dep),backgroundColor:'rgba(0,229,255,.5)',borderRadius:4,borderWidth:0},
@@ -2033,7 +2031,7 @@ function rSaldos(){
   ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(Math.abs(v),false)}}}}});
   // Exposure alerts
   const alerts=[];
-  last30.forEach(d=>{
+  fd.forEach(d=>{
     const pr=d.ds>0?d.ws/d.ds*100:0;
     if(pr>120)alerts.push({dt:d.date,desc:'Saques superam depositos em '+Math.round(pr)+'%',v:fR(d.ws),sev:'critical'});
     else if(pr>90)alerts.push({dt:d.date,desc:'Pressao de saques alta: '+Math.round(pr)+'%',v:fR(d.ws),sev:'warning'});
@@ -2048,9 +2046,9 @@ function rSaldos(){
       <div style="font-size:11px;color:var(--text1)">${a.desc}</div></div>`;
   }).join('');}
   // Daily table
-  let cumRun=0;D.forEach(d=>{cumRun+=(d.ds-d.ws);});
+  let cumRun=0;fd.forEach(d=>{cumRun+=(d.ds-d.ws);});
   let tblCum=cumRun;
-  document.getElementById('sal-tb').innerHTML=last30.slice().reverse().map(d=>{
+  document.getElementById('sal-tb').innerHTML=fd.slice().reverse().map(d=>{
     const net=d.ds-d.ws;const pr=d.ds>0?Math.round(d.ws/d.ds*100):0;
     const sc=pr>100?'var(--red)':pr>70?'var(--gold)':'var(--green)';
     const sl=pr>100?'ALERTA':pr>70?'ATENÇÃO':'OK';
@@ -2384,29 +2382,47 @@ function toggleSidebar(){
 }
 
 // ═══ TICKER — CNN-style insights ═══
+// ═══ CÂMBIO AO VIVO ═══
+let liveRates={eur:6.14,usdt:5.25};
+async function fetchRates(){
+  try{
+    const [eurRes,usdtRes]=await Promise.allSettled([
+      fetch('https://api.frankfurter.dev/v1/latest?from=EUR&to=BRL').then(r=>r.json()),
+      fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=brl').then(r=>r.json())
+    ]);
+    if(eurRes.status==='fulfilled'&&eurRes.value.rates) liveRates.eur=eurRes.value.rates.BRL;
+    if(usdtRes.status==='fulfilled'&&usdtRes.value.tether) liveRates.usdt=usdtRes.value.tether.brl;
+  }catch(e){console.warn('Rates fetch error',e);}
+  buildTicker();
+  setTimeout(fetchRates,300000);
+}
+
 function buildTicker(){
   const fR=v=>{const a=Math.abs(v);return(v<0?'-':'')+'R$ '+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e3?(a/1e3).toFixed(1)+'K':Math.round(a).toLocaleString('pt-BR'))};
   const pct=v=>v.toFixed(1)+'%';
   const items=[];
+  // CÂMBIO AO VIVO
+  items.push({l:'EUR/BRL',v:'R$ '+liveRates.eur.toFixed(4),c:'up'});
+  items.push({l:'USDT/BRL',v:'R$ '+liveRates.usdt.toFixed(2),c:'up'});
   // TODAY
   const today=new Date().toISOString().slice(0,10);
   const td=D.filter(d=>d.date===today);
   if(td.length){
     const t=td[0];
-    items.push({l:'HOJE · NGR',v:fR(t.ngr),c:t.ngr>=0?'up':'down'});
-    items.push({l:'HOJE · Depósitos',v:fR(t.ds),c:'up'});
-    items.push({l:'HOJE · Saques',v:fR(t.ws),c:'down'});
-    items.push({l:'HOJE · Registros',v:t.nr.toString(),c:'up'});
-    items.push({l:'HOJE · FTD',v:t.ftd.toString(),c:'up'});
+    items.push({l:'HOJE \u00b7 NGR',v:fR(t.ngr),c:t.ngr>=0?'up':'down'});
+    items.push({l:'HOJE \u00b7 Dep\u00f3sitos',v:fR(t.ds),c:'up'});
+    items.push({l:'HOJE \u00b7 Saques',v:fR(t.ws),c:'down'});
+    items.push({l:'HOJE \u00b7 Registros',v:t.nr.toString(),c:'up'});
+    items.push({l:'HOJE \u00b7 FTD',v:t.ftd.toString(),c:'up'});
   }
   // YESTERDAY
   const yd=new Date();yd.setDate(yd.getDate()-1);const yds=yd.toISOString().slice(0,10);
   const ydd=D.filter(d=>d.date===yds);
   if(ydd.length){
     const y=ydd[0];
-    items.push({l:'ONTEM · NGR',v:fR(y.ngr),c:y.ngr>=0?'up':'down'});
-    items.push({l:'ONTEM · Depósitos',v:fR(y.ds),c:'up'});
-    items.push({l:'ONTEM · Net Cash',v:fR(y.ds-y.ws),c:(y.ds-y.ws)>=0?'up':'down'});
+    items.push({l:'ONTEM \u00b7 NGR',v:fR(y.ngr),c:y.ngr>=0?'up':'down'});
+    items.push({l:'ONTEM \u00b7 Dep\u00f3sitos',v:fR(y.ds),c:'up'});
+    items.push({l:'ONTEM \u00b7 Net Cash',v:fR(y.ds-y.ws),c:(y.ds-y.ws)>=0?'up':'down'});
   }
   // THIS WEEK
   const now=new Date();const dow=now.getDay();const monday=new Date(now);monday.setDate(now.getDate()-(dow===0?6:dow-1));
@@ -2417,10 +2433,10 @@ function buildTicker(){
     const wDs=wk.reduce((a,d)=>a+d.ds,0);
     const wNr=wk.reduce((a,d)=>a+d.nr,0);
     const wFtd=wk.reduce((a,d)=>a+d.ftd,0);
-    items.push({l:'SEMANA · NGR',v:fR(wNgr),c:wNgr>=0?'up':'down'});
-    items.push({l:'SEMANA · Depósitos',v:fR(wDs),c:'up'});
-    items.push({l:'SEMANA · Registros',v:wNr.toString(),c:'up'});
-    items.push({l:'SEMANA · Conv. Reg→FTD',v:wNr>0?pct(wFtd/wNr*100):'—',c:'up'});
+    items.push({l:'SEMANA \u00b7 NGR',v:fR(wNgr),c:wNgr>=0?'up':'down'});
+    items.push({l:'SEMANA \u00b7 Dep\u00f3sitos',v:fR(wDs),c:'up'});
+    items.push({l:'SEMANA \u00b7 Registros',v:wNr.toString(),c:'up'});
+    items.push({l:'SEMANA \u00b7 Conv. Reg\u2192FTD',v:wNr>0?pct(wFtd/wNr*100):'\u2014',c:'up'});
   }
   // THIS MONTH
   const mStart=now.toISOString().slice(0,8)+'01';
@@ -2430,17 +2446,17 @@ function buildTicker(){
     const mDs=mo.reduce((a,d)=>a+d.ds,0);
     const mWs=mo.reduce((a,d)=>a+d.ws,0);
     const mCg=mo.reduce((a,d)=>a+d.cg,0);
-    items.push({l:'MÊS · NGR',v:fR(mNgr),c:mNgr>=0?'up':'down'});
-    items.push({l:'MÊS · Depósitos',v:fR(mDs),c:'up'});
-    items.push({l:'MÊS · Saques',v:fR(mWs),c:'down'});
-    items.push({l:'MÊS · Casino GGR',v:fR(mCg),c:mCg>=0?'up':'down'});
+    items.push({l:'M\u00caS \u00b7 NGR',v:fR(mNgr),c:mNgr>=0?'up':'down'});
+    items.push({l:'M\u00caS \u00b7 Dep\u00f3sitos',v:fR(mDs),c:'up'});
+    items.push({l:'M\u00caS \u00b7 Saques',v:fR(mWs),c:'down'});
+    items.push({l:'M\u00caS \u00b7 Casino GGR',v:fR(mCg),c:mCg>=0?'up':'down'});
   }
   // Build HTML (duplicate for seamless loop)
-  const html=items.map(i=>'<span class="ticker-item"><span class="ti-label">'+i.l+'</span><span class="ti-val ti-'+i.c+'">'+i.v+'</span></span><span class="ticker-sep">•</span>').join('');
+  const html=items.map(i=>'<span class="ticker-item"><span class="ti-label">'+i.l+'</span><span class="ti-val ti-'+i.c+'">'+i.v+'</span></span><span class="ticker-sep">\u2022</span>').join('');
   document.getElementById('ticker-track').innerHTML=html+html;
 }
 
-document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); buildTicker(); });
+document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); fetchRates(); });
 
 // ═══════════════════════════════════════════════════════════
 // AUTH SYSTEM — Jogo Grande BI (API-based)
