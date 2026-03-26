@@ -30,9 +30,49 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .sheets-btn{background:var(--greenA);border:1px solid rgba(14,165,90,.3);color:var(--green);padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;transition:.2s;cursor:pointer}
 .sheets-btn:hover{background:rgba(14,165,90,.25);border-color:var(--green)}
 .upd{font-size:10px;color:var(--text3)}
-.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;display:flex;gap:1px;overflow-x:auto}
-.tab{padding:8px 10px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text2);border-bottom:2px solid transparent;transition:.2s;letter-spacing:.3px;white-space:nowrap}
-.tab:hover{color:var(--text)}.tab.active{color:var(--green);border-bottom-color:var(--green)}
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;width:52px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);z-index:200;display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden}
+.sidebar:hover,.sidebar.open{width:200px}
+.sidebar .sb-logo{padding:14px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);min-height:56px}
+.sidebar .sb-logo img{width:28px;height:28px;flex-shrink:0}
+.sidebar .sb-logo span{font-size:13px;font-weight:800;color:var(--green);letter-spacing:1px;white-space:nowrap;opacity:0;transition:opacity .2s}
+.sidebar:hover .sb-logo span,.sidebar.open .sb-logo span{opacity:1}
+.sb-menu{flex:1;overflow-y:auto;padding:8px 0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;color:var(--text2);font-size:11px;font-weight:700;letter-spacing:.3px;white-space:nowrap;transition:.15s;border-left:3px solid transparent}
+.sb-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.sb-item.active{color:var(--green);border-left-color:var(--green);background:var(--greenB)}
+.sb-item svg{flex-shrink:0}
+.sb-item .sb-label{opacity:0;transition:opacity .2s}
+.sidebar:hover .sb-label,.sidebar.open .sb-label{opacity:1}
+.sb-group-title{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;padding:16px 14px 4px;font-weight:800;white-space:nowrap;opacity:0;transition:opacity .2s}
+.sidebar:hover .sb-group-title,.sidebar.open .sb-group-title{opacity:1}
+.sb-sub{padding-left:18px}
+.sb-sub .sb-item{font-size:10px;padding:7px 14px;font-weight:600}
+.sb-expand{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;color:var(--text2);font-size:11px;font-weight:700;white-space:nowrap;transition:.15s;border-left:3px solid transparent}
+.sb-expand:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.sb-expand svg{flex-shrink:0;transition:transform .2s}
+.sb-expand.expanded svg.chevron{transform:rotate(90deg)}
+.sb-expand .sb-label{opacity:0;transition:opacity .2s}
+.sidebar:hover .sb-expand .sb-label,.sidebar.open .sb-expand .sb-label{opacity:1}
+.sb-children{max-height:0;overflow:hidden;transition:max-height .25s ease}
+.sb-children.show{max-height:200px}
+/* TICKER */
+.ticker-bar{background:var(--bg2);border-bottom:1px solid var(--border);overflow:hidden;height:32px;position:relative;margin-left:52px}
+.ticker-tag{position:absolute;left:0;top:0;height:32px;background:var(--green);color:#000;font-size:10px;font-weight:800;padding:0 12px;display:flex;align-items:center;z-index:2;letter-spacing:.5px}
+.ticker-track{display:flex;align-items:center;height:32px;animation:tickerScroll 45s linear infinite;white-space:nowrap;padding-left:100px}
+.ticker-track:hover{animation-play-state:paused}
+.ticker-item{display:inline-flex;align-items:center;gap:6px;padding:0 24px;font-size:11px;color:var(--text2);font-weight:500}
+.ticker-item .ti-label{color:var(--text3);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.ticker-item .ti-val{font-weight:800;color:var(--text)}
+.ticker-item .ti-up{color:var(--green)}.ticker-item .ti-down{color:var(--red)}
+.ticker-sep{color:var(--border);padding:0 4px;font-size:8px}
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+/* OLD NAV HIDDEN */
+.nav{display:none}
+.tab{display:none}
+/* LAYOUT */
+.main-wrap{margin-left:52px}
+.hdr{margin-left:52px}
 .ctn{max-width:1600px;margin:0 auto;padding:20px 24px}
 .page{display:none}.page.active{display:block}
 .sec{font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin:0 0 12px}
@@ -82,7 +122,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .pc-rl{font-size:12px;color:var(--text2)}
 .pc-rv{font-size:13px;font-weight:700}
 .og{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px}
-@media(max-width:900px){.cg2,.cg3{grid-template-columns:1fr}.hdr{padding:12px 16px;flex-direction:column;gap:10px}.ctn{padding:14px}.time-bar{gap:3px;justify-content:center}.time-btn{padding:4px 10px;font-size:10px}}
+@media(max-width:900px){.cg2,.cg3{grid-template-columns:1fr}.hdr{padding:12px 16px;flex-direction:column;gap:10px;margin-left:0}.ctn{padding:14px}.time-bar{gap:3px;justify-content:center}.time-btn{padding:4px 10px;font-size:10px}.sidebar{width:0;display:none}.main-wrap{margin-left:0}.ticker-bar{margin-left:0}}
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 
@@ -226,6 +266,81 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 </div>
 
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <img src="https://d1nxk8io3iz4ej.cloudfront.net/cms/icons/f8836d75-7a52-4ccf-ab9e-06795d794282-81.svg" alt="JG">
+    <span>JOGO GRANDE</span>
+  </div>
+  <div class="sb-menu">
+    <div class="sb-group-title">Principal</div>
+    <div class="sb-item active" data-roles="admin,socio" onclick="sbNav('ov',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span class="sb-label">Overview</span>
+    </div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('perf',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="sb-label">Performance</span>
+    </div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('hist',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="sb-label">Histórico</span>
+    </div>
+    <div class="sb-group-title">Financeiro</div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('fin',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="sb-label">Financeiro</span>
+    </div>
+    <div class="sb-sub">
+      <div class="sb-item" data-roles="admin,socio" onclick="sbNav('recon',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span class="sb-label">Conciliação</span>
+      </div>
+      <div class="sb-item" data-roles="admin,socio" onclick="sbNav('caixa',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" ry="1"/><path d="M12 9v6"/><path d="M9 12h6"/></svg>
+        <span class="sb-label">Caixa</span>
+      </div>
+    </div>
+    <div class="sb-group-title">Operações</div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('soc',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="sb-label">Sócios</span>
+    </div>
+    <div class="sb-item" data-roles="admin,socio,crm" onclick="sbNav('crm',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="sb-label">CRM</span>
+    </div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('afil',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      <span class="sb-label">Afiliados</span>
+    </div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('casino',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/></svg>
+      <span class="sb-label">Casino Det.</span>
+    </div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('btag',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      <span class="sb-label">BTAG ROI</span>
+    </div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('alertas',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="sb-label">Alertas <span id="sb-alert-badge" style="background:var(--red);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;font-weight:800;display:none">0</span></span>
+    </div>
+    <div class="sb-group-title">Admin</div>
+    <div class="sb-item" data-roles="admin" onclick="sbNav('acessos',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span class="sb-label">Acessos</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker-bar" id="ticker-bar">
+  <div class="ticker-tag">INSIGHTS</div>
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
+<div class="main-wrap">
 <div class="hdr">
   <div class="logo-area">
     <img src="https://d1nxk8io3iz4ej.cloudfront.net/cms/icons/f8836d75-7a52-4ccf-ab9e-06795d794282-81.svg" alt="Jogo Grande" height="40" style="margin-right:4px">
@@ -1967,6 +2082,7 @@ function filterGames(){
 function sp(n,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(t=>t.classList.remove('active'));
   const pg=document.getElementById('pg-'+n);
   if(pg) pg.classList.add('active');
   if(el)el.classList.add('active');
@@ -1975,7 +2091,68 @@ function sp(n,el){
   else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
   else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
-document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); });
+function sbNav(n,el){
+  sp(n,el);
+}
+
+// ═══ TICKER — CNN-style insights ═══
+function buildTicker(){
+  const fR=v=>{const a=Math.abs(v);return(v<0?'-':'')+'R$ '+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e3?(a/1e3).toFixed(1)+'K':Math.round(a).toLocaleString('pt-BR'))};
+  const pct=v=>v.toFixed(1)+'%';
+  const items=[];
+  // TODAY
+  const today=new Date().toISOString().slice(0,10);
+  const td=D.filter(d=>d.date===today);
+  if(td.length){
+    const t=td[0];
+    items.push({l:'HOJE · NGR',v:fR(t.ngr),c:t.ngr>=0?'up':'down'});
+    items.push({l:'HOJE · Depósitos',v:fR(t.ds),c:'up'});
+    items.push({l:'HOJE · Saques',v:fR(t.ws),c:'down'});
+    items.push({l:'HOJE · Registros',v:t.nr.toString(),c:'up'});
+    items.push({l:'HOJE · FTD',v:t.ftd.toString(),c:'up'});
+  }
+  // YESTERDAY
+  const yd=new Date();yd.setDate(yd.getDate()-1);const yds=yd.toISOString().slice(0,10);
+  const ydd=D.filter(d=>d.date===yds);
+  if(ydd.length){
+    const y=ydd[0];
+    items.push({l:'ONTEM · NGR',v:fR(y.ngr),c:y.ngr>=0?'up':'down'});
+    items.push({l:'ONTEM · Depósitos',v:fR(y.ds),c:'up'});
+    items.push({l:'ONTEM · Net Cash',v:fR(y.ds-y.ws),c:(y.ds-y.ws)>=0?'up':'down'});
+  }
+  // THIS WEEK
+  const now=new Date();const dow=now.getDay();const monday=new Date(now);monday.setDate(now.getDate()-(dow===0?6:dow-1));
+  const weekStart=monday.toISOString().slice(0,10);
+  const wk=D.filter(d=>d.date>=weekStart);
+  if(wk.length){
+    const wNgr=wk.reduce((a,d)=>a+d.ngr,0);
+    const wDs=wk.reduce((a,d)=>a+d.ds,0);
+    const wNr=wk.reduce((a,d)=>a+d.nr,0);
+    const wFtd=wk.reduce((a,d)=>a+d.ftd,0);
+    items.push({l:'SEMANA · NGR',v:fR(wNgr),c:wNgr>=0?'up':'down'});
+    items.push({l:'SEMANA · Depósitos',v:fR(wDs),c:'up'});
+    items.push({l:'SEMANA · Registros',v:wNr.toString(),c:'up'});
+    items.push({l:'SEMANA · Conv. Reg→FTD',v:wNr>0?pct(wFtd/wNr*100):'—',c:'up'});
+  }
+  // THIS MONTH
+  const mStart=now.toISOString().slice(0,8)+'01';
+  const mo=D.filter(d=>d.date>=mStart);
+  if(mo.length){
+    const mNgr=mo.reduce((a,d)=>a+d.ngr,0);
+    const mDs=mo.reduce((a,d)=>a+d.ds,0);
+    const mWs=mo.reduce((a,d)=>a+d.ws,0);
+    const mCg=mo.reduce((a,d)=>a+d.cg,0);
+    items.push({l:'MÊS · NGR',v:fR(mNgr),c:mNgr>=0?'up':'down'});
+    items.push({l:'MÊS · Depósitos',v:fR(mDs),c:'up'});
+    items.push({l:'MÊS · Saques',v:fR(mWs),c:'down'});
+    items.push({l:'MÊS · Casino GGR',v:fR(mCg),c:mCg>=0?'up':'down'});
+  }
+  // Build HTML (duplicate for seamless loop)
+  const html=items.map(i=>'<span class="ticker-item"><span class="ti-label">'+i.l+'</span><span class="ti-val ti-'+i.c+'">'+i.v+'</span></span><span class="ticker-sep">•</span>').join('');
+  document.getElementById('ticker-track').innerHTML=html+html;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); buildTicker(); });
 
 // ═══════════════════════════════════════════════════════════
 // AUTH SYSTEM — Jogo Grande BI (API-based)
@@ -2143,4 +2320,5 @@ function showAcMsg(text,type){
 }
 
 </script>
+</div><!-- /main-wrap -->
 </body></html>
