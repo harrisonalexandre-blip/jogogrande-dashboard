@@ -1008,16 +1008,18 @@ function getAffDateRange(){
     return{from:window._affFrom,to:window._affTo};
   }
   if(currentPeriod==='lifetime')return{from:allDates[0],to:lastDate};
-  if(currentPeriod==='yesterday')return{from:lastDate,to:lastDate};
+  if(currentPeriod==='today'){var td=_todayStr();return{from:td,to:td}}
+  if(currentPeriod==='yesterday'){var yd=_yesterdayStr();return{from:yd,to:yd}}
   if(currentPeriod==='week'){
-    var ld=new Date(lastDate+'T12:00:00');var dow=ld.getDay();var diff=dow===0?6:dow-1;
-    var wStart=new Date(ld);wStart.setDate(ld.getDate()-diff);
+    var td=_todayStr();
+    var now=new Date();var dow=now.getDay();var diff=dow===0?6:dow-1;
+    var wStart=new Date(now);wStart.setDate(now.getDate()-diff);
     var ws=wStart.toISOString().substring(0,10);
-    return{from:ws,to:lastDate};
+    return{from:ws,to:td};
   }
-  if(currentPeriod==='month')return{from:lastDate.substring(0,8)+'01',to:lastDate};
-  if(currentPeriod==='year')return{from:'2026-01-01',to:lastDate};
-  return{from:lastDate,to:lastDate};
+  if(currentPeriod==='month'){var td=_todayStr();return{from:td.substring(0,8)+'01',to:td}}
+  if(currentPeriod==='year')return{from:'2026-01-01',to:_todayStr()};
+  return{from:allDates[0],to:lastDate};
 }
 function getFilteredAffData(){
   var range=getAffDateRange();
