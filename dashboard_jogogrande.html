@@ -484,7 +484,11 @@ function getFilteredData(period){
     case 'yesterday': {
       var yd=_yesterdayStr();
       var r=D.filter(d=>d.date===yd);
-      if(r.length===0){r=D.filter(d=>d.date===lastDay.date)}
+      // Se não tem Phoenix de ontem, stub zerado para calcKPIs usar DTP
+      if(r.length===0){
+        r=[{date:yd,yr:parseInt(yd.substring(0,4)),month:yd.substring(0,7),ml:'',nr:0,ftd:0,ds:0,ws:0,ngr:0,cg:0,sg:0,nd:0,nw:0,uap:0,nc:0,mi:0,
+          c_to:0,sb_to:0,c_uap:0,sb_uap:0,c_po:0,sb_po:0,c_sc:0,c_bon:0,sb_ggr:0,sb_bc:0,sb_bon:0,sb_ngr:0}];
+      }
       return r;
     }
     case 'week': {
