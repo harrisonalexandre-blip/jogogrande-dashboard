@@ -720,19 +720,19 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ═══ PAGE: COHORTS ═══ -->
 <div id="pg-cohorts" class="page">
-<p class="sec">Cohort Analysis · Retencao & LTV por Mes de Registro</p>
+<p class="sec">Cohort Analysis · Retenção & LTV por Semana de Registro</p>
 <div class="kg" id="kp-cohorts"></div>
 <div class="cg cg2">
-  <div class="cb"><div class="ct"><span class="dot g"></span>Registros & FTD por Mes (Cohort Size)</div><canvas id="c-coh-size"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot g"></span>Registros & FTD por Semana (Cohort Size)</div><canvas id="c-coh-size"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot b"></span>FTD Rate por Cohort (%)</div><canvas id="c-coh-ftdr"></canvas></div>
 </div>
 <div class="cg cg2">
   <div class="cb"><div class="ct"><span class="dot gl"></span>Depositos por Cohort (R$)</div><canvas id="c-coh-dep"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot c"></span>NGR por Cohort (R$)</div><canvas id="c-coh-ngr"></canvas></div>
 </div>
-<div class="tb"><div class="th"><h3>Retencao de UAP por Cohort (% do mes de registro)</h3></div>
+<div class="tb"><div class="th"><h3>Retenção de UAP por Cohort (% da semana de registro)</h3></div>
 <div id="coh-heatmap" style="overflow-x:auto"></div></div>
-<div class="tb"><div class="th"><h3>Metricas por Cohort Mensal</h3></div>
+<div class="tb"><div class="th"><h3>Métricas por Cohort Semanal</h3></div>
 <table><thead><tr><th>Cohort</th><th>Regs</th><th>FTD</th><th>FTD%</th><th>UAP Med</th><th>Depositos</th><th>Saques</th><th>Net Dep</th><th>NGR</th><th>LTV/FTD</th></tr></thead>
 <tbody id="coh-tb"></tbody></table></div>
 </div>
@@ -1889,16 +1889,16 @@ function rRecon(){
 
 // ═══ COHORT ANALYSIS ═══
 function getCohortData(){
-  const months={};
+  const weeks={};
   const fd=filteredData&&filteredData.length?filteredData:D;fd.forEach(d=>{
-    const m=d.month;if(!m)return;
-    if(!months[m])months[m]={ml:d.ml,nr:0,ftd:0,uap:0,c_uap:0,sb_uap:0,ds:0,ws:0,ngr:0,cg:0,sg:0,days:0};
-    months[m].nr+=d.nr;months[m].ftd+=d.ftd;months[m].uap+=d.uap;months[m].c_uap+=d.c_uap;
-    months[m].sb_uap+=d.sb_uap;months[m].ds+=d.ds;months[m].ws+=d.ws;months[m].ngr+=d.ngr;
-    months[m].cg+=d.cg;months[m].sg+=d.sg;months[m].days++;
+    const wk=d.yr+'-W'+String(d.wk).padStart(2,'0');
+    if(!weeks[wk])weeks[wk]={ml:'S'+d.wk+'/'+String(d.yr).slice(2),nr:0,ftd:0,uap:0,c_uap:0,sb_uap:0,ds:0,ws:0,ngr:0,cg:0,sg:0,days:0};
+    weeks[wk].nr+=d.nr;weeks[wk].ftd+=d.ftd;weeks[wk].uap+=d.uap;weeks[wk].c_uap+=(d.c_uap||0);
+    weeks[wk].sb_uap+=(d.sb_uap||0);weeks[wk].ds+=d.ds;weeks[wk].ws+=d.ws;weeks[wk].ngr+=d.ngr;
+    weeks[wk].cg+=d.cg;weeks[wk].sg+=d.sg;weeks[wk].days++;
   });
-  const keys=Object.keys(months).sort();
-  return keys.map(k=>{const m=months[k];m.key=k;m.avgUap=m.days>0?Math.round(m.uap/m.days):0;m.ftdr=m.nr>0?Math.round(m.ftd/m.nr*1000)/10:0;m.ltv=m.ftd>0?Math.round(m.ds/m.ftd):0;return m;});
+  const keys=Object.keys(weeks).sort();
+  return keys.map(k=>{const w=weeks[k];w.key=k;w.avgUap=w.days>0?Math.round(w.uap/w.days):0;w.ftdr=w.nr>0?Math.round(w.ftd/w.nr*1000)/10:0;w.ltv=w.ftd>0?Math.round(w.ds/w.ftd):0;return w;});
 }
 function buildRetentionMatrix(cohorts){
   if(cohorts.length<2)return[];
@@ -1929,7 +1929,7 @@ function rCohorts(){
   const avgLTV=totFTD>0?Math.round(totDep/totFTD):0;
   const bestCoh=cohorts.reduce((b,c)=>c.nr>10&&c.ftdr>b.ftdr?c:b,{ftdr:0,ml:'N/A'});
   document.getElementById('kp-cohorts').innerHTML=[
-    {l:'TOTAL REGISTROS',v:fN(totNR),s:cohorts.length+' meses',c:''},
+    {l:'TOTAL REGISTROS',v:fN(totNR),s:cohorts.length+' semanas',c:''},
     {l:'TOTAL FTD',v:fN(totFTD),s:'Primeira deposito',c:'gold'},
     {l:'FTD RATE MEDIO',v:avgFTDR+'%',s:'Conversao geral',c:avgFTDR>25?'green':avgFTDR>15?'gold':'red'},
     {l:'LTV MEDIO/FTD',v:fR(avgLTV),s:'Deposito total / FTD',c:'cyan'},
