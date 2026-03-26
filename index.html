@@ -585,16 +585,37 @@ function setTime(period,el){
 function calcKPIs(data,period){
   const nr=data.reduce((a,d)=>a+d.nr,0);
   const ftd=data.reduce((a,d)=>a+d.ftd,0);
-  const ds=data.reduce((a,d)=>a+d.ds,0);
-  const ws=data.reduce((a,d)=>a+d.ws,0);
+  var ds=data.reduce((a,d)=>a+d.ds,0);
+  var ws=data.reduce((a,d)=>a+d.ws,0);
   const ngr=data.reduce((a,d)=>a+d.ngr,0);
   const cg=data.reduce((a,d)=>a+d.cg,0);
   const sg=data.reduce((a,d)=>a+d.sg,0);
-  const nd=data.reduce((a,d)=>a+d.nd,0);
+  var nd=data.reduce((a,d)=>a+d.nd,0);
   const uap=data.length>0?data.reduce((a,d)=>a+d.uap,0)/data.length:0;
   const mi=data.reduce((a,d)=>a+(d.mi||0),0);
+  // Enriquecer com DigiToPay (RECON) — dados atualizados a cada 1h
+  var dtpDs=0,dtpWs=0,dtpNd=0,dtpDn=0,dtpSn=0,dtpUsed=false;
+  if(typeof RECON!=='undefined'){
+    var dates=data.map(function(d){return d.date});
+    // Pegar dados DTP para o mesmo range de datas
+    var reconMatch=RECON.filter(function(r){return dates.indexOf(r.d)>=0});
+    // Se não tem match por datas do D, usar range real do período
+    if(reconMatch.length===0){
+      if(period==='today'){reconMatch=RECON.filter(function(r){return r.d===_todayStr()})}
+      else if(period==='yesterday'){reconMatch=RECON.filter(function(r){return r.d===_yesterdayStr()})}
+    }
+    reconMatch.forEach(function(r){
+      dtpDs+=(r.dtp_dep||0);dtpWs+=(r.dtp_saq||0);
+      dtpDn+=(r.dtp_dep_n||0);dtpSn+=(r.dtp_saq_n||0);
+    });
+    dtpNd=dtpDn;
+    // Se PHX não tem dados (ds===0) mas DTP tem, usar DTP como fonte primária
+    if(ds===0&&dtpDs>0){ds=dtpDs;ws=dtpWs;nd=dtpDn;dtpUsed=true}
+    // Se PHX tem dados, DTP serve como complemento para validação (não sobrescreve)
+  }
   return {nr,ftd,ds,ws,nc:ds-ws,ngr,cg,sg,nd,mi,uap:Math.round(uap),
-    conv:nr>0?ftd/nr*100:0,days:data.length};
+    conv:nr>0?ftd/nr*100:0,days:data.length,
+    dtpDs:dtpDs,dtpWs:dtpWs,dtpNd:dtpDn,dtpSn:dtpSn,dtpUsed:dtpUsed};
 }
 
 // Agregar dados por mês (para gráficos de 2026 e Lifetime)
@@ -624,12 +645,17 @@ function renderOverview(){
   const pLabel=getPeriodLabel(currentPeriod);
   const depSaqPct=k.ds>0?((k.ws-k.mi)/k.ds*100):0;
   const volPct=k.ds>0?((k.ds/(k.ds+(k.ws-k.mi)))*100):0;
+  // Labels para depósitos/saques: se veio do DTP, sinalizar
+  var srcTag=k.dtpUsed?' <span style="color:var(--cyan);font-size:8px;font-weight:800">DTP</span>':'';
+  var depSub=k.dtpUsed?`${fN(k.dtpNd)} transações (DigiToPay 1h)`:`${fN(k.nd)} transações`;
+  var saqSub=k.dtpUsed?`${fN(k.dtpSn)} saques (DigiToPay 1h)`:'Saques reais (sem mov. interna)';
+  var ncSub=k.dtpUsed?'DigiToPay (dep - saq)':`Retenção: ${fP(100-depSaqPct)}`;
   document.getElementById('kov').innerHTML=[
-    {i:'💰',l:'NGR',v:fR(k.ngr),s:pLabel,c:''},
-    {i:'💳',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold'},
-    {i:'💸',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`Saques reais (sem mov. interna)`,c:'red'},
+    {i:'💰',l:'NGR',v:fR(k.ngr),s:pLabel+(k.ngr===0&&k.dtpUsed?' (aguardando PHX)':''),c:''},
+    {i:'💳',l:'Vol. Depósitos'+srcTag,v:fR(k.ds),s:depSub,c:'gold'},
+    {i:'💸',l:'Vol. Saques'+srcTag,v:fR(k.ws-k.mi),s:saqSub,c:'red'},
     {i:'📊',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red'},
-    {i:'🏦',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red'},
+    {i:'🏦',l:'NetCash'+srcTag,v:fR(k.nc),s:ncSub,c:k.nc>=0?'':'red'},
     {i:'🔄',l:'Mov. Interna',v:fR(k.mi),s:'Saques cripto → Wallet',c:k.mi>0?'purple':''},
     {i:'👤',l:'Novos Cadastros',v:fN(k.nr),s:`FTD: ${fN(k.ftd)}`,c:'blue'},
     {i:'🎯',l:'Conv. Reg→FTD',v:fP(k.conv),s:'Taxa conversão',c:'cyan'},
