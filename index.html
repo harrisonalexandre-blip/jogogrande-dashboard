@@ -248,8 +248,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="hdr-r">
     <div class="rate-badge">EUR/BRL <span class="cur">R$ 6,14</span></div>
     <div class="rate-badge">USDT/BRL <span class="cur">R$ 5,25</span></div>
-    <a class="sheets-btn" href="https://docs.google.com/spreadsheets/" target="_blank">📊 Google Sheets</a>
-    <div class="sheets-btn" onclick="toggleBacklog()" style="cursor:pointer;position:relative">📋 Backlog <span id="bk-count" style="background:var(--green);color:#000;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:800;margin-left:2px">0</span></div>
+    <a class="sheets-btn" href="https://docs.google.com/spreadsheets/" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>Google Sheets</a>
+    <div class="sheets-btn" onclick="toggleBacklog()" style="cursor:pointer;position:relative"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path d="M9 7h6M9 11h6M9 15h6"></path></svg>Backlog <span id="bk-count" style="background:var(--green);color:#000;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:800;margin-left:2px">0</span></div>
     <span class="upd" id="upd"></span>
     <div class="user-badge" id="user-badge" onclick="doLogout()" title="Clique para sair" style="display:none">
       <span id="user-name-badge">—</span>
@@ -259,16 +259,16 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 </div>
 <div class="nav">
-  <div class="tab active" data-roles="admin,socio" onclick="sp('ov',this)">📊 OVERVIEW</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('perf',this)">🎰 PERFORMANCE</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('hist',this)">📆 HISTÓRICO</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('fin',this)">💰 FINANCEIRO</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('soc',this)">👥 SÓCIOS</div>
-  <div class="tab" data-roles="admin,socio,crm" onclick="sp('crm',this)">📱 CRM</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('afil',this)">🤝 AFILIADOS</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('recon',this)">🔍 CONCILIAÇÃO</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('caixa',this)">🏦 CAIXA <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
-  <div class="tab" data-roles="admin" onclick="sp('acessos',this)">🔐 ACESSOS</div>
+  <div class="tab active" data-roles="admin,socio" onclick="sp('ov',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>OVERVIEW</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('perf',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>PERFORMANCE</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('hist',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>HISTÓRICO</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('fin',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a4.5 4.5 0 0 0 0 9h5a4.5 4.5 0 0 1 0 9H6"></path></svg>FINANCEIRO</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('soc',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>SÓCIOS</div>
+  <div class="tab" data-roles="admin,socio,crm" onclick="sp('crm',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="17" x2="22" y2="17"></line><path d="M6 3v4M10 3v4M14 3v4M18 3v4"></path></svg>CRM</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('afil',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M2 12c0-2.76 1.12-5.26 2.93-7.07S7.24 2 10 2c1.24 0 2.43.2 3.57.58.24.08.48.16.72.25"></path><path d="M22 12c0 2.76-1.12 5.26-2.93 7.07S16.76 22 14 22c-1.24 0-2.43-.2-3.57-.58-.24-.08-.48-.16-.72-.25"></path><path d="M10 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM14 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path><path d="M12 6v12"></path></svg>AFILIADOS</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('recon',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>CONCILIAÇÃO</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('caixa',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="5" width="18" height="14" rx="1" ry="1"></rect><path d="M12 9v6"></path><path d="M9 12h6"></path></svg>CAIXA <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
+  <div class="tab" data-roles="admin" onclick="sp('acessos',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>ACESSOS</div>
 </div>
 <div class="ctn">
 
@@ -285,7 +285,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="cb"><div class="ct"><span class="dot c"></span>UAP · Jogadores Ativos</div><canvas id="c-uap"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot p"></span>Ticket Médio Depósito (R$)</div><canvas id="c-tk"></canvas></div>
 </div>
-<div class="tb"><div class="th"><h3 id="tbl-title">📋 Dados do Período</h3><input class="si" placeholder="Filtrar..." oninput="fdt(this.value)"></div>
+<div class="tb"><div class="th"><h3 id="tbl-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path d="M9 7h6M9 11h6M9 15h6"></path></svg>Dados do Período</h3><input class="si" placeholder="Filtrar..." oninput="fdt(this.value)"></div>
 <table><thead><tr>
 <th onclick="sdt(0)">Data</th><th onclick="sdt(1)">Regs</th><th onclick="sdt(2)">FTD</th><th onclick="sdt(3)">Conv%</th>
 <th onclick="sdt(4)">UAP</th><th onclick="sdt(5)">Deps</th><th onclick="sdt(6)">Vol.Dep R$</th>
@@ -320,7 +320,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="cb"><div class="ct"><span class="dot b"></span>Registros & FTD por Mês</div><canvas id="c-mrf"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot c"></span>NetCash por Mês (R$)</div><canvas id="c-mnc"></canvas></div>
 </div>
-<div class="tb"><div class="th"><h3>📆 Tabela Mensal Consolidada</h3></div>
+<div class="tb"><div class="th"><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Tabela Mensal Consolidada</h3></div>
 <table><thead><tr><th>Mês</th><th>Regs</th><th>FTD</th><th>Conv%</th><th>Vol.Dep R$</th><th>Vol.Saq R$</th><th>Mov.Int R$</th><th>NetCash R$</th><th>Casino GGR R$</th><th>NGR R$</th><th>Turnover Casino R$</th></tr></thead>
 <tbody id="mtb"></tbody></table></div>
 </div>
@@ -354,7 +354,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="cb"><div class="ct"><span class="dot gl"></span>Share Atual (a partir de Mar/2026)</div><canvas id="c-share"></canvas></div>
 </div>
 <div class="pg" id="pcards"></div>
-<div class="tb"><div class="th"><h3>👤 Detalhamento AFFBR (Membros)</h3></div>
+<div class="tb"><div class="th"><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Detalhamento AFFBR (Membros)</h3></div>
 <table><thead><tr><th>Mês</th><th>Lucro Total</th><th>AFFBR Total</th><th>Bruno (4,75%)</th><th>Harrison (10,68%)</th><th>Neja (10,68%)</th><th>Gregório/Op</th></tr></thead>
 <tbody id="atb"></tbody></table></div>
 </div>
@@ -379,16 +379,16 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 </div>
 
 <div class="crm-filters">
-  <div class="crm-filter active" onclick="filterCRM('all',this)">🔎 Todos</div>
-  <div class="crm-filter" onclick="filterCRM('hot',this)">🔥 Hot (≤3d)</div>
-  <div class="crm-filter" onclick="filterCRM('active',this)">✅ Ativo (≤7d)</div>
-  <div class="crm-filter" onclick="filterCRM('warm',this)">🟡 Morno (8-30d)</div>
-  <div class="crm-filter" onclick="filterCRM('cold',this)">❄️ Frio (31-90d)</div>
-  <div class="crm-filter" onclick="filterCRM('lost',this)">💀 Perdido (>90d)</div>
-  <div class="crm-filter" onclick="filterCRM('vip',this)">👑 VIP</div>
-  <div class="crm-filter" onclick="filterCRM('high',this)">⭐ High</div>
-  <div class="crm-filter" onclick="filterCRM('winner',this)">🏆 Vencedores</div>
-  <div class="crm-filter" onclick="filterCRM('loser',this)">📉 Perdedores</div>
+  <div class="crm-filter active" onclick="filterCRM('all',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>Todos</div>
+  <div class="crm-filter" onclick="filterCRM('hot',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom;color:#ff6b6b"><path d="M14 14.76v1.5a2.5 2.5 0 1 1-5 0v-1.5M10 11V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4"></path><path d="M14 4v3"></path><path d="M10 4v3"></path></svg>Hot (≤3d)</div>
+  <div class="crm-filter" onclick="filterCRM('active',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg>Ativo (≤7d)</div>
+  <div class="crm-filter" onclick="filterCRM('warm',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><circle cx="12" cy="12" r="1" fill="currentColor"></circle></svg>Morno (8-30d)</div>
+  <div class="crm-filter" onclick="filterCRM('cold',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M20 16.5a4.5 4.5 0 1 1-9-9 4.5 4.5 0 0 1 9 9z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>Frio (31-90d)</div>
+  <div class="crm-filter" onclick="filterCRM('lost',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>Perdido (>90d)</div>
+  <div class="crm-filter" onclick="filterCRM('vip',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M6 9l6-3 6 3"></path><path d="M6 9l-3 4v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5l-3-4"></path><line x1="10" y1="14" x2="14" y2="14"></line></svg>VIP</div>
+  <div class="crm-filter" onclick="filterCRM('high',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>High</div>
+  <div class="crm-filter" onclick="filterCRM('winner',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v8M9 13h6"></path><path d="M13 6h-2v-2h2v2z"></path></svg>Vencedores</div>
+  <div class="crm-filter" onclick="filterCRM('loser',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"></path><polyline points="9 9 12 12 15 9"></polyline><polyline points="9 15 12 12 15 15"></polyline></svg>Perdedores</div>
   <input class="si" placeholder="Buscar jogador..." oninput="crmSearch=this.value;renderCRMList()" style="margin-left:auto;max-width:200px">
 </div>
 <div id="cli-list" class="cli-list"></div>
@@ -397,12 +397,12 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <!-- ═══ BACKLOG MODAL ═══ -->
 <div id="bk-overlay" class="bk-overlay" onclick="if(event.target===this)toggleBacklog()">
 <div class="bk-modal">
-  <div class="bk-hdr"><h2>📋 Backlog</h2><button class="bk-close" onclick="toggleBacklog()">✕</button></div>
+  <div class="bk-hdr"><h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path d="M9 7h6M9 11h6M9 15h6"></path></svg>Backlog</h2><button class="bk-close" onclick="toggleBacklog()">✕</button></div>
   <div class="bk-body">
     <div class="bk-add">
       <input class="bk-input desc" id="bk-new-desc" placeholder="Descrição do item..." onkeydown="if(event.key==='Enter')addBkItem()">
       <select class="bk-sel" id="bk-new-status"><option value="Planejado">Planejado</option><option value="Em andamento">Em andamento</option><option value="Concluído">Concluído</option></select>
-      <select class="bk-sel" id="bk-new-prio"><option value="Alta">🔴 Alta</option><option value="Média">🟡 Média</option><option value="Baixa">⚪ Baixa</option></select>
+      <select class="bk-sel" id="bk-new-prio"><option value="Alta"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" style="display:inline;margin-right:4px"><circle cx="12" cy="12" r="10"></circle></svg>Alta</option><option value="Média"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" style="display:inline;margin-right:4px"><circle cx="12" cy="12" r="10"></circle></svg>Média</option><option value="Baixa"><svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" style="display:inline;margin-right:4px"><circle cx="12" cy="12" r="10"></circle></svg>Baixa</option></select>
       <button class="bk-abtn" onclick="addBkItem()">+ Adicionar</button>
     </div>
     <div id="bk-list"></div>
@@ -463,19 +463,19 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <div class="kg" id="krecon"></div>
 <div id="recon-alerts" style="margin:16px 0"></div>
 <div class="cg cg2" style="margin-bottom:18px">
-  <div class="cb"><div class="ct">📊 Depósitos por Plataforma (Mensal)</div><canvas id="c-recon-dep"></canvas></div>
-  <div class="cb"><div class="ct">📊 Saques por Plataforma (Mensal)</div><canvas id="c-recon-saq"></canvas></div>
+  <div class="cb"><div class="ct"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>Depósitos por Plataforma (Mensal)</div><canvas id="c-recon-dep"></canvas></div>
+  <div class="cb"><div class="ct"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>Saques por Plataforma (Mensal)</div><canvas id="c-recon-saq"></canvas></div>
 </div>
 <div class="cg cg2" style="margin-bottom:18px">
-  <div class="cb"><div class="ct">📈 Divergência Depósitos PHX vs DTP (%)</div><canvas id="c-recon-divdep"></canvas></div>
-  <div class="cb"><div class="ct">📈 Divergência Saques PHX vs DTP (%)</div><canvas id="c-recon-divsaq"></canvas></div>
+  <div class="cb"><div class="ct"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>Divergência Depósitos PHX vs DTP (%)</div><canvas id="c-recon-divdep"></canvas></div>
+  <div class="cb"><div class="ct"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>Divergência Saques PHX vs DTP (%)</div><canvas id="c-recon-divsaq"></canvas></div>
 </div>
 <div class="cg cg2" style="margin-bottom:18px">
-  <div class="cb"><div class="ct">👥 Registros: Phoenix vs Smartico</div><canvas id="c-recon-regs"></canvas></div>
-  <div class="cb"><div class="ct">💰 FTDs: Phoenix vs Smartico</div><canvas id="c-recon-ftds"></canvas></div>
+  <div class="cb"><div class="ct"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Registros: Phoenix vs Smartico</div><canvas id="c-recon-regs"></canvas></div>
+  <div class="cb"><div class="ct"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a4.5 4.5 0 0 0 0 9h5a4.5 4.5 0 0 1 0 9H6"></path></svg>FTDs: Phoenix vs Smartico</div><canvas id="c-recon-ftds"></canvas></div>
 </div>
 <div class="cb" style="margin-bottom:18px;overflow-x:auto">
-<div class="ct">📋 Tabela Comparativa Mensal</div>
+<div class="ct"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path d="M9 7h6M9 11h6M9 15h6"></path></svg>Tabela Comparativa Mensal</div>
 <table id="recon-table-monthly" style="width:100%;border-collapse:collapse;font-size:12px"></table>
 </div>
 <div class="cb" style="overflow-x:auto">
@@ -487,7 +487,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <!-- ═══ PAGE: CAIXA (Em Construção) ═══ -->
 <div id="pg-caixa" class="page">
 <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;gap:16px">
-<div style="font-size:64px">🏦</div>
+<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline"><rect x="2" y="7" width="20" height="12" rx="1" ry="1"></rect><path d="M12 7V4M7 7V4M17 7V4M2 19h20M7 11h1M16 11h1M7 15h1M16 15h1"></path></svg>
 <h2 style="font-size:22px;font-weight:900;color:var(--green)">CAIXA</h2>
 <p style="color:var(--text2);font-size:14px;max-width:400px">Módulo de controle de caixa em construção.<br>Em breve: entradas/saídas USDT e BRL, saldo consolidado, histórico de movimentações e conciliação.</p>
 <div style="background:var(--greenA);border:1px solid rgba(14,165,90,.3);padding:10px 20px;border-radius:8px;color:var(--green);font-size:12px;font-weight:700">🚧 EM CONSTRUÇÃO</div>
@@ -502,7 +502,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="ac-user-list">
     <div class="ct" style="margin-bottom:14px"><span class="dot g"></span>USUÁRIOS CADASTRADOS</div>
     <div id="ac-user-list-body"><div style="color:var(--text3);font-size:12px;padding:10px 0">Carregando...</div></div>
-    <button class="ac-export" onclick="exportAuthJson()">⬇️ Exportar auth.json (para commit no git)</button>
   </div>
   <!-- Coluna direita: formulário de adição -->
   <div class="ac-form">
@@ -511,8 +510,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
     <input class="ac-input" id="ac-email" placeholder="E-mail">
     <input class="ac-input" type="password" id="ac-pass" placeholder="Senha">
     <select class="ac-select" id="ac-role">
-      <option value="socio">👥 Sócio — Vê todas as páginas</option>
-      <option value="crm">📱 CRM — Somente página CRM</option>
+      <option value="socio"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Sócio — Vê todas as páginas</option>
+      <option value="crm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="17" x2="22" y2="17"></line><path d="M6 3v4M10 3v4M14 3v4M18 3v4"></path></svg>CRM — Somente página CRM</option>
     </select>
     <button class="ac-submit" onclick="addUser()">Adicionar Usuário</button>
     <div class="ac-msg" id="ac-msg"></div>
@@ -523,26 +522,25 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="ct" style="margin-bottom:14px"><span class="dot b"></span>NÍVEIS DE ACESSO</div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
     <div style="background:var(--greenA);border:1px solid rgba(14,165,90,.3);border-radius:10px;padding:16px">
-      <div style="font-size:12px;font-weight:800;color:var(--green);margin-bottom:8px">🔑 ADMIN</div>
+      <div style="font-size:12px;font-weight:800;color:var(--green);margin-bottom:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>ADMIN</div>
       <div style="font-size:11px;color:var(--text2);line-height:1.6">Poder máximo. Cria, edita e remove usuários. Vê todas as páginas e o painel de acessos.</div>
     </div>
     <div style="background:var(--goldA);border:1px solid rgba(255,215,64,.3);border-radius:10px;padding:16px">
-      <div style="font-size:12px;font-weight:800;color:var(--gold);margin-bottom:8px">👥 SÓCIO</div>
+      <div style="font-size:12px;font-weight:800;color:var(--gold);margin-bottom:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>SÓCIO</div>
       <div style="font-size:11px;color:var(--text2);line-height:1.6">Acesso completo ao dashboard: Overview, Performance, Financeiro, CRM, Sócios, Afiliados e Conciliação.</div>
     </div>
     <div style="background:var(--blueA);border:1px solid rgba(68,136,255,.3);border-radius:10px;padding:16px">
-      <div style="font-size:12px;font-weight:800;color:var(--blue);margin-bottom:8px">📱 CRM</div>
+      <div style="font-size:12px;font-weight:800;color:var(--blue);margin-bottom:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="17" x2="22" y2="17"></line><path d="M6 3v4M10 3v4M14 3v4M18 3v4"></path></svg>CRM</div>
       <div style="font-size:11px;color:var(--text2);line-height:1.6">Acesso restrito: entra diretamente na página CRM. Não vê as demais páginas do dashboard.</div>
     </div>
   </div>
 </div>
 <div class="cb" style="padding:16px 22px;margin-top:14px">
-  <div class="ct" style="margin-bottom:10px"><span class="dot gl"></span>COMO FUNCIONA O FLUXO DE CADASTRO</div>
+  <div class="ct" style="margin-bottom:10px"><span class="dot gl"></span>COMO FUNCIONA</div>
   <div style="font-size:12px;color:var(--text2);line-height:1.8">
-    1. Adicione o usuário acima com nome, e-mail, senha e nível de acesso.<br>
-    2. Clique em <strong style="color:var(--blue)">Exportar auth.json</strong> para baixar o arquivo atualizado.<br>
-    3. Faça o commit do arquivo <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--green)">auth.json</code> no repositório git e faça o deploy no Vercel.<br>
-    4. O acesso estará ativo para o novo usuário assim que o Vercel terminar o deploy.
+    1. Preencha nome, e-mail, senha e nível de acesso do novo usuário.<br>
+    2. Clique em <strong style="color:var(--green)">Adicionar Usuário</strong>.<br>
+    3. O usuário já consegue fazer login imediatamente. <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg>
   </div>
 </div>
 </div>
@@ -724,23 +722,23 @@ function renderOverview(){
   const depSaqPct=k.ds>0?((k.ws-k.mi)/k.ds*100):0;
   const volPct=k.ds>0?((k.ds/(k.ds+(k.ws-k.mi)))*100):0;
   document.getElementById('kov').innerHTML=[
-    {i:'💰',l:'NGR',v:fR(k.ngr),s:pLabel,c:''},
-    {i:'💳',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold'},
-    {i:'💸',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`Saques reais (sem mov. interna)`,c:'red'},
-    {i:'📊',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red'},
-    {i:'🏦',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red'},
-    {i:'🔄',l:'Mov. Interna',v:fR(k.mi),s:'Saques cripto → Wallet',c:k.mi>0?'purple':''},
-    {i:'👤',l:'Novos Cadastros',v:fN(k.nr),s:`FTD: ${fN(k.ftd)}`,c:'blue'},
-    {i:'🎯',l:'Conv. Reg→FTD',v:fP(k.conv),s:'Taxa conversão',c:'cyan'},
-    {i:'🎮',l:'UAP Médio/Dia',v:fN(k.uap),s:`${k.days} dias`,c:'purple'},
-    {i:'📉',l:'Churn 7d',v:fP(CHURN.r7),s:`${fN(CHURN.c7)} de ${fN(CHURN.total)} players`,c:'red'},
-    {i:'📉',l:'Churn 30d',v:fP(CHURN.r30),s:`${fN(CHURN.c30)} inativos >30d`,c:CHURN.r30>50?'red':'gold'},
-    {i:'📉',l:'Churn 90d',v:fP(CHURN.r90),s:`${fN(CHURN.c90)} inativos >90d`,c:CHURN.r90>30?'red':'gold'},
-    {i:'🎰',l:'Casino GGR',v:fR(k.cg),s:'Gross Gaming Revenue',c:'gold'},
-    {i:'⚽',l:'Sportsbook GGR',v:fR(k.sg),s:'Esportes',c:'blue'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',l:'NGR',v:fR(k.ngr),s:pLabel,c:''},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`Saques reais (sem mov. interna)`,c:'red'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/></svg>',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>',l:'Mov. Interna',v:fR(k.mi),s:'Saques cripto → Wallet',c:k.mi>0?'purple':''},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',l:'Novos Cadastros',v:fN(k.nr),s:`FTD: ${fN(k.ftd)}`,c:'blue'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',l:'Conv. Reg→FTD',v:fP(k.conv),s:'Taxa conversão',c:'cyan'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',l:'UAP Médio/Dia',v:fN(k.uap),s:`${k.days} dias`,c:'purple'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 7d',v:fP(CHURN.r7),s:`${fN(CHURN.c7)} de ${fN(CHURN.total)} players`,c:'red'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 30d',v:fP(CHURN.r30),s:`${fN(CHURN.c30)} inativos >30d`,c:CHURN.r30>50?'red':'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 90d',v:fP(CHURN.r90),s:`${fN(CHURN.c90)} inativos >90d`,c:CHURN.r90>30?'red':'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>',l:'Casino GGR',v:fR(k.cg),s:'Gross Gaming Revenue',c:'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>',l:'Sportsbook GGR',v:fR(k.sg),s:'Esportes',c:'blue'},
   ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
   document.getElementById('ct-ngr-title').textContent='NGR — '+pLabel+' (R$)';
-  document.getElementById('tbl-title').textContent='📋 '+pLabel;
+  document.getElementById('tbl-title').textContent=pLabel;
 
   // Decidir se usa barras mensais ou diárias
   const useMonthly=(currentPeriod==='year'||currentPeriod==='lifetime');
@@ -829,12 +827,12 @@ function rPerf(){
   const acu=allD.length>0?allD.reduce((a,d)=>a+d.c_uap,0)/allD.length:0;
   const cmg=tct>0?tcg/tct*100:0;
   document.getElementById('kp').innerHTML=[
-    {i:'🎰',l:'Casino GGR Total',v:fR(tcg),s:pLabel,c:''},
-    {i:'⚽',l:'SB GGR Total',v:fR(tsg),s:'Esportes',c:'gold'},
-    {i:'🔄',l:'Casino Turnover',v:fR(tct),s:'Vol. apostado',c:'blue'},
-    {i:'🔄',l:'SB Turnover',v:fR(tst),s:'Vol. apostado',c:'cyan'},
-    {i:'📈',l:'Margem Casino',v:fP(cmg),s:'GGR/Turnover',c:cmg>0?'':'red'},
-    {i:'👥',l:'UAP Casino Méd',v:fN(Math.round(acu)),s:'Por dia',c:'purple'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',l:'Casino GGR Total',v:fR(tcg),s:pLabel,c:''},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v6M16 12h-8"></path></svg>',l:'SB GGR Total',v:fR(tsg),s:'Esportes',c:'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',l:'Casino Turnover',v:fR(tct),s:'Vol. apostado',c:'blue'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',l:'SB Turnover',v:fR(tst),s:'Vol. apostado',c:'cyan'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 5 12 19M5 12h14"></polyline></svg>',l:'Margem Casino',v:fP(cmg),s:'GGR/Turnover',c:cmg>0?'':'red'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',l:'UAP Casino Méd',v:fN(Math.round(acu)),s:'Por dia',c:'purple'},
   ].map(k=>`<div class="kpi ${k.c}"><div class="kpi-i">${k.i}</div><div class="kpi-l">${k.l}</div><div class="kpi-v">${k.v}</div><div class="kpi-s">${k.s}</div></div>`).join('');
   const lb=fM.map(m=>m.ml);
   mc('c-gs',{type:'bar',data:{labels:lb,datasets:[
@@ -997,9 +995,9 @@ function rSoc(){
     // "A Selecionar" — mostra visão geral
     pctEl.textContent='';
     document.getElementById('ks').innerHTML=[
-      {i:'💰',l:'Lucro Total Acum.',v:fR(tl),s:pLabel,c:''},
-      {i:'📊',l:'Meses com Lucro',v:fPD.filter(p=>p.lucro>0).length+'',s:'de '+fPD.length+' meses',c:'blue'},
-      {i:'📈',l:'Lucro Médio/Mês',v:fR(tl/Math.max(fPD.length,1)),s:'Média geral',c:'gold'},
+      {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a4.5 4.5 0 0 0 0 9h5a4.5 4.5 0 0 1 0 9H6"></path></svg>',l:'Lucro Total Acum.',v:fR(tl),s:pLabel,c:''},
+      {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>',l:'Meses com Lucro',v:fPD.filter(p=>p.lucro>0).length+'',s:'de '+fPD.length+' meses',c:'blue'},
+      {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',l:'Lucro Médio/Mês',v:fR(tl/Math.max(fPD.length,1)),s:'Média geral',c:'gold'},
     ].map(k=>`<div class="kpi ${k.c}"><div class="kpi-i">${k.i}</div><div class="kpi-l">${k.l}</div><div class="kpi-v">${k.v}</div><div class="kpi-s">${k.s}</div></div>`).join('');
   } else {
     // Calcular lucro do sócio selecionado
@@ -1013,9 +1011,9 @@ function rSoc(){
     pctEl.textContent=`${pctAtual}% do lucro líquido`;
 
     document.getElementById('ks').innerHTML=[
-      {i:'👤',l:selected,v:fR(totalSocio),s:`Acumulado (${pctAtual}%)`,c:''},
-      {i:'💰',l:'Lucro Total Op.',v:fR(tl),s:'Todos os sócios',c:'gold'},
-      {i:'📊',l:'Média/Mês',v:fR(totalSocio/Math.max(fPD.filter(p=>p.lucro>0).length,1)),s:'Meses com lucro',c:'blue'},
+      {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>',l:selected,v:fR(totalSocio),s:`Acumulado (${pctAtual}%)`,c:''},
+      {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a4.5 4.5 0 0 0 0 9h5a4.5 4.5 0 0 1 0 9H6"></path></svg>',l:'Lucro Total Op.',v:fR(tl),s:'Todos os sócios',c:'gold'},
+      {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>',l:'Média/Mês',v:fR(totalSocio/Math.max(fPD.filter(p=>p.lucro>0).length,1)),s:'Meses com lucro',c:'blue'},
     ].map(k=>`<div class="kpi ${k.c}"><div class="kpi-i">${k.i}</div><div class="kpi-l">${k.l}</div><div class="kpi-v">${k.v}</div><div class="kpi-s">${k.s}</div></div>`).join('');
   }
 
@@ -1124,17 +1122,17 @@ function rAfil(){
   var pLabel=getPeriodLabel(currentPeriod);
   // Show sync timestamp
   var syncEl=document.getElementById('smartico-sync');
-  if(syncEl&&AFF.syncAt)syncEl.innerHTML='🔄 Última sync Smartico: '+AFF.syncAt;
+  if(syncEl&&AFF.syncAt)syncEl.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36M20.49 15a9 9 0 0 1-14.85 3.36"></path></svg>Última sync Smartico: '+AFF.syncAt;
   document.getElementById('kaff').innerHTML=[
-    {i:'👥',l:'Afiliados',v:fN(s.totalAffs),s:pLabel,c:''},
-    {i:'📝',l:'Registros',v:fN(s.totalRegs),s:'Total cadastros',c:'blue'},
-    {i:'💰',l:'FTDs',v:fN(s.totalFtd),s:'Taxa: '+fP(s.ftdRate),c:'gold'},
-    {i:'💳',l:'Depósitos',v:fR(s.totalDep),s:'Volume total',c:'cyan'},
-    {i:'💸',l:'Saques',v:fR(s.totalWdr),s:'Withdrawals',c:'red'},
-    {i:'🏦',l:'Net Deposits',v:fR(s.totalNd),s:'Dep - Saques',c:s.totalNd>=0?'':'red'},
-    {i:'📊',l:'Net P&L',v:fR(s.totalNp),s:'Lucro após comissões',c:s.totalNp>=0?'':'red'},
-    {i:'💼',l:'Comissões',v:fR(s.totalComm),s:'Pago a afiliados',c:'purple'},
-    {i:'📈',l:'Margem',v:fP(s.totalNp>0&&s.totalComm>0?(s.totalNp/(s.totalNp+s.totalComm)*100):0),s:'Net P&L / (P&L + Comm)',c:'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',l:'Afiliados',v:fN(s.totalAffs),s:pLabel,c:''},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path d="M9 7h6M9 11h6M9 15h6"></path></svg>',l:'Registros',v:fN(s.totalRegs),s:'Total cadastros',c:'blue'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a4.5 4.5 0 0 0 0 9h5a4.5 4.5 0 0 1 0 9H6"></path></svg>',l:'FTDs',v:fN(s.totalFtd),s:'Taxa: '+fP(s.ftdRate),c:'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>',l:'Depósitos',v:fR(s.totalDep),s:'Volume total',c:'cyan'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M12 8v4M10 12h4"></path></svg>',l:'Saques',v:fR(s.totalWdr),s:'Withdrawals',c:'red'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="12" rx="1" ry="1"></rect><path d="M12 7V4M7 7V4M17 7V4M2 19h20M7 11h1M16 11h1M7 15h1M16 15h1"></path></svg>',l:'Net Deposits',v:fR(s.totalNd),s:'Dep - Saques',c:s.totalNd>=0?'':'red'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>',l:'Net P&L',v:fR(s.totalNp),s:'Lucro após comissões',c:s.totalNp>=0?'':'red'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3m-4 0a2 2 0 0 0-4 0m0 0H3m16 0h-2M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>',l:'Comissões',v:fR(s.totalComm),s:'Pago a afiliados',c:'purple'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',l:'Margem',v:fP(s.totalNp>0&&s.totalComm>0?(s.totalNp/(s.totalNp+s.totalComm)*100):0),s:'Net P&L / (P&L + Comm)',c:'gold'},
   ].map(function(k){return '<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>'}).join('');
 
   // Margem por Afiliado (Net P&L - Comissão)
@@ -1229,7 +1227,7 @@ function renderAffTable(){
       +'<td class="num" colspan="2">—</td>'
       +'<td class="num" style="color:var(--purple)">'+fR(tt.cm)+'</td><td class="num">'+fR(tt.vol)+'</td></tr>';
   } else if(affView==='weekly'){
-    title.textContent='📆 Dados Semanais';
+    title.textContent='';title.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Dados Semanais';
     var data=fd.weeks;
     tbody.innerHTML=data.map(function(w,i){return '<tr><td><span class="aff-rank">'+(i+1)+'</span></td>'
       +'<td style="font-weight:700">'+w.k+'</td>'
@@ -1286,7 +1284,7 @@ function rCRM(){
   var coldC=CLI.filter(function(c){return c.st2==='cold'}).length;
   var lostC=CLI.filter(function(c){return c.st2==='lost'}).length;
   mc('c-dist',{type:'doughnut',data:{
-    labels:['🔥 Hot (≤3d)','✅ Ativo (4-7d)','🟡 Morno (8-30d)','❄️ Frio (31-90d)','💀 Perdido (>90d)'],
+    labels:['Hot (≤3d)','Ativo (4-7d)','Morno (8-30d)','Frio (31-90d)','Perdido (>90d)'],
     datasets:[{data:[hotC,actC,warmC,coldC,lostC],
       backgroundColor:['rgba(14,165,90,.8)','rgba(14,165,90,.5)','rgba(255,215,64,.6)','rgba(68,136,255,.5)','rgba(255,68,68,.6)'],borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'#888',usePointStyle:true,font:{size:11}}}}}});
@@ -1315,7 +1313,7 @@ function rCRM(){
   var tierCount={VIP:0,High:0,Mid:0,Low:0};
   CLI.forEach(function(c){tierData[c.tr]++;tierVol[c.tr]+=c.dt;tierCount[c.tr]+=c.dc});
   mc('c-tiers',{type:'doughnut',data:{
-    labels:['👑 VIP (>50k)','⭐ High (10-50k)','🔷 Mid (1-10k)','⚪ Low (<1k)'],
+    labels:['VIP (>50k)','High (10-50k)','Mid (1-10k)','Low (<1k)'],
     datasets:[{data:[tierData.VIP,tierData.High,tierData.Mid,tierData.Low],
       backgroundColor:['rgba(187,134,252,.7)','rgba(255,215,64,.6)','rgba(68,136,255,.5)','rgba(150,150,150,.4)'],borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'#888',usePointStyle:true,font:{size:11}}}}}});
@@ -1323,7 +1321,7 @@ function rCRM(){
   // Avg ticket by tier
   var tiers=['VIP','High','Mid','Low'];
   var avgByTier=tiers.map(function(t){return tierCount[t]>0?tierVol[t]/tierCount[t]:0});
-  mc('c-tieravg',{type:'bar',data:{labels:['👑 VIP','⭐ High','🔷 Mid','⚪ Low'],datasets:[
+  mc('c-tieravg',{type:'bar',data:{labels:['VIP','High','Mid','Low'],datasets:[
     {label:'Ticket Médio R$',data:avgByTier,backgroundColor:['rgba(187,134,252,.5)','rgba(255,215,64,.5)','rgba(68,136,255,.4)','rgba(150,150,150,.3)'],borderColor:['#BB86FC','#FFD740','#4488FF','#999'],borderWidth:2,borderRadius:5}
   ]},options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:function(v){return fR(v)}}}}}});
 
@@ -1352,8 +1350,8 @@ function renderCRMList(){
     data=data.filter(function(c){return c.n.toLowerCase().indexOf(q)>=0});
   }
 
-  var tierIcon=function(t){return t==='VIP'?'👑':t==='High'?'⭐':t==='Mid'?'🔷':'⚪'};
-  var stIcon=function(s){return s==='hot'?'🔥':s==='active'?'✅':s==='warm'?'🟡':s==='cold'?'❄️':'💀'};
+  var tierIcon=function(t){return t==='VIP'?'VIP':t==='High'?'High':t==='Mid'?'Mid':'Low'};
+  var stIcon=function(s){return s==='hot'?'Hot':s==='active'?'Active':s==='warm'?'Warm':s==='cold'?'Cold':'Lost'};
   var stLabel=function(c){return c.st2==='hot'?'Hot '+c.di+'d':c.st2==='active'?'Ativo '+c.di+'d':c.st2==='warm'?'Morno '+c.di+'d':c.st2==='cold'?'Frio '+c.di+'d':'Perdido '+c.di+'d'};
 
   var hdr='<div class="cli-row hdr"><span>#</span><span>Cliente</span><span style="text-align:center">Tier</span><span style="text-align:right">Depósitos</span><span style="text-align:right">Saques</span><span style="text-align:right">NGR</span><span style="text-align:center">Freq.</span><span style="text-align:center">Win%</span><span style="text-align:right">Status</span><span></span></div>';
@@ -1487,21 +1485,21 @@ function rRecon(){
   var orgPct=totPhx.dep>0?(orgDep/totPhx.dep*100):0;
   var pLabel=getPeriodLabel(currentPeriod);
   document.getElementById('krecon').innerHTML=[
-    {i:'🏦',l:'Dep DigiToPay',v:fR(totDtp.dep),s:'PSP (processador)',c:'cyan'},
-    {i:'🎰',l:'Dep Phoenix',v:fR(totPhx.dep),s:'Operador',c:'green'},
-    {i:'📡',l:'Dep Smartico',v:fR(totSmt.dep),s:'Trackeado afiliados',c:'blue'},
-    {i:'🌱',l:'Orgânico (est.)',v:fR(orgDep>0?orgDep:0),s:fP(orgPct>0?orgPct:0)+' do total PHX',c:'gold'},
-    {i:'⚠️',l:'Div Dep PHX-DTP',v:fP(Math.abs(divDep)),s:divDep>=0?'Phoenix > DTP':'DTP > Phoenix',c:Math.abs(divDep)>5?'red':'green'},
-    {i:'💸',l:'Saq DigiToPay',v:fR(totDtp.saq),s:'PSP (processador)',c:'cyan'},
-    {i:'💸',l:'Saq Phoenix',v:fR(totPhx.saq),s:'Operador',c:'green'},
-    {i:'⚠️',l:'Div Saq PHX-DTP',v:fP(Math.abs(divSaq)),s:divSaq>=0?'Phoenix > DTP':'DTP > Phoenix',c:Math.abs(divSaq)>5?'red':'green'},
-    {i:'💰',l:'Taxas PSP',v:fR(totDtp.taxa),s:'Total taxas DigiToPay',c:'purple'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="12" rx="1" ry="1"></rect><path d="M12 7V4M7 7V4M17 7V4M2 19h20M7 11h1M16 11h1M7 15h1M16 15h1"></path></svg>',l:'Dep DigiToPay',v:fR(totDtp.dep),s:'PSP (processador)',c:'cyan'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',l:'Dep Phoenix',v:fR(totPhx.dep),s:'Operador',c:'green'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 2.2"></path></svg>',l:'Dep Smartico',v:fR(totSmt.dep),s:'Trackeado afiliados',c:'blue'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2"></path></svg>',l:'Orgânico (est.)',v:fR(orgDep>0?orgDep:0),s:fP(orgPct>0?orgPct:0)+' do total PHX',c:'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>',l:'Div Dep PHX-DTP',v:fP(Math.abs(divDep)),s:divDep>=0?'Phoenix > DTP':'DTP > Phoenix',c:Math.abs(divDep)>5?'red':'green'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M12 8v4M10 12h4"></path></svg>',l:'Saq DigiToPay',v:fR(totDtp.saq),s:'PSP (processador)',c:'cyan'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M12 8v4M10 12h4"></path></svg>',l:'Saq Phoenix',v:fR(totPhx.saq),s:'Operador',c:'green'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>',l:'Div Saq PHX-DTP',v:fP(Math.abs(divSaq)),s:divSaq>=0?'Phoenix > DTP':'DTP > Phoenix',c:Math.abs(divSaq)>5?'red':'green'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a4.5 4.5 0 0 0 0 9h5a4.5 4.5 0 0 1 0 9H6"></path></svg>',l:'Taxas PSP',v:fR(totDtp.taxa),s:'Total taxas DigiToPay',c:'purple'},
   ].map(function(k){return '<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>'}).join('');
   var alerts=[];
-  if(Math.abs(divDep)>5)alerts.push({type:'danger',msg:'⚠️ Divergência DEPÓSITOS PHX vs DTP: '+divDep.toFixed(1)+'% ('+fR(Math.abs(totPhx.dep-totDtp.dep))+'). Possível causa: fuso horário ou processamento pendente.'});
-  if(Math.abs(divSaq)>10)alerts.push({type:'danger',msg:'🚨 Divergência SAQUES PHX vs DTP: '+divSaq.toFixed(1)+'% ('+fR(Math.abs(totPhx.saq-totDtp.saq))+'). DTP reporta valor solicitado, Phoenix reporta valor líquido.'});
-  if(orgDep>0)alerts.push({type:'warning',msg:'🌱 Tráfego ORGÂNICO estimado: '+fR(orgDep)+' em depósitos ('+orgPct.toFixed(1)+'%). Leads que cadastraram fora dos links trackeados não aparecem na Smartico.'});
-  if(totDtp.taxa>0){var pctTx=((totDtp.taxa/(totDtp.dep+totDtp.saq))*100);alerts.push({type:'info',msg:'💡 Taxas PSP no período: '+fR(totDtp.taxa)+' ('+pctTx.toFixed(2)+'% do volume processado)'});}
+  if(Math.abs(divDep)>5)alerts.push({type:'danger',msg:'Divergência DEPÓSITOS PHX vs DTP: '+divDep.toFixed(1)+'% ('+fR(Math.abs(totPhx.dep-totDtp.dep))+'). Possível causa: fuso horário ou processamento pendente.'});
+  if(Math.abs(divSaq)>10)alerts.push({type:'danger',msg:'Divergência SAQUES PHX vs DTP: '+divSaq.toFixed(1)+'% ('+fR(Math.abs(totPhx.saq-totDtp.saq))+'). DTP reporta valor solicitado, Phoenix reporta valor líquido.'});
+  if(orgDep>0)alerts.push({type:'warning',msg:'Tráfego ORGÂNICO estimado: '+fR(orgDep)+' em depósitos ('+orgPct.toFixed(1)+'%). Leads que cadastraram fora dos links trackeados não aparecem na Smartico.'});
+  if(totDtp.taxa>0){var pctTx=((totDtp.taxa/(totDtp.dep+totDtp.saq))*100);alerts.push({type:'info',msg:'Taxas PSP no período: '+fR(totDtp.taxa)+' ('+pctTx.toFixed(2)+'% do volume processado)'});}
   document.getElementById('recon-alerts').innerHTML=alerts.map(function(a){
     var bg=a.type==='danger'?'rgba(243,139,168,.15)':a.type==='warning'?'rgba(249,226,175,.12)':'rgba(137,180,250,.1)';
     var bd=a.type==='danger'?'#f38ba8':a.type==='warning'?'#f9e2af':'#89b4fa';
@@ -1627,50 +1625,48 @@ function sp(n,el){
 document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); });
 
 // ═══════════════════════════════════════════════════════════
-// AUTH SYSTEM — Jogo Grande BI
+// AUTH SYSTEM — Jogo Grande BI (API-based)
 // ═══════════════════════════════════════════════════════════
 let AUTH_USERS = [];
 let CURRENT_USER = null;
 
-async function sha256(str){
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+function getAdminCreds(){
+  try{ const r=sessionStorage.getItem('jg_acreds'); return r?JSON.parse(atob(r)):null; }catch(e){return null;}
 }
 
 async function loadAuthUsers(){
+  if(!CURRENT_USER||CURRENT_USER.role!=='admin') return;
+  const creds=getAdminCreds(); if(!creds) return;
   try{
-    const r = await fetch('./auth.json?_='+Date.now());
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    AUTH_USERS = await r.json();
-  }catch(e){
-    AUTH_USERS = [];
-  }
-  // Aplicar pending (mudanças do admin nesta sessão, ainda não commitadas)
-  const pending = localStorage.getItem('jg_auth_pending');
-  if(pending){
-    try{ AUTH_USERS = JSON.parse(pending); }catch(e){}
-  }
+    const res=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'list',adminEmail:creds.e,adminPassword:creds.p})});
+    if(res.ok) AUTH_USERS=await res.json();
+  }catch(e){}
 }
 
 async function doLogin(){
-  const email = (document.getElementById('auth-email').value||'').trim().toLowerCase();
-  const pass  = (document.getElementById('auth-pass').value||'');
-  const errEl = document.getElementById('auth-error');
+  const email=(document.getElementById('auth-email').value||'').trim().toLowerCase();
+  const pass =(document.getElementById('auth-pass').value||'');
+  const errEl=document.getElementById('auth-error');
+  const btn  =document.querySelector('.auth-btn');
   errEl.classList.remove('show');
-  if(!email||!pass){ errEl.textContent='Preencha e-mail e senha.'; errEl.classList.add('show'); return; }
-  await loadAuthUsers();
-  const hash = await sha256(email+':'+pass+':jogo2024');
-  const user = AUTH_USERS.find(u=>u.email.toLowerCase()===email && u.hash===hash);
-  if(!user){ errEl.textContent='E-mail ou senha incorretos.'; errEl.classList.add('show'); return; }
-  sessionStorage.setItem('jg_user', JSON.stringify({email:user.email,name:user.name,role:user.role}));
-  CURRENT_USER = user;
-  document.getElementById('auth-overlay').classList.add('hidden');
-  bootDashboard();
+  if(!email||!pass){errEl.textContent='Preencha e-mail e senha.';errEl.classList.add('show');return;}
+  btn.textContent='Entrando...'; btn.disabled=true;
+  try{
+    const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    const data=await res.json();
+    if(!res.ok){errEl.textContent=data.error||'E-mail ou senha incorretos.';errEl.classList.add('show');return;}
+    sessionStorage.setItem('jg_user',JSON.stringify(data));
+    if(data.role==='admin') sessionStorage.setItem('jg_acreds',btoa(JSON.stringify({e:email,p:pass})));
+    CURRENT_USER=data;
+    document.getElementById('auth-overlay').classList.add('hidden');
+    bootDashboard();
+  }catch(e){errEl.textContent='Erro de conexão. Tente novamente.';errEl.classList.add('show');}
+  finally{btn.textContent='Entrar →';btn.disabled=false;}
 }
 
 function doLogout(){
   if(!confirm('Deseja sair do dashboard?')) return;
-  sessionStorage.removeItem('jg_user');
+  sessionStorage.clear();
   CURRENT_USER = null;
   document.getElementById('auth-overlay').classList.remove('hidden');
   document.getElementById('auth-email').value='';
@@ -1752,43 +1748,36 @@ function renderUserList(){
 }
 
 async function addUser(){
-  const name  = (document.getElementById('ac-name').value||'').trim();
-  const email = (document.getElementById('ac-email').value||'').trim().toLowerCase();
-  const pass  = (document.getElementById('ac-pass').value||'');
-  const role  = document.getElementById('ac-role').value;
-  if(!name||!email||!pass){ showAcMsg('Preencha nome, e-mail e senha.','err'); return; }
-  if(AUTH_USERS.find(u=>u.email.toLowerCase()===email)){ showAcMsg('Este e-mail já está cadastrado.','err'); return; }
-  const hash = await sha256(email+':'+pass+':jogo2024');
-  AUTH_USERS.push({email,name,role,hash});
-  savePending();
-  document.getElementById('ac-name').value='';
-  document.getElementById('ac-email').value='';
-  document.getElementById('ac-pass').value='';
-  renderUserList();
-  showAcMsg('✅ '+name+' adicionado! Exporte o auth.json e faça o commit para ativar o acesso.','ok');
+  const name =(document.getElementById('ac-name').value||'').trim();
+  const email=(document.getElementById('ac-email').value||'').trim().toLowerCase();
+  const pass =(document.getElementById('ac-pass').value||'');
+  const role =document.getElementById('ac-role').value;
+  if(!name||!email||!pass){showAcMsg('Preencha nome, e-mail e senha.','err');return;}
+  const creds=getAdminCreds();
+  if(!creds){showAcMsg('Sessão expirada. Faça login novamente.','err');return;}
+  const btn=document.querySelector('.ac-submit'); btn.textContent='Adicionando...'; btn.disabled=true;
+  try{
+    const res=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'add',adminEmail:creds.e,adminPassword:creds.p,email,name,role,password:pass})});
+    const data=await res.json();
+    if(!res.ok){showAcMsg(data.error||'Erro ao adicionar.','err');return;}
+    document.getElementById('ac-name').value='';
+    document.getElementById('ac-email').value='';
+    document.getElementById('ac-pass').value='';
+    await loadAuthUsers(); renderUserList();
+    showAcMsg(name+' adicionado com sucesso! Já pode fazer login agora.','ok');
+  }catch(e){showAcMsg('Erro de conexão.','err');}
+  finally{btn.textContent='Adicionar Usuário';btn.disabled=false;}
 }
 
-function removeUser(email){
+async function removeUser(email){
   if(!confirm('Remover o acesso de '+email+'?')) return;
-  AUTH_USERS = AUTH_USERS.filter(u=>u.email.toLowerCase()!==email.toLowerCase());
-  savePending();
-  renderUserList();
-  showAcMsg('Usuário removido. Exporte o auth.json e faça o commit para confirmar.','ok');
-}
-
-function savePending(){
-  localStorage.setItem('jg_auth_pending', JSON.stringify(AUTH_USERS));
-}
-
-function exportAuthJson(){
-  const data = AUTH_USERS.map(u=>({email:u.email,name:u.name,role:u.role,hash:u.hash}));
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'auth.json';
-  a.click();
-  localStorage.removeItem('jg_auth_pending');
-  showAcMsg('✅ auth.json exportado! Commit o arquivo no repositório e faça o deploy no Vercel.','ok');
+  const creds=getAdminCreds(); if(!creds){showAcMsg('Sessão expirada.','err');return;}
+  try{
+    const res=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'remove',adminEmail:creds.e,adminPassword:creds.p,email})});
+    const data=await res.json();
+    if(res.ok){await loadAuthUsers();renderUserList();showAcMsg('Usuário removido com sucesso.','ok');}
+    else showAcMsg(data.error||'Erro ao remover.','err');
+  }catch(e){showAcMsg('Erro de conexão.','err');}
 }
 
 function showAcMsg(text,type){
