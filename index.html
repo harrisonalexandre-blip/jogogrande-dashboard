@@ -507,6 +507,28 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <tbody id="game-tb"></tbody></table></div>
 </div>
 
+<!-- ═══ PAGE: ALERTAS ═══ -->
+<div id="pg-alertas" class="page">
+<p class="sec">Central de Alertas · Anomalias & Monitoramento</p>
+<div class="kg" id="kp-alertas"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0">
+  <div class="cb" style="padding:18px"><div class="ct"><span class="dot r"></span>ALERTAS CRITICOS</div><div id="alert-critical" style="margin-top:12px"></div></div>
+  <div class="cb" style="padding:18px"><div class="ct"><span class="dot gl"></span>AVISOS</div><div id="alert-warning" style="margin-top:12px"></div></div>
+</div>
+<div class="cb" style="padding:18px;margin:16px 0"><div class="ct"><span class="dot b"></span>INFORMATIVO</div><div id="alert-info" style="margin-top:12px"></div></div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot r"></span>RTP % Diario vs Referencia 96%</div><canvas id="c-alert-rtp"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot gl"></span>NGR Diario (R$)</div><canvas id="c-alert-ngr"></canvas></div>
+</div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot c"></span>FTD por Dia (tendencia)</div><canvas id="c-alert-ftd"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot b"></span>Sportsbook GGR Diario (R$)</div><canvas id="c-alert-sbggr"></canvas></div>
+</div>
+<div class="tb"><div class="th"><h3>Historico de Alertas (ultimos 30 dias)</h3></div>
+<table><thead><tr><th>Data</th><th>Severidade</th><th>Categoria</th><th>Descricao</th><th>Valor</th></tr></thead>
+<tbody id="alert-history-tb"></tbody></table></div>
+</div>
+
 <!-- ═══ PAGE: CAIXA (Em Construção) ═══ -->
 <div id="pg-caixa" class="page">
 <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;gap:16px">
@@ -1656,6 +1678,104 @@ function rRecon(){
   document.getElementById('recon-table-daily').innerHTML=dH+dB;
 }
 
+// ═══ ALERTAS ENGINE ═══
+function generateAlerts(){
+  const alerts=[];
+  const sev={CRITICAL:'critical',WARNING:'warning',INFO:'info'};
+  const cat={RTP:'RTP Casino',GGR:'GGR/Margem',PERF:'Performance',SB:'Sportsbook',PROV:'Provider'};
+  if(typeof SS_DAILY!=='undefined'){
+    SS_DAILY.forEach(d=>{
+      if(d.rtp>100)alerts.push({sev:sev.CRITICAL,cat:cat.RTP,dt:d.dt,desc:'RTP acima de 100% \u2014 casa no prejuizo',val:d.rtp.toFixed(2)+'%',detail:'GGR: \u20ac'+fN(Math.round(d.ggr))});
+      else if(d.rtp>98)alerts.push({sev:sev.WARNING,cat:cat.RTP,dt:d.dt,desc:'RTP elevado (>98%), margem comprimida',val:d.rtp.toFixed(2)+'%',detail:'GGR%: '+d.gp.toFixed(2)+'%'});
+      if(d.rtp<90&&d.sc>5000)alerts.push({sev:sev.WARNING,cat:cat.RTP,dt:d.dt,desc:'RTP anormalmente baixo (<90%)',val:d.rtp.toFixed(2)+'%',detail:'Spins: '+fN(d.sc)});
+    });
+    SS_DAILY.forEach(d=>{
+      if(d.ggr<0)alerts.push({sev:sev.CRITICAL,cat:cat.GGR,dt:d.dt,desc:'GGR NEGATIVO \u2014 casino perdeu dinheiro',val:'\u20ac'+fN(Math.round(d.ggr)),detail:'Turnover: \u20ac'+fN(Math.round(d.to))});
+    });
+  }
+  if(typeof SS_PROVS!=='undefined'){
+    SS_PROVS.forEach(p=>{
+      if(p.rtp>97)alerts.push({sev:sev.WARNING,cat:cat.PROV,dt:'Acumulado',desc:'Provider '+p.pv+' com RTP alto (>97%)',val:p.rtp.toFixed(2)+'%',detail:'Turnover: \u20ac'+fN(Math.round(p.to))});
+      if(p.gp<0)alerts.push({sev:sev.CRITICAL,cat:cat.PROV,dt:'Acumulado',desc:'Provider '+p.pv+' com GGR% NEGATIVO',val:p.gp.toFixed(2)+'%',detail:'GGR: \u20ac'+fN(Math.round(p.ggr))});
+    });
+    const totTo=SS_PROVS.reduce((s,p)=>s+p.to,0);
+    const topPct=(SS_PROVS[0].to/totTo*100);
+    if(topPct>40)alerts.push({sev:sev.INFO,cat:cat.PROV,dt:'Acumulado',desc:'Concentracao: '+SS_PROVS[0].pv+' representa '+topPct.toFixed(1)+'% do turnover',val:topPct.toFixed(1)+'%',detail:'Diversificar pode reduzir risco'});
+  }
+  const last30=D.slice(-30);
+  for(let i=1;i<last30.length;i++){
+    const d=last30[i],prev=last30[i-1];
+    if(d.ngr<0)alerts.push({sev:sev.CRITICAL,cat:cat.PERF,dt:d.date,desc:'NGR NEGATIVO no dia',val:fR(d.ngr),detail:'Dep: '+fR(d.ds)+' | Saq: '+fR(d.ws)});
+    if(prev.ftd>3&&d.ftd>0){const ftdChg=((d.ftd-prev.ftd)/prev.ftd*100);
+      if(ftdChg<-50)alerts.push({sev:sev.WARNING,cat:cat.PERF,dt:d.date,desc:'Queda brusca de FTD ('+ftdChg.toFixed(0)+'%)',val:d.ftd+' FTDs',detail:'Anterior: '+prev.ftd});}
+    if(prev.ds>100&&d.ds>0){const depChg=((d.ds-prev.ds)/prev.ds*100);
+      if(depChg>100)alerts.push({sev:sev.INFO,cat:cat.PERF,dt:d.date,desc:'Spike de depositos (+'+depChg.toFixed(0)+'%)',val:fR(d.ds),detail:'Anterior: '+fR(prev.ds)});}
+  }
+  last30.forEach(d=>{if(d.sb_ggr<-1000)alerts.push({sev:sev.WARNING,cat:cat.SB,dt:d.date,desc:'Sportsbook GGR negativo',val:fR(d.sb_ggr),detail:'TO: '+fR(d.sb_to)});});
+  const sevOrd={critical:0,warning:1,info:2};
+  alerts.sort((a,b)=>sevOrd[a.sev]-sevOrd[b.sev]||(b.dt||'').localeCompare(a.dt||''));
+  return alerts;
+}
+function rAlertas(){
+  const alerts=generateAlerts();
+  const crit=alerts.filter(a=>a.sev==='critical');
+  const warn=alerts.filter(a=>a.sev==='warning');
+  const info=alerts.filter(a=>a.sev==='info');
+  const badge=document.getElementById('alert-badge');
+  if(badge){badge.style.display=crit.length>0?'inline':'none';badge.textContent=crit.length;}
+  document.getElementById('kp-alertas').innerHTML=[
+    {l:'CRITICOS',v:crit.length,s:'Atencao imediata',c:crit.length>0?'red':''},
+    {l:'AVISOS',v:warn.length,s:'Monitorar de perto',c:warn.length>0?'gold':''},
+    {l:'INFORMATIVOS',v:info.length,s:'Para conhecimento',c:'blue'},
+    {l:'TOTAL',v:alerts.length,s:'Ultimos 30d + acumulado',c:''},
+    {l:'RTP HOJE',v:typeof SS_DAILY!=='undefined'?SS_DAILY[SS_DAILY.length-1].rtp.toFixed(2)+'%':'N/A',s:'Ref: 96%',c:typeof SS_DAILY!=='undefined'&&SS_DAILY[SS_DAILY.length-1].rtp>98?'red':'green'},
+    {l:'NGR ONTEM',v:D.length>1?fR(D[D.length-1].ngr):'N/A',s:'Net Gaming Revenue',c:D.length>1&&D[D.length-1].ngr<0?'red':'green'},
+  ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
+  function renderCards(cid,items,empty){
+    const el=document.getElementById(cid);
+    if(!items.length){el.innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px">'+empty+'</div>';return;}
+    el.innerHTML=items.slice(0,10).map(a=>{
+      const ic=a.sev==='critical'?'var(--red)':a.sev==='warning'?'var(--gold)':'var(--blue)';
+      const bg=a.sev==='critical'?'rgba(255,68,68,.08)':a.sev==='warning'?'rgba(255,215,64,.08)':'rgba(68,136,255,.08)';
+      return `<div style="background:${bg};border-left:3px solid ${ic};border-radius:8px;padding:10px 14px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:11px;font-weight:800;color:${ic}">${a.cat}</span>
+          <span style="font-size:10px;color:var(--text3)">${a.dt}</span></div>
+        <div style="font-size:12px;color:var(--text1);margin:4px 0;font-weight:600">${a.desc}</div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="font-size:11px;color:${ic};font-weight:700">${a.val}</span>
+          <span style="font-size:10px;color:var(--text3)">${a.detail}</span></div></div>`;
+    }).join('');
+  }
+  renderCards('alert-critical',crit,'Nenhum alerta critico. Tudo OK!');
+  renderCards('alert-warning',warn,'Nenhum aviso no momento.');
+  renderCards('alert-info',info,'Nenhuma informacao relevante.');
+  const last30=D.slice(-30);const lbl30=last30.map(d=>d.df);
+  if(typeof SS_DAILY!=='undefined'){
+    const dlb=SS_DAILY.map(d=>d.dt.substring(5));
+    mc('c-alert-rtp',{type:'line',data:{labels:dlb,datasets:[
+      {label:'RTP %',data:SS_DAILY.map(d=>d.rtp),borderColor:'#FF4444',backgroundColor:'rgba(255,68,68,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:3,pointBackgroundColor:SS_DAILY.map(d=>d.rtp>100?'#FF4444':d.rtp>98?'#FFD740':'#0EA55A')},
+      {label:'Ref 96%',data:SS_DAILY.map(()=>96),borderColor:'#555',borderWidth:1,borderDash:[5,5],pointRadius:0},
+      {label:'Zona 100%',data:SS_DAILY.map(()=>100),borderColor:'rgba(255,68,68,.3)',borderWidth:1,borderDash:[3,3],pointRadius:0}
+    ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,min:85,max:110,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
+  }
+  mc('c-alert-ngr',{type:'bar',data:{labels:lbl30,datasets:[{label:'NGR R$',data:last30.map(d=>d.ngr),
+    backgroundColor:last30.map(d=>d.ngr>=0?'rgba(14,165,90,.5)':'rgba(255,68,68,.5)'),
+    borderColor:last30.map(d=>d.ngr>=0?'#0EA55A':'#FF4444'),borderWidth:1,borderRadius:4}]},
+    options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
+  mc('c-alert-ftd',{type:'line',data:{labels:lbl30,datasets:[{label:'FTD',data:last30.map(d=>d.ftd),
+    borderColor:'#00E5FF',backgroundColor:'rgba(0,229,255,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:3}]},options:{...CD}});
+  mc('c-alert-sbggr',{type:'bar',data:{labels:lbl30,datasets:[{label:'SB GGR R$',data:last30.map(d=>d.sb_ggr),
+    backgroundColor:last30.map(d=>d.sb_ggr>=0?'rgba(68,136,255,.5)':'rgba(255,68,68,.5)'),
+    borderColor:last30.map(d=>d.sb_ggr>=0?'#4488FF':'#FF4444'),borderWidth:1,borderRadius:4}]},
+    options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
+  document.getElementById('alert-history-tb').innerHTML=alerts.slice(0,30).map(a=>{
+    const sc=a.sev==='critical'?'var(--red)':a.sev==='warning'?'var(--gold)':'var(--blue)';
+    const sl=a.sev==='critical'?'CRITICO':a.sev==='warning'?'AVISO':'INFO';
+    return `<tr><td>${a.dt}</td><td style="color:${sc};font-weight:700">${sl}</td><td>${a.cat}</td><td>${a.desc}</td><td style="color:${sc};font-weight:600">${a.val}</td></tr>`;
+  }).join('');
+}
+
 // ═══ SUPERSET DATA: Casino Detalhado ═══
 const SS_GAMES=[{"ig":"Spribe","pv":"Spribe","gm":"Aviator","gid":135316,"uap":1677,"to":1050172.06,"po":1015971.5,"ggr":34200.56,"gp":2.22,"as":1.68},{"ig":"Evolution","pv":"Evolution","gm":"Ruleta Automatica","gid":339980,"uap":568,"to":1004305.67,"po":981470.45,"ggr":22835.22,"gp":2.27,"as":6.74},{"ig":"Evolution","pv":"Evolution","gm":"Speed Auto Roulette","gid":20705,"uap":620,"to":706161,"po":675138.75,"ggr":31022.25,"gp":4.39,"as":6.09},{"ig":"PGSoft","pv":"PGSOFT","gm":"Fortune Tiger","gid":44581,"uap":3761,"to":435366.89,"po":434652.22,"ggr":714.67,"gp":0.26,"as":0.43},{"ig":"AleaPlay","pv":"CreedRoomz","gm":"Roulette A Aurum","gid":149061,"uap":382,"to":418421.92,"po":408859.71,"ggr":9562.21,"gp":2.24,"as":8.75},{"ig":"Evolution","pv":"Evolution","gm":"Roleta ao Vivo","gid":20677,"uap":532,"to":318232.76,"po":314145.69,"ggr":4087.07,"gp":1.28,"as":7.04},{"ig":"AleaPlay","pv":"CreedRoomz","gm":"Roulette Brasileira","gid":149122,"uap":496,"to":287597.28,"po":280569.09,"ggr":7028.19,"gp":2.44,"as":4.55},{"ig":"PGSoft","pv":"PGSOFT","gm":"Fortune Rabbit","gid":59131,"uap":2768,"to":280710.6,"po":268476.25,"ggr":12234.35,"gp":4.35,"as":0.39},{"ig":"PGSoft","pv":"PGSOFT","gm":"Fortune Ox","gid":27534,"uap":1929,"to":217974.93,"po":208937.27,"ggr":9037.66,"gp":4.14,"as":0.39},{"ig":"PGSoft","pv":"PGSOFT","gm":"Fortune Mouse","gid":9653,"uap":1599,"to":149073.73,"po":143785.19,"ggr":5288.54,"gp":3.55,"as":0.42}];
 
@@ -1738,7 +1858,7 @@ function sp(n,el){
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
   else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
-  else if(n==='casino')rCasino();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
+  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
 document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); });
 
