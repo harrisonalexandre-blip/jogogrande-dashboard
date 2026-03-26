@@ -322,6 +322,10 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
       <span class="sb-label">BTAG ROI</span>
     </div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('saldos',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="14" r="2"/></svg>
+      <span class="sb-label">Saldos</span>
+    </div>
     <div class="sb-item" data-roles="admin,socio" onclick="sbNav('alertas',this)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="sb-label">Alertas <span id="sb-alert-badge" style="background:var(--red);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;font-weight:800;display:none">0</span></span>
@@ -385,6 +389,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tab" data-roles="admin,socio" onclick="sp('recon',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>CONCIL.</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('casino',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>CASINO DET.</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('alertas',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>ALERTAS <span id="alert-badge" style="background:var(--red);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;margin-left:2px;font-weight:800;display:none">0</span></div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('saldos',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="14" r="2"/></svg>SALDOS</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('caixa',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="3" y="5" width="18" height="14" rx="1" ry="1"></rect><path d="M12 9v6"></path><path d="M9 12h6"></path></svg>CAIXA</div>
   <div class="tab" data-roles="admin" onclick="sp('acessos',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>ACESSOS</div>
 </div>
@@ -664,6 +669,35 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <div class="tb"><div class="th"><h3>Cross-Reference Completo: BTAG x Smartico</h3><input class="si" id="btag-search" placeholder="Buscar afiliado..." oninput="filterBtag()"></div>
 <table><thead><tr><th>Afiliado (BTAG)</th><th>Tipo</th><th>Regs</th><th>FTD</th><th>FTD%</th><th>Depositos</th><th>Saques</th><th>Net P&L</th><th>Comissao</th><th>ROI</th><th>Status</th></tr></thead>
 <tbody id="btag-tb"></tbody></table></div>
+</div>
+
+<!-- ═══ PAGE: SALDOS (Client Balances) ═══ -->
+<div id="pg-saldos" class="page">
+<p class="sec">Saldos dos Jogadores · Exposicao & Monitoramento</p>
+<div class="kg" id="kp-saldos"></div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot g"></span>Saldo Acumulado (Dep - Saq) por Dia</div><canvas id="c-sal-acum"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot r"></span>Pressao de Saques (Saq / Dep %)</div><canvas id="c-sal-press"></canvas></div>
+</div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot b"></span>Depositos vs Saques Diarios</div><canvas id="c-sal-depvsaq"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot gl"></span>Net Deposits Mensal</div><canvas id="c-sal-monthly"></canvas></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0">
+  <div class="cb" style="padding:16px"><div class="ct"><span class="dot r"></span>ALERTAS DE EXPOSICAO</div><div id="sal-alerts" style="margin-top:10px"></div></div>
+  <div class="cb" style="padding:16px"><div class="ct"><span class="dot b"></span>SUPERSET REAL-TIME (em breve)</div><div id="sal-superset" style="margin-top:10px">
+    <div style="color:var(--text3);font-size:11px;line-height:1.8">
+      Quando o pipeline automatico estiver ativo, esta secao mostrara:<br>
+      <span style="color:var(--cyan)">Real Balance</span> — Saldo real dos jogadores (sacavel)<br>
+      <span style="color:var(--purple)">Bonus Balance</span> — Saldo de bonus (wagering pendente)<br>
+      <span style="color:var(--gold)">Client_Currency</span> — Split BRL vs EUR<br>
+      <span style="color:var(--green)">Wallet_UpdateTime</span> — Snapshot atualizado em tempo real
+    </div>
+  </div></div>
+</div>
+<div class="tb"><div class="th"><h3>Fluxo Diario (ultimos 30 dias)</h3></div>
+<table><thead><tr><th>Data</th><th>Depositos</th><th>Saques</th><th>Net</th><th>Saq/Dep %</th><th>Saldo Acum.</th><th>Status</th></tr></thead>
+<tbody id="sal-tb"></tbody></table></div>
 </div>
 
 <!-- ═══ PAGE: CAIXA (Em Construção) ═══ -->
@@ -1815,6 +1849,84 @@ function rRecon(){
   document.getElementById('recon-table-daily').innerHTML=dH+dB;
 }
 
+// ═══ SALDOS (Client Balances) ═══
+function rSaldos(){
+  const last30=D.slice(-30);
+  let cumDep=0,cumSaq=0;
+  // Calculate running totals from ALL data
+  D.forEach(d=>{cumDep+=d.ds;cumSaq+=d.ws;});
+  const netBalance=cumDep-cumSaq;
+  // Last 30 days metrics
+  const dep30=last30.reduce((s,d)=>s+d.ds,0);
+  const saq30=last30.reduce((s,d)=>s+d.ws,0);
+  const net30=dep30-saq30;
+  const pressao30=dep30>0?Math.round(saq30/dep30*100):0;
+  // Max single day withdrawal
+  const maxSaqDay=last30.reduce((m,d)=>d.ws>m.v?{v:d.ws,dt:d.date}:m,{v:0,dt:''});
+  document.getElementById('kp-saldos').innerHTML=[
+    {l:'SALDO ACUMULADO',v:fR(netBalance),s:'Dep - Saq historico',c:netBalance>=0?'green':'red'},
+    {l:'DEP 30 DIAS',v:fR(dep30),s:'Entradas recentes',c:'cyan'},
+    {l:'SAQ 30 DIAS',v:fR(saq30),s:'Saidas recentes',c:'red'},
+    {l:'NET 30 DIAS',v:fR(net30),s:net30>=0?'Positivo':'Negativo',c:net30>=0?'green':'red'},
+    {l:'PRESSAO SAQUES',v:pressao30+'%',s:'Saq/Dep ratio 30d',c:pressao30>80?'red':pressao30>60?'gold':'green'},
+    {l:'MAIOR SAQUE DIA',v:fR(maxSaqDay.v),s:maxSaqDay.dt||'N/A',c:'purple'},
+  ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
+  // Chart 1: Cumulative balance
+  let running=0;const cumData=[];
+  D.forEach(d=>{running+=(d.ds-d.ws);cumData.push({dt:d.df,v:running});});
+  const cum30=cumData.slice(-30);
+  mc('c-sal-acum',{type:'line',data:{labels:cum30.map(d=>d.dt),datasets:[{label:'Saldo Acumulado',data:cum30.map(d=>d.v),
+    borderColor:'#0EA55A',backgroundColor:'rgba(14,165,90,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:2}]},
+    options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
+  // Chart 2: Withdrawal pressure
+  const press=last30.map(d=>({dt:d.df,v:d.ds>0?Math.round(d.ws/d.ds*100):0}));
+  mc('c-sal-press',{type:'bar',data:{labels:press.map(d=>d.dt),datasets:[{label:'Saq/Dep %',data:press.map(d=>d.v),
+    backgroundColor:press.map(d=>d.v>100?'rgba(255,68,68,.6)':d.v>70?'rgba(255,215,64,.5)':'rgba(14,165,90,.4)'),
+    borderWidth:0,borderRadius:4},{label:'Zona 100%',data:press.map(()=>100),type:'line',borderColor:'rgba(255,68,68,.3)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false}]},
+    options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
+  // Chart 3: Dep vs Saq daily
+  mc('c-sal-depvsaq',{type:'bar',data:{labels:last30.map(d=>d.df),datasets:[
+    {label:'Depositos',data:last30.map(d=>d.ds),backgroundColor:'rgba(0,229,255,.5)',borderRadius:4,borderWidth:0},
+    {label:'Saques',data:last30.map(d=>-d.ws),backgroundColor:'rgba(255,68,68,.5)',borderRadius:4,borderWidth:0}
+  ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,stacked:true,ticks:{...CD.scales.y.ticks,callback:v=>fR(Math.abs(v),false)}}},x:{...CD.scales.x,stacked:true}}});
+  // Chart 4: Monthly net deposits
+  const months={};D.forEach(d=>{const m=d.month;if(!months[m])months[m]={dep:0,saq:0};months[m].dep+=d.ds;months[m].saq+=d.ws;});
+  const mKeys=Object.keys(months).sort();
+  mc('c-sal-monthly',{type:'bar',data:{labels:mKeys.map(m=>m.substring(2)),datasets:[
+    {label:'Dep',data:mKeys.map(m=>months[m].dep),backgroundColor:'rgba(0,229,255,.5)',borderRadius:4,borderWidth:0},
+    {label:'Saq',data:mKeys.map(m=>-months[m].saq),backgroundColor:'rgba(255,68,68,.5)',borderRadius:4,borderWidth:0},
+    {label:'Net',data:mKeys.map(m=>months[m].dep-months[m].saq),type:'line',borderColor:'#FFD740',borderWidth:2,pointRadius:4,pointBackgroundColor:mKeys.map(m=>months[m].dep-months[m].saq>=0?'#0EA55A':'#FF4444'),fill:false}
+  ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(Math.abs(v),false)}}}}});
+  // Exposure alerts
+  const alerts=[];
+  last30.forEach(d=>{
+    const pr=d.ds>0?d.ws/d.ds*100:0;
+    if(pr>120)alerts.push({dt:d.date,desc:'Saques superam depositos em '+Math.round(pr)+'%',v:fR(d.ws),sev:'critical'});
+    else if(pr>90)alerts.push({dt:d.date,desc:'Pressao de saques alta: '+Math.round(pr)+'%',v:fR(d.ws),sev:'warning'});
+  });
+  if(netBalance<0)alerts.unshift({dt:'Acumulado',desc:'Saldo acumulado NEGATIVO — mais saques que depositos no total',v:fR(netBalance),sev:'critical'});
+  const salEl=document.getElementById('sal-alerts');
+  if(!alerts.length){salEl.innerHTML='<div style="color:var(--green);font-size:12px">Nenhum alerta de exposicao. Saudavel!</div>';}
+  else{salEl.innerHTML=alerts.slice(0,8).map(a=>{
+    const ic=a.sev==='critical'?'var(--red)':'var(--gold)';
+    return `<div style="border-left:3px solid ${ic};padding:6px 10px;margin-bottom:6px;border-radius:6px;background:rgba(255,255,255,.02)">
+      <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:var(--text3)">${a.dt}</span><span style="font-size:11px;color:${ic};font-weight:700">${a.v}</span></div>
+      <div style="font-size:11px;color:var(--text1)">${a.desc}</div></div>`;
+  }).join('');}
+  // Daily table
+  let cumRun=0;D.forEach(d=>{cumRun+=(d.ds-d.ws);});
+  let tblCum=cumRun;
+  document.getElementById('sal-tb').innerHTML=last30.slice().reverse().map(d=>{
+    const net=d.ds-d.ws;const pr=d.ds>0?Math.round(d.ws/d.ds*100):0;
+    const sc=pr>100?'var(--red)':pr>70?'var(--gold)':'var(--green)';
+    const sl=pr>100?'ALERTA':pr>70?'ATENÇÃO':'OK';
+    const row=`<tr><td>${d.df||d.date}</td><td style="color:var(--cyan)">${fR(d.ds)}</td><td style="color:var(--red)">${fR(d.ws)}</td>
+      <td class="${net>=0?'bp':'bn'}">${fR(net)}</td><td style="color:${sc}">${pr}%</td>
+      <td>${fR(tblCum)}</td><td style="color:${sc};font-weight:700;font-size:10px">${sl}</td></tr>`;
+    tblCum-=net;return row;
+  }).join('');
+}
+
 // ═══ BTAG CROSS-REFERENCE ═══
 function getBtagData(){
   if(typeof AFF==='undefined'||!AFF.affs)return[];
@@ -2089,7 +2201,7 @@ function sp(n,el){
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
   else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
-  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
+  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
 function sbNav(n,el){
   sp(n,el);
