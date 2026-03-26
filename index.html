@@ -61,12 +61,7 @@ body.sb-open .sb-toggle svg{transform:rotate(180deg)}
 .sb-handle:hover{background:var(--greenB);color:var(--green);border-color:rgba(14,165,90,.3)}
 .sb-handle svg{transition:transform .25s;width:12px;height:12px}
 body.sb-open .sb-handle{left:197px}
-body.sb-hidden .sidebar{width:0;border:none}
-body.sb-hidden .sb-handle{left:-3px;border-left:1px solid var(--border);border-radius:0 8px 8px 0}
-body.sb-hidden .sb-handle svg{transform:rotate(180deg)}
-body.sb-hidden .main-wrap{margin-left:0}
-body.sb-hidden .hdr{margin-left:0}
-body.sb-hidden .ticker-bar{margin-left:0}
+body.sb-open .sb-handle svg{transform:rotate(180deg)}
 /* TICKER */
 .ticker-bar{background:var(--bg2);border-bottom:1px solid var(--border);overflow:hidden;height:32px;position:relative;margin-left:52px;transition:margin-left .25s}
 body.sb-open .ticker-bar{margin-left:200px}
@@ -2396,13 +2391,7 @@ function toggleSidebar(){
   document.body.classList.remove('sb-hidden');
 }
 function toggleSidebarVisibility(){
-  const isHidden=document.body.classList.contains('sb-hidden');
-  if(isHidden){
-    document.body.classList.remove('sb-hidden');
-  } else {
-    document.body.classList.add('sb-hidden');
-    document.body.classList.remove('sb-open');
-  }
+  document.body.classList.toggle('sb-open');
 }
 
 // ═══ TICKER — CNN-style insights ═══
