@@ -919,7 +919,8 @@ function setTime(period,el){
   const ap=document.querySelector('.page.active');
   if(ap){const id=ap.id.replace('pg-','');RD[id]=true;
     if(id==='ov')renderOverview();else if(id==='perf')rPerf();
-    else if(id==='hist')rHist();else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='afil')rAfil();else if(id==='crm')rCRM();else if(id==='recon')rRecon();}
+    else if(id==='hist')rHist();else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='afil')rAfil();else if(id==='crm')rCRM();else if(id==='recon')rRecon();
+    else if(id==='casino')rCasino();else if(id==='alertas')rAlertas();else if(id==='btag')rBtag();}
 }
 
 function calcKPIs(data,period){
@@ -2131,38 +2132,76 @@ const SS_PROVS=[{"pv":"Evolution","to":2708893.78,"po":2630574.36,"ggr":78319.42
 
 const SS_DAILY=[{"dt":"2025-12-01","uap":89,"sc":11389,"as":1.05,"to":11937.82,"po":12101.32,"ggr":-163.5,"gp":-1.57,"rtp":101.37},{"dt":"2025-12-13","uap":71,"sc":18505,"as":1.58,"to":29303.85,"po":22959.35,"ggr":6344.5,"gp":21.81,"rtp":78.35},{"dt":"2026-01-15","uap":89,"sc":25411,"as":0.81,"to":20548.37,"po":19834.78,"ggr":713.59,"gp":3.55,"rtp":96.53},{"dt":"2026-02-15","uap":219,"sc":48775,"as":0.72,"to":35306.39,"po":33823.41,"ggr":1482.98,"gp":4.2,"rtp":95.8},{"dt":"2026-03-01","uap":284,"sc":90516,"as":0.49,"to":44116.9,"po":44212.24,"ggr":-95.34,"gp":-0.43,"rtp":100.22},{"dt":"2026-03-05","uap":170,"sc":55633,"as":0.73,"to":40842.78,"po":43811.91,"ggr":-2969.13,"gp":-7.27,"rtp":107.27},{"dt":"2026-03-10","uap":213,"sc":43754,"as":0.98,"to":42710.24,"po":42668.01,"ggr":42.23,"gp":0.1,"rtp":99.9},{"dt":"2026-03-15","uap":289,"sc":55870,"as":0.99,"to":55068.06,"po":51994.18,"ggr":3073.88,"gp":5.54,"rtp":94.42},{"dt":"2026-03-17","uap":267,"sc":62458,"as":1.22,"to":76063.15,"po":67889.19,"ggr":8173.96,"gp":10.76,"rtp":89.25},{"dt":"2026-03-20","uap":276,"sc":48740,"as":1.01,"to":49261.23,"po":46747.18,"ggr":2514.05,"gp":5.1,"rtp":94.9},{"dt":"2026-03-23","uap":420,"sc":87915,"as":0.99,"to":87078.49,"po":84030.31,"ggr":3048.18,"gp":3.5,"rtp":96.5},{"dt":"2026-03-25","uap":323,"sc":78840,"as":1.1,"to":86695.98,"po":83181.53,"ggr":3514.45,"gp":4.07,"rtp":95.95}];
 
+function getFilteredSSDaily(){
+  // Filtra SS_DAILY pelo período selecionado (mesma lógica do getFilteredData)
+  const all=SS_DAILY;
+  if(!all.length) return all;
+  switch(currentPeriod){
+    case 'today': {
+      const today=new Date().toISOString().slice(0,10);
+      const f=all.filter(d=>d.dt===today);
+      return f.length?f:[all[all.length-1]];
+    }
+    case 'yesterday': {
+      const yd=new Date();yd.setDate(yd.getDate()-1);const yds=yd.toISOString().slice(0,10);
+      const f=all.filter(d=>d.dt===yds);
+      return f.length?f:[all[all.length-1]];
+    }
+    case 'week': {
+      const now=new Date();const dow=now.getDay();const mon=new Date(now);mon.setDate(now.getDate()-(dow===0?6:dow-1));
+      const ws=mon.toISOString().slice(0,10);
+      const f=all.filter(d=>d.dt>=ws);
+      return f.length?f:all.slice(-3);
+    }
+    case 'month': {
+      const ms=new Date().toISOString().slice(0,8)+'01';
+      const f=all.filter(d=>d.dt>=ms);
+      return f.length?f:all.slice(-5);
+    }
+    case 'year': {
+      return all.filter(d=>d.dt>='2026-01-01');
+    }
+    case 'lifetime': default:
+      return all;
+  }
+}
+
 function rCasino(){
   const EB=6.14;
   const fBRL=v=>{const a=Math.abs(v);return(v<0?'-':'')+'R$ '+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e3?(a/1e3).toFixed(1)+'K':fN(Math.round(a)))};
   const fEUR=v=>'\u20ac'+fN(Math.round(v));
-  const totTo=SS_PROVS.reduce((s,p)=>s+p.to,0);
-  const totGGR=SS_PROVS.reduce((s,p)=>s+p.ggr,0);
-  const avgRTP=Math.round((1-totGGR/totTo)*10000)/100;
-  const avgGGRP=Math.round(totGGR/totTo*10000)/100;
-  const totGames=SS_PROVS.reduce((s,p)=>s+p.gc,0);
-  const lastDay=SS_DAILY[SS_DAILY.length-1];
+  const daily=getFilteredSSDaily();
+  const pLabel=getPeriodLabel(currentPeriod);
+  // KPIs agregados do período filtrado
+  const totTo=daily.reduce((s,d)=>s+d.to,0);
+  const totPo=daily.reduce((s,d)=>s+d.po,0);
+  const totGGR=daily.reduce((s,d)=>s+d.ggr,0);
+  const avgRTP=totTo>0?Math.round((1-totGGR/totTo)*10000)/100:0;
+  const avgGGRP=totTo>0?Math.round(totGGR/totTo*10000)/100:0;
+  const lastDay=daily[daily.length-1];
+  const avgUAP=daily.length>0?Math.round(daily.reduce((s,d)=>s+d.uap,0)/daily.length):0;
   document.getElementById('kp-casino').innerHTML=[
-    {l:'TURNOVER TOTAL',v:fBRL(totTo*EB),s:'<span style="opacity:.5;font-size:10px">'+fEUR(totTo)+'</span> · Todos os providers',c:'gold'},
-    {l:'GGR TOTAL',v:fBRL(totGGR*EB),s:'<span style="opacity:.5;font-size:10px">'+fEUR(totGGR)+'</span> · Gross Gaming Revenue',c:''},
-    {l:'GGR %',v:avgGGRP.toFixed(2)+'%',s:'Margem casino',c:'blue'},
+    {l:'TURNOVER '+pLabel,v:fBRL(totTo*EB),s:'<span style="opacity:.5;font-size:10px">'+fEUR(totTo)+'</span> · '+daily.length+' dias',c:'gold'},
+    {l:'GGR '+pLabel,v:fBRL(totGGR*EB),s:'<span style="opacity:.5;font-size:10px">'+fEUR(totGGR)+'</span> · Gross Gaming Revenue',c:totGGR>=0?'':'red'},
+    {l:'GGR %',v:avgGGRP.toFixed(2)+'%',s:'Margem casino · '+pLabel,c:'blue'},
     {l:'RTP M\u00c9DIO',v:avgRTP.toFixed(2)+'%',s:'Retorno ao jogador',c:avgRTP>97?'red':avgRTP>95?'gold':'green'},
-    {l:'AVG SPIN (HOJE)',v:'R$ '+(lastDay.as*EB).toFixed(2),s:'<span style="opacity:.5;font-size:10px">\u20ac'+lastDay.as.toFixed(2)+'</span> · Aposta m\u00e9dia por spin',c:'cyan'},
-    {l:'PROVIDERS',v:fN(SS_PROVS.length),s:fN(totGames)+' jogos ativos',c:'purple'},
+    {l:'AVG SPIN',v:'R$ '+(lastDay.as*EB).toFixed(2),s:'<span style="opacity:.5;font-size:10px">\u20ac'+lastDay.as.toFixed(2)+'</span> · Último dia',c:'cyan'},
+    {l:'UAP MÉDIO',v:fN(avgUAP),s:'Jogadores ativos/dia · '+pLabel,c:'purple'},
   ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
 
-  const dlb=SS_DAILY.map(d=>d.dt.substring(5));
-  mc('c-rtp',{type:'line',data:{labels:dlb,datasets:[{label:'RTP %',data:SS_DAILY.map(d=>d.rtp),
+  const dlb=daily.map(d=>d.dt.substring(5));
+  mc('c-rtp',{type:'line',data:{labels:dlb,datasets:[{label:'RTP %',data:daily.map(d=>d.rtp),
     borderColor:'#FF4444',backgroundColor:'rgba(255,68,68,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:4},
-    {label:'Ref 96%',data:SS_DAILY.map(()=>96),borderColor:'#555',borderWidth:1,borderDash:[5,5],pointRadius:0}]},
+    {label:'Ref 96%',data:daily.map(()=>96),borderColor:'#555',borderWidth:1,borderDash:[5,5],pointRadius:0}]},
     options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},
     scales:{...CD.scales,y:{...CD.scales.y,min:85,max:110,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
 
-  mc('c-ggrp',{type:'bar',data:{labels:dlb,datasets:[{label:'GGR %',data:SS_DAILY.map(d=>d.gp),
-    backgroundColor:SS_DAILY.map(d=>d.gp>=0?'rgba(14,165,90,.5)':'rgba(255,68,68,.5)'),
-    borderColor:SS_DAILY.map(d=>d.gp>=0?'#0EA55A':'#FF4444'),borderWidth:1,borderRadius:4}]},
+  mc('c-ggrp',{type:'bar',data:{labels:dlb,datasets:[{label:'GGR %',data:daily.map(d=>d.gp),
+    backgroundColor:daily.map(d=>d.gp>=0?'rgba(14,165,90,.5)':'rgba(255,68,68,.5)'),
+    borderColor:daily.map(d=>d.gp>=0?'#0EA55A':'#FF4444'),borderWidth:1,borderRadius:4}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
 
-  mc('c-avgspin',{type:'line',data:{labels:dlb,datasets:[{label:'Avg Spin R$',data:SS_DAILY.map(d=>Math.round(d.as*EB*100)/100),
+  mc('c-avgspin',{type:'line',data:{labels:dlb,datasets:[{label:'Avg Spin R$',data:daily.map(d=>Math.round(d.as*EB*100)/100),
     borderColor:'#4488FF',backgroundColor:'rgba(68,136,255,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:4}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'R$ '+v.toFixed(2)}}}}});
 
