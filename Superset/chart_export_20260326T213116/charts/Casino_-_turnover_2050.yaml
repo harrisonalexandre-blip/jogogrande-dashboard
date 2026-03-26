@@ -1,0 +1,59 @@
+slice_name: Casino - turnover
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_area
+params:
+  datasource: 5__table
+  viz_type: echarts_area
+  x_axis: spin_date
+  time_grain_sqla: P1D
+  metrics:
+  - casino_turnover_eur
+  groupby:
+  - currency
+  adhoc_filters:
+  - clause: WHERE
+    subject: spin_date
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  row_limit: 10000
+  truncate_metric: true
+  show_empty_columns: true
+  comparison_type: values
+  annotation_layers: []
+  forecastPeriods: 10
+  forecastInterval: 0.8
+  x_axis_title_margin: 15
+  y_axis_title_margin: 15
+  y_axis_title_position: Left
+  sort_series_type: sum
+  color_scheme: supersetColors
+  seriesType: line
+  opacity: 0.2
+  only_total: true
+  markerSize: 6
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  x_axis_time_format: smart_date
+  rich_tooltip: true
+  showTooltipTotal: true
+  showTooltipPercentage: true
+  tooltipTimeFormat: smart_date
+  y_axis_format: SMART_NUMBER
+  truncateXAxis: true
+  y_axis_bounds:
+  - null
+  - null
+  extra_form_data: {}
+  dashboards:
+  - 925
+query_context: '{"datasource":{"id":5,"type":"table"},"force":false,"queries":[{"filters":[{"col":"spin_date","op":"TEMPORAL_RANGE","val":"No
+  filter"}],"extras":{"time_grain_sqla":"P1D","having":"","where":""},"applied_time_extras":{},"columns":[{"timeGrain":"P1D","columnType":"BASE_AXIS","sqlExpression":"spin_date","label":"spin_date","expressionType":"SQL"},"currency"],"metrics":["casino_turnover_eur"],"orderby":[["casino_turnover_eur",false]],"annotation_layers":[],"row_limit":10000,"series_columns":["currency"],"series_limit":0,"order_desc":true,"url_params":{},"custom_params":{},"custom_form_data":{},"time_offsets":[],"post_processing":[{"operation":"pivot","options":{"index":["spin_date"],"columns":["currency"],"aggregates":{"casino_turnover_eur":{"operator":"mean"}},"drop_missing_columns":false}},{"operation":"rename","options":{"columns":{"casino_turnover_eur":null},"level":0,"inplace":true}},{"operation":"flatten"}]}],"form_data":{"adhoc_filters":[{"clause":"WHERE","comparator":"No
+  filter","expressionType":"SIMPLE","operator":"TEMPORAL_RANGE","subject":"spin_date"}],"annotation_layers":[],"color_scheme":"supersetColors","comparison_type":"values","dashboards":[925],"datasource":"5__table","extra_form_data":{},"forecastInterval":0.8,"forecastPeriods":10,"groupby":["currency"],"legendOrientation":"top","legendType":"scroll","markerSize":6,"metrics":["casino_turnover_eur"],"only_total":true,"opacity":0.2,"rich_tooltip":true,"row_limit":10000,"seriesType":"line","showTooltipPercentage":true,"showTooltipTotal":true,"show_empty_columns":true,"show_legend":true,"slice_id":2050,"sort_series_type":"sum","time_grain_sqla":"P1D","tooltipTimeFormat":"smart_date","truncateXAxis":true,"truncate_metric":true,"viz_type":"echarts_area","x_axis":"spin_date","x_axis_time_format":"smart_date","x_axis_title_margin":15,"y_axis_bounds":[null,null],"y_axis_format":"SMART_NUMBER","y_axis_title_margin":15,"y_axis_title_position":"Left","force":false,"result_format":"json","result_type":"full"},"result_format":"json","result_type":"full"}'
+cache_timeout: null
+uuid: 5f419228-ce7b-4e23-a68a-af30bfbda74f
+version: 1.0.0
+dataset_uuid: bce7aad0-f8c8-4d09-9f5f-fe068cd3914b

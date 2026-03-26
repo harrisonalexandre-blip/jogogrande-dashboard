@@ -1,0 +1,783 @@
+table_name: olap_sportsbook
+main_dttm_col: event_start_time
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: null
+catalog: null
+schema: default
+sql: "select \nbc.bet_id as bet_id, \nbc.outcome_id as outcome_id,\nbc.bet_odds,\n\
+  bc.event_id,\nbc.event_name,\nbc.event_start_time,\nbc.outcome_odds,\nbc.market_id,\n\
+  bc.market_name,\nbc.sport_id,\nbc.sport_name,\nbc.provider_name, \nbc.region_name,\n\
+  bc.outcome_sport_service,\nbc.outcome_status,\nbc.tournament_name,\nbc.outcomes_count,\n\
+  bc.project_id as project_id,\nbc.sport_service,\nbc.bet_status,\nbc.create_time,\n\
+  bc.update_time as update_time,\nbc.outcome_name,\nbc.test_mode as is_test_bet,\n\
+  bc.client_fin_category,\nbc.market_grade,\nbc.currency as currency,\nbld.amount,\
+  \ \nbld.amount_bc,\nbld.win_amount as win_amount,\nbld.win_amount_bc as win_amount_bc,\n\
+  p.name as project_name,\nc.login as client_login,\nc.phone as client_phone_number,\n\
+  c.email as client_email,\nc.btag as BTAG,\nc.first_name,\nc.last_name,\nc.is_test\
+  \ as client_is_test,\nc.is_verified as client_is_verified,\nc.status as client_status,\n\
+  c.country as client_country,\nbc.client_id as client_id,\ncase when bc.bet_amount\
+  \ < 100 then 'less than 1'\nwhen bc.bet_amount >= 100 and bc.bet_amount < 500 then\
+  \ '1-5'\nwhen bc.bet_amount >= 500 and bc.bet_amount < 1000 then '5-10'\nwhen bc.bet_amount\
+  \ >= 1000 and bc.bet_amount < 2000 then '10-20'\nwhen bc.bet_amount >= 2000 and\
+  \ bc.bet_amount < 5000 then '20-50'\nwhen bc.bet_amount >= 5000 and bc.bet_amount\
+  \ < 10000 then '50-100'\nwhen bc.bet_amount >= 10000 and bc.bet_amount < 50000 then\
+  \ '100-500'\nwhen bc.bet_amount >= 50000 then 'more than 500'\nend as bet_amount_range,\n\
+  case when bc.bet_amount_bc < 100 then 'less than 1'\nwhen bc.bet_amount_bc >= 100\
+  \ and bc.bet_amount_bc < 500 then '1-5'\nwhen bc.bet_amount_bc >= 500 and bc.bet_amount_bc\
+  \ < 1000 then '5-10'\nwhen bc.bet_amount_bc >= 1000 and bc.bet_amount_bc < 2000\
+  \ then '10-20'\nwhen bc.bet_amount_bc >= 2000 and bc.bet_amount_bc < 5000 then '20-50'\n\
+  when bc.bet_amount_bc >= 5000 and bc.bet_amount_bc < 10000 then '50-100'\nwhen bc.bet_amount_bc\
+  \ >= 10000 and bc.bet_amount_bc < 50000 then '100-500'\nwhen bc.bet_amount_bc >=\
+  \ 50000 then 'more than 500'\nend as bet_amount_range_eur,\nc.registration_time\
+  \ as client_registration_time,\nbc.settlement_time,\nbc.money_balance_type,\ne.new_status\
+  \ as event_status\nfrom project_0.bet_change bc final\njoin project_0.bet_liability_distribution\
+  \ bld final on bld.bet_id  = bc.bet_id and bld.outcome_id = bc.outcome_id \njoin\
+  \ project_0.project p final on p.id = bc.project_id\njoin project_0.client c final\
+  \ on c.client_id = bc.client_id\nleft join project_0.event e final on e.event_id\
+  \ = bc.event_id"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: f1dc7d31-8a85-4c5e-b1ed-58110e06afba
+metrics:
+- metric_name: arpu_eur
+  verbose_name: "arpu \u20AC"
+  metric_type: null
+  expression: sum(win_amount_bc/100*-1) / count(distinct client_id)
+  description: Average Revenue Per User in EUR (calculated as total revenue divided
+    by total active users)
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: pending_eur
+  verbose_name: "pending \u20AC"
+  metric_type: null
+  expression: "sum(CASE \n\t\t\tWHEN bet_status = 'UNSETTLED'\n\t\t\t\tTHEN amount_bc\
+    \ / 100 else 0\n\t\t\tEND)"
+  description: Amount of unsettled bets in EUR
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: arpu
+  verbose_name: arpu
+  metric_type: null
+  expression: sum(win_amount/100*-1) / count(distinct client_id)
+  description: Average Revenue Per User (calculated as total revenue divided by total
+    active users)
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: pending
+  verbose_name: pending
+  metric_type: null
+  expression: "sum(CASE \n\t\t\tWHEN bet_status = 'UNSETTLED'\n\t\t\t\tTHEN amount\
+    \ / 100 else 0\n\t\t\tEND)"
+  description: Amount of unsettled bets
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: avg_bet_eur
+  verbose_name: "avg bet \u20AC"
+  metric_type: null
+  expression: sum(amount_bc/100) / count(distinct client_id)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: avg_bet
+  verbose_name: avg bet
+  metric_type: null
+  expression: sum(amount/100) / count(distinct client_id)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: uap
+  verbose_name: uap
+  metric_type: null
+  expression: count(distinct client_id)
+  description: Unic Active Players
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: payout_eur
+  verbose_name: "payout \u20AC"
+  metric_type: null
+  expression: sum(amount_bc/100) - sum(win_amount_bc/100*-1)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: count
+  verbose_name: bets count
+  metric_type: count
+  expression: COUNT(distinct bet_id)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: payout
+  verbose_name: payout
+  metric_type: null
+  expression: sum(amount/100) - sum(win_amount/100*-1)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: ggr_eur
+  verbose_name: "ggr \u20AC"
+  metric_type: null
+  expression: sum(win_amount_bc/100*-1)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: bets_amount_eur
+  verbose_name: "turnover \u20AC"
+  metric_type: null
+  expression: sum(amount_bc/100)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: ggr
+  verbose_name: ggr
+  metric_type: null
+  expression: sum(win_amount/100*-1)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: bets_amount
+  verbose_name: turnover
+  metric_type: null
+  expression: sum(amount/100)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+columns:
+- column_name: bet_odds
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Decimal(8, 2)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: outcome_odds
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Decimal(8, 2)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: settlement_time
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: Nullable(DateTime64(3))
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_registration_time
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DateTime64(3)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: event_start_time
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DateTime64(3)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: create_time
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DateTime64(3)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: update_time
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DateTime64(3)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: bet_amount_range_eur
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Nullable(String)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: bet_amount_range
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Nullable(String)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: project_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Nullable(String)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: bc.event_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: win_amount_bc
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: amount_bc
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: win_amount
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: outcomes_count
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: project_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: sport_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: amount
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: market_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: outcome_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: BTAG
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: is_test_bet
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Bool
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_is_verified
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Bool
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_is_test
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Bool
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_phone_number
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: false
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_email
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: false
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: money_balance_type
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_fin_category
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: outcome_sport_service
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: market_grade
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: market_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: tournament_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: last_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: bet_status
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: outcome_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_status
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: outcome_status
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: provider_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: event_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: region_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: event_status
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: first_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: sport_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: bet_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_country
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: sport_service
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_login
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: currency
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+version: 1.0.0
+database_uuid: c3137cc5-2157-4d37-b685-ffec405bd2ec

@@ -1,0 +1,179 @@
+table_name: Client Balances(Current state)
+main_dttm_col: null
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: null
+catalog: null
+schema: null
+sql: "SELECT \r\ncb.wallet_id as Wallet_ID,\r\ncb.project_id as project_id,\r\ndictGet('project_0.project_dict',\
+  \ 'name', cb.project_id) as project_name,\r\ncb.client_id as Client_ID,\r\ncb.currency\
+  \ As Client_Currency,\r\ncb.amount as Client_Real_Balance,\r\ncb.bonus_amount as\
+  \ Client_Bonus_balance,\r\ncb.create_time as Wallet_CreateTime,\r\ncb.update_time\
+  \ as Wallet_UpdateTime,\r\nc.is_test as client_is_test,\r\nc.status as client_status\r\
+  \nFROM project_0.client_balance cb final\r\nleft join project_0.client c final on\
+  \ c.client_id = cb.client_id"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 269e5957-fb90-4feb-9d64-a2ece114c4e7
+metrics:
+- metric_name: Bonus Balance
+  verbose_name: Bonus Balance
+  metric_type: null
+  expression: sum(Client_Bonus_balance)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: Real Balance
+  verbose_name: Real Balane
+  metric_type: null
+  expression: Sum(Client_Real_Balance)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+columns:
+- column_name: Wallet_CreateTime
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DateTime64(3)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: Wallet_UpdateTime
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DateTime64(3)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: project_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: Client_Real_Balance
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: Client_Bonus_balance
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: Client_ID
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: Wallet_ID
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_is_test
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Bool
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: Client_Currency
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: project_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_status
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+version: 1.0.0
+database_uuid: c3137cc5-2157-4d37-b685-ffec405bd2ec

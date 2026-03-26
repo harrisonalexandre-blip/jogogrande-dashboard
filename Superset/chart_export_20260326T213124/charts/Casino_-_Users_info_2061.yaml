@@ -1,0 +1,55 @@
+slice_name: Casino - Users info
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  datasource: 5__table
+  viz_type: table
+  slice_id: 1024
+  query_mode: aggregate
+  groupby:
+  - client_id
+  - client_registration_time
+  - first_name
+  - last_name
+  - client_status
+  - client_email
+  - client_phone_number
+  - client_country
+  - currency
+  - client_is_verified
+  time_grain_sqla: P1D
+  temporal_columns_lookup:
+    spin_date: true
+    client_registration_time: true
+  metrics:
+  - ftd_amount_eur
+  - avg_spin_eur
+  - ggr_percent
+  all_columns: []
+  percent_metrics: []
+  adhoc_filters:
+  - clause: WHERE
+    comparator: No filter
+    expressionType: SIMPLE
+    operator: TEMPORAL_RANGE
+    subject: spin_date
+  order_by_cols: []
+  row_limit: 1000
+  table_timestamp_format: smart_date
+  allow_render_html: true
+  show_cell_bars: true
+  color_pn: true
+  comparison_color_scheme: Green
+  comparison_type: values
+  extra_form_data: {}
+  dashboards:
+  - 925
+query_context: '{"datasource":{"id":5,"type":"table"},"force":false,"queries":[{"filters":[{"col":"spin_date","op":"TEMPORAL_RANGE","val":"No
+  filter"}],"extras":{"time_grain_sqla":"P1D","having":"","where":""},"applied_time_extras":{},"columns":[{"timeGrain":"P1D","columnType":"BASE_AXIS","sqlExpression":"client_registration_time","label":"client_registration_time","expressionType":"SQL"},"client_id","first_name","last_name","client_status","client_email","client_phone_number","client_country","currency","client_is_verified"],"metrics":["ftd_amount_eur","avg_spin_eur","ggr_percent"],"orderby":[["ftd_amount_eur",false]],"annotation_layers":[],"row_limit":1000,"series_limit":0,"order_desc":true,"url_params":{},"custom_params":{},"custom_form_data":{},"post_processing":[],"time_offsets":[]}],"form_data":{"adhoc_filters":[{"clause":"WHERE","comparator":"No
+  filter","expressionType":"SIMPLE","operator":"TEMPORAL_RANGE","subject":"spin_date"}],"all_columns":[],"allow_render_html":true,"color_pn":true,"comparison_color_scheme":"Green","comparison_type":"values","dashboards":[925],"datasource":"5__table","extra_form_data":{},"groupby":["client_id","client_registration_time","first_name","last_name","client_status","client_email","client_phone_number","client_country","currency","client_is_verified"],"metrics":["ftd_amount_eur","avg_spin_eur","ggr_percent"],"order_by_cols":[],"percent_metrics":[],"query_mode":"aggregate","row_limit":1000,"show_cell_bars":true,"slice_id":2061,"table_timestamp_format":"smart_date","temporal_columns_lookup":{"client_registration_time":true,"spin_date":true},"time_grain_sqla":"P1D","viz_type":"table","force":false,"result_format":"json","result_type":"full"},"result_format":"json","result_type":"full"}'
+cache_timeout: null
+uuid: c6af98f3-06b7-40f6-8a45-0be4b3af6340
+version: 1.0.0
+dataset_uuid: bce7aad0-f8c8-4d09-9f5f-fe068cd3914b

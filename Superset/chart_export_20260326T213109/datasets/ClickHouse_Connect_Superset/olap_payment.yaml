@@ -1,0 +1,491 @@
+table_name: olap_payment
+main_dttm_col: create_time
+description: null
+default_endpoint: null
+offset: 0
+cache_timeout: null
+catalog: null
+schema: null
+sql: "SELECT pa.id as id,\r\n       pa.client_id as client_id,\r\n       pa.currency\
+  \ as currency,\r\n       pa.amount as amount,\r\n       pa.amount_bc as amount_bc,\r\
+  \n       pa.status as status,\r\n       pa.transaction as transaction,\r\n     \
+  \  dictGet('project_0.payment_method_dict', 'name',  pa.method_id) as method_name,\r\
+  \n       pa.method_id as method_id,\r\n       dictGet('project_0.project_dict',\
+  \ 'name',  pa.project_id) as project_name,\r\n       pa.project_id as project_id,\r\
+  \n       pa.provider_type as provider_type,\r\n       pa.create_time as create_time,\r\
+  \n       pa.test_payment as test_payment,\r\n       pa.type as payment_type,\r\n\
+  \       pa.payment_order_number as paymnet_order_number,\r\n       pa.update_time\
+  \ as update_time,\r\n       c.first_name as first_name,\r\n       c.last_name as\
+  \ last_name,\r\n       c.btag as BTAG,\r\n       c.phone as client_phone_number,\r\
+  \n       c.email as client_email,\r\n       c.is_test as client_is_test,\r\n\t \
+  \    c.is_verified as client_is_verified,\r\n       c.status as client_status,\r\
+  \n       c.country as client_country,\r\n       c.registration_time as client_registration_time,\r\
+  \n       case when payment_order_number = 1 then True else False end as is_first_deposit,\r\
+  \n       case when payment_order_number = 1 and type = 'DEPOSIT' then pa.amount_bc\
+  \ end as first_deposit_amount_bc\r\nFROM project_0.payment pa final\r\n  join project_0.client\
+  \ c final on c.client_id = pa.client_id"
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 64ccd1dd-ff55-463b-8c8b-e60fa438d268
+metrics:
+- metric_name: payment_success_rate
+  verbose_name: Success Rate
+  metric_type: null
+  expression: "Sum(CASE \n\t\t\tWHEN status = 'PAID'\n\t\t\t\tTHEN 1 else 0\n\t\t\t\
+    END) / COunt (id)"
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: wd_amount_bc
+  verbose_name: "Withdrawal amount \u20AC"
+  metric_type: null
+  expression: "Sum(CASE \n\t\t\tWHEN payment_type  = 'WITHDRAWAL'\n\t\t\t\tTHEN amount_bc\n\
+    \t\t\tEND) / 100"
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: deposit_amount_bc
+  verbose_name: "Deposit amount \u20AC"
+  metric_type: null
+  expression: "Sum(CASE \n\t\t\tWHEN payment_type  = 'DEPOSIT'\n\t\t\t\tTHEN amount_bc\n\
+    \t\t\tEND) / 100"
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: wd_amount
+  verbose_name: Withdrawal amount
+  metric_type: null
+  expression: "Sum(CASE \n\t\t\tWHEN payment_type  = 'WITHDRAWAL'\n\t\t\t\tTHEN amount\n\
+    \t\t\tEND) / 100"
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: deposit_amount
+  verbose_name: Deposit amount
+  metric_type: null
+  expression: "Sum(CASE \n\t\t\tWHEN payment_type  = 'DEPOSIT'\n\t\t\t\tTHEN amount\n\
+    \t\t\tEND) / 100"
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: ftd_amount_eur
+  verbose_name: "first deposit amount \u20AC"
+  metric_type: null
+  expression: min(first_deposit_amount_bc / 100)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: payment_transaction
+  verbose_name: transactions_count
+  metric_type: null
+  expression: count(distinct transaction)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: payment_amount_bc
+  verbose_name: amount_bc
+  metric_type: count
+  expression: sum(amount_bc/100)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: payment_amount
+  verbose_name: amount
+  metric_type: null
+  expression: sum(amount/100)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+- metric_name: payment_UAP
+  verbose_name: UAP
+  metric_type: null
+  expression: COUNTDistinct(client_id)
+  description: null
+  d3format: null
+  currency: null
+  extra:
+    warning_markdown: ''
+  warning_text: null
+columns:
+- column_name: client_registration_time
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DateTime64(3)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: create_time
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DateTime64(3)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: update_time
+  verbose_name: null
+  is_dttm: true
+  is_active: true
+  type: DateTime64(3)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: first_deposit_amount_bc
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Nullable(Int64)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: paymnet_order_number
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Nullable(Int64)
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: project_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: method_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int32
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: amount_bc
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: false
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: amount
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: false
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: id
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Int64
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: BTAG
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_is_verified
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Bool
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_is_test
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Bool
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: is_first_deposit
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Bool
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: test_payment
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: Bool
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_phone_number
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: false
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_email
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: false
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: last_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: project_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_status
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: method_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: payment_type
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: first_name
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: client_country
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: provider_type
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: transaction
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: status
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+- column_name: currency
+  verbose_name: null
+  is_dttm: false
+  is_active: true
+  type: String
+  advanced_data_type: null
+  groupby: true
+  filterable: true
+  expression: null
+  description: null
+  python_date_format: null
+  extra: {}
+version: 1.0.0
+database_uuid: c3137cc5-2157-4d37-b685-ffec405bd2ec

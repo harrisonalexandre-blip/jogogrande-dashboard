@@ -1,0 +1,29 @@
+slice_name: Casino - GGR %
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  datasource: 5__table
+  viz_type: big_number_total
+  metric: ggr_percent
+  adhoc_filters:
+  - clause: WHERE
+    subject: spin_date
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  header_font_size: 0.4
+  subheader_font_size: 0.15
+  y_axis_format: SMART_NUMBER
+  time_format: smart_date
+  extra_form_data: {}
+  dashboards:
+  - 925
+query_context: '{"datasource":{"id":5,"type":"table"},"force":false,"queries":[{"filters":[{"col":"spin_date","op":"TEMPORAL_RANGE","val":"No
+  filter"}],"extras":{"having":"","where":""},"applied_time_extras":{},"columns":[],"metrics":["ggr_percent"],"annotation_layers":[],"series_limit":0,"order_desc":true,"url_params":{},"custom_params":{},"custom_form_data":{}}],"form_data":{"adhoc_filters":[{"clause":"WHERE","comparator":"No
+  filter","expressionType":"SIMPLE","operator":"TEMPORAL_RANGE","subject":"spin_date"}],"dashboards":[925],"datasource":"5__table","extra_form_data":{},"header_font_size":0.4,"metric":"ggr_percent","slice_id":2059,"subheader_font_size":0.15,"time_format":"smart_date","viz_type":"big_number_total","y_axis_format":"SMART_NUMBER","force":false,"result_format":"json","result_type":"full"},"result_format":"json","result_type":"full"}'
+cache_timeout: null
+uuid: a4f9264a-7ef3-40cd-96fc-72cd3559098d
+version: 1.0.0
+dataset_uuid: bce7aad0-f8c8-4d09-9f5f-fe068cd3914b

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitetura de Automação | Jogo Grande</title>
+    <style>
+        :root { --bg:#080808; --card:#111; --border:#222; --green:#16E500; --green-dim:#0d8f00; --green-glow:rgba(22,229,0,0.15); --red:#ff4444; --yellow:#ffbb00; --blue:#4488ff; --purple:#aa66ff; --text:#e8e8e8; --dim:#888; --bright:#fff; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+        .container { max-width:1200px; margin:0 auto; padding:20px; }
+        .header { background:linear-gradient(135deg,#0d0d0d,#1a1a1a); border:1px solid var(--border); border-radius:12px; padding:28px 32px; margin-bottom:20px; }
+        .header h1 { font-size:24px; color:var(--bright); margin-bottom:4px; }
+        .header p { font-size:14px; color:var(--dim); }
+        .section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:20px; }
+        .section h2 { font-size:18px; color:var(--bright); margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+        .badge-yes { background:var(--green-glow); color:var(--green); border:1px solid var(--green-dim); padding:4px 14px; border-radius:20px; font-size:13px; font-weight:700; }
+
+        /* FLOW DIAGRAM */
+        .flow { display:flex; flex-direction:column; gap:12px; margin:20px 0; }
+        .flow-row { display:flex; align-items:center; gap:12px; }
+        .flow-box { background:#161616; border:1px solid var(--border); border-radius:10px; padding:14px 20px; flex:1; }
+        .flow-box.active { border-color:var(--green); box-shadow:0 0 15px var(--green-glow); }
+        .flow-box .num { display:inline-block; width:28px; height:28px; line-height:28px; text-align:center; background:var(--green); color:#000; border-radius:50%; font-weight:900; font-size:13px; margin-right:10px; }
+        .flow-box .title { font-weight:700; color:var(--bright); font-size:14px; }
+        .flow-box .desc { font-size:12px; color:var(--dim); margin-top:4px; }
+        .flow-arrow { font-size:20px; color:var(--green); text-align:center; padding:4px 0; }
+
+        /* COMPARISON */
+        .vs-grid { display:grid; grid-template-columns:1fr 60px 1fr; gap:16px; margin:20px 0; align-items:start; }
+        .vs-card { background:#161616; border:1px solid var(--border); border-radius:10px; padding:20px; }
+        .vs-card.old { border-color:var(--red); border-style:dashed; opacity:0.7; }
+        .vs-card.new { border-color:var(--green); box-shadow:0 0 15px var(--green-glow); }
+        .vs-card h3 { font-size:15px; margin-bottom:12px; }
+        .vs-card ul { list-style:none; font-size:13px; }
+        .vs-card ul li { padding:6px 0; border-bottom:1px solid #1a1a1a; display:flex; align-items:center; gap:8px; }
+        .vs-card ul li:last-child { border-bottom:none; }
+        .vs-center { display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:900; color:var(--dim); }
+
+        /* CODE BLOCK */
+        .code-block { background:#0a0a0a; border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:12px; overflow-x:auto; color:#aaa; line-height:1.8; }
+        .code-block .comment { color:#555; }
+        .code-block .keyword { color:var(--blue); }
+        .code-block .string { color:var(--green); }
+        .code-block .highlight { color:var(--yellow); font-weight:700; }
+
+        /* RESULT PROOF */
+        .proof-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:16px 0; }
+        .proof-card { background:#0d1a00; border:1px solid var(--green-dim); border-radius:10px; padding:16px; text-align:center; }
+        .proof-card .value { font-size:28px; font-weight:800; color:var(--green); }
+        .proof-card .label { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+
+        .answer-box { background:linear-gradient(135deg,#0d1a00,#111); border:2px solid var(--green); border-radius:12px; padding:24px; margin:20px 0; }
+        .answer-box h3 { color:var(--green); font-size:18px; margin-bottom:12px; }
+        .answer-box p { font-size:14px; color:var(--text); line-height:1.8; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>Resposta: Sim, conseguimos puxar dados em tempo real!</h1>
+        <p>Validação completa da API do Superset — testada e funcionando agora</p>
+    </div>
+
+    <!-- ANSWER -->
+    <div class="answer-box">
+        <h3>A resposta curta</h3>
+        <p>
+            <strong>NÃO precisamos pedir nada pra Phoenix.</strong> A sua senha do Superset
+            (<code>harrisonwash@gmail.com</code>) já tem acesso total via REST API.
+            Testei agora e puxei dados de 17 charts automaticamente — 140 dias de casino,
+            2.726 jogos, cohorts de payment, saldos de jogadores, tudo.
+        </p>
+        <p style="margin-top:12px">
+            O Superset funciona como uma "ponte": ele já está conectado ao ClickHouse (que tem os dados da Phoenix).
+            A gente se conecta ao Superset via API, que por sua vez puxa do ClickHouse. <strong>Zero interação manual.</strong>
+        </p>
+    </div>
+
+    <!-- PROOF -->
+    <div class="section">
+        <h2>Prova de Conceito — Dados Puxados Agora</h2>
+        <div class="proof-grid">
+            <div class="proof-card">
+                <div class="value">17/22</div>
+                <div class="label">Charts Acessados</div>
+            </div>
+            <div class="proof-card">
+                <div class="value">140</div>
+                <div class="label">Dias de Casino</div>
+            </div>
+            <div class="proof-card">
+                <div class="value">2.726</div>
+                <div class="label">Jogos Mapeados</div>
+            </div>
+            <div class="proof-card">
+                <div class="value">1.000</div>
+                <div class="label">Jogadores Detalhados</div>
+            </div>
+            <div class="proof-card">
+                <div class="value">269</div>
+                <div class="label">Charts Disponíveis</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOW -->
+    <div class="section">
+        <h2>Como Funciona a Automação</h2>
+        <div class="flow">
+            <div class="flow-row">
+                <div class="flow-box active">
+                    <span class="num">1</span>
+                    <span class="title">Login API</span>
+                    <div class="desc">POST /api/v1/security/login → JWT Token (válido por horas)</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-row">
+                <div class="flow-box active">
+                    <span class="num">2</span>
+                    <span class="title">CSRF Token</span>
+                    <div class="desc">GET /api/v1/security/csrf_token/ → Token anti-CSRF</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-row">
+                <div class="flow-box active">
+                    <span class="num">3</span>
+                    <span class="title">Pull Chart Data</span>
+                    <div class="desc">GET /api/v1/chart/{id}/data/ → JSON com dados reais do ClickHouse</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-row">
+                <div class="flow-box active">
+                    <span class="num">4</span>
+                    <span class="title">Processar + Dashboard</span>
+                    <div class="desc">Formatar dados → Atualizar dashboard → Deploy Vercel automático</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANTES vs DEPOIS -->
+    <div class="section">
+        <h2>Antes vs Depois</h2>
+        <div class="vs-grid">
+            <div class="vs-card old">
+                <h3 style="color:var(--red)">Hoje — Manual</h3>
+                <ul>
+                    <li><span style="color:var(--red)">✗</span> Esperar Phoenix enviar XLSX por email (~5h)</li>
+                    <li><span style="color:var(--red)">✗</span> Salvar arquivo manualmente na pasta</li>
+                    <li><span style="color:var(--red)">✗</span> Script roda, mas depende do arquivo chegar</li>
+                    <li><span style="color:var(--red)">✗</span> Se email atrasa, dashboard fica desatualizado</li>
+                    <li><span style="color:var(--red)">✗</span> Só tem dados resumidos por dia</li>
+                    <li><span style="color:var(--red)">✗</span> Sem dados de jogo, provider, saldo</li>
+                </ul>
+            </div>
+            <div class="vs-center">→</div>
+            <div class="vs-card new">
+                <h3 style="color:var(--green)">Novo — 100% Automático</h3>
+                <ul>
+                    <li><span style="color:var(--green)">✓</span> API puxa dados direto do Superset</li>
+                    <li><span style="color:var(--green)">✓</span> Task agendada roda 2x por dia automático</li>
+                    <li><span style="color:var(--green)">✓</span> Zero dependência de email/arquivo manual</li>
+                    <li><span style="color:var(--green)">✓</span> Dados quasi real-time (delay ~minutos)</li>
+                    <li><span style="color:var(--green)">✓</span> Granularidade por jogo, provider, jogador</li>
+                    <li><span style="color:var(--green)">✓</span> 39+ métricas vs 32 de antes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHAT STAYS -->
+    <div class="section">
+        <h2>O Que Muda no Pipeline</h2>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+                <tr style="border-bottom:2px solid var(--border)">
+                    <th style="text-align:left;padding:10px;color:var(--dim)">FONTE</th>
+                    <th style="text-align:left;padding:10px;color:var(--dim)">ANTES</th>
+                    <th style="text-align:left;padding:10px;color:var(--dim)">DEPOIS</th>
+                    <th style="text-align:left;padding:10px;color:var(--dim)">STATUS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom:1px solid #1a1a1a">
+                    <td style="padding:10px;font-weight:700">Casino + Sport + Payment</td>
+                    <td style="padding:10px">Phoenix XLSX (manual)</td>
+                    <td style="padding:10px;color:var(--green)">Superset API (automático)</td>
+                    <td style="padding:10px"><span class="badge-yes">SUBSTITUÍDO</span></td>
+                </tr>
+                <tr style="border-bottom:1px solid #1a1a1a">
+                    <td style="padding:10px;font-weight:700">Saldo dos Jogadores</td>
+                    <td style="padding:10px;color:var(--red)">NÃO EXISTIA</td>
+                    <td style="padding:10px;color:var(--green)">Superset API (automático)</td>
+                    <td style="padding:10px"><span class="badge-yes">NOVO</span></td>
+                </tr>
+                <tr style="border-bottom:1px solid #1a1a1a">
+                    <td style="padding:10px;font-weight:700">Affiliates (Smartico)</td>
+                    <td style="padding:10px">Smartico API</td>
+                    <td style="padding:10px">Smartico API (mantém)</td>
+                    <td style="padding:10px;color:var(--dim)">SEM MUDANÇA</td>
+                </tr>
+                <tr style="border-bottom:1px solid #1a1a1a">
+                    <td style="padding:10px;font-weight:700">Registros (NR)</td>
+                    <td style="padding:10px">Phoenix XLSX</td>
+                    <td style="padding:10px;color:var(--yellow)">Ainda do XLSX (Superset não tem)</td>
+                    <td style="padding:10px;color:var(--yellow)">MANTER XLSX</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px;font-weight:700">PSP Conciliação</td>
+                    <td style="padding:10px">CSV manual</td>
+                    <td style="padding:10px">CSV manual (mantém)</td>
+                    <td style="padding:10px;color:var(--dim)">SEM MUDANÇA</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- NEXT STEPS -->
+    <div class="section">
+        <h2>Próximos Passos Concretos</h2>
+        <div class="flow">
+            <div class="flow-row">
+                <div class="flow-box active">
+                    <span class="num">1</span>
+                    <span class="title">Criar Scheduled Task</span>
+                    <div class="desc">Task agendada que roda 2x/dia (8h e 14h), puxa dados via API e atualiza JSONs</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-row">
+                <div class="flow-box active">
+                    <span class="num">2</span>
+                    <span class="title">Validação Cruzada</span>
+                    <div class="desc">Comparar últimos 30 dias: Superset vs Phoenix XLSX — garantir que os números batem</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-row">
+                <div class="flow-box active">
+                    <span class="num">3</span>
+                    <span class="title">Dashboard Expandido</span>
+                    <div class="desc">Adicionar abas: Casino por Jogo/Provider, RTP, Saldos, Cohorts — tudo automático</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

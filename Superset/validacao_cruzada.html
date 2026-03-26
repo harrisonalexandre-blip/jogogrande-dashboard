@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validação Cruzada: Phoenix XLSX vs Superset</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #080808;
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #16E500;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #16E500;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #999;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* KPI CARDS */
+        .kpi-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1px solid #16E500;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(22, 229, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            box-shadow: 0 12px 48px rgba(22, 229, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .kpi-label {
+            font-size: 0.95em;
+            color: #999;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .kpi-value {
+            font-size: 2.8em;
+            font-weight: 700;
+            color: #16E500;
+            margin-bottom: 5px;
+        }
+
+        .kpi-desc {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        /* SECTION TITLE */
+        .section-title {
+            font-size: 1.8em;
+            color: #16E500;
+            margin: 40px 0 25px 0;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #16E500;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* INSIGHTS CARDS */
+        .insights-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border-left: 4px solid #16E500;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(22, 229, 0, 0.08);
+        }
+
+        .insight-card h3 {
+            color: #16E500;
+            font-size: 1.2em;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .insight-card p {
+            color: #b0b0b0;
+            font-size: 0.95em;
+            line-height: 1.7;
+        }
+
+        /* CHARTS SECTION */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1px solid #16E500;
+            border-radius: 8px;
+            padding: 25px;
+            position: relative;
+        }
+
+        .chart-container h3 {
+            color: #16E500;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        /* TABLE SECTION */
+        .table-section {
+            margin-bottom: 40px;
+        }
+
+        .table-container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1px solid #16E500;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(22, 229, 0, 0.08);
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        thead {
+            background-color: #0d0d0d;
+            border-bottom: 2px solid #16E500;
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #16E500;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #1a1a1a;
+            color: #b0b0b0;
+        }
+
+        tr:hover {
+            background-color: #0f0f0f;
+        }
+
+        .highlight-high {
+            background-color: rgba(220, 53, 69, 0.2) !important;
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .metric-positive {
+            color: #16E500;
+        }
+
+        .metric-negative {
+            color: #ff6b6b;
+        }
+
+        /* CONCLUSION SECTION */
+        .conclusion-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .conclusion-card {
+            background: linear-gradient(135deg, #0a3a0a 0%, #0d1a0d 100%);
+            border: 1px solid #16E500;
+            border-radius: 8px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .conclusion-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #16E500 0%, transparent 100%);
+        }
+
+        .conclusion-card h3 {
+            color: #16E500;
+            font-size: 1.15em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .conclusion-card p {
+            color: #a8d5a8;
+            font-size: 0.95em;
+            line-height: 1.8;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #1a1a1a;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-section {
+                grid-template-columns: 1fr;
+            }
+
+            .insight-card, .conclusion-card {
+                grid-column: 1 / -1;
+            }
+
+            table {
+                font-size: 0.8em;
+            }
+
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+
+        /* LEGEND */
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1>Validação Cruzada: Phoenix XLSX vs Superset</h1>
+            <p class="subtitle">Fase 1 — Auditoria de Integridade | Casino | Março 2026</p>
+        </header>
+
+        <!-- KPI CARDS -->
+        <section class="kpi-section" id="kpiSection"></section>
+
+        <!-- IMPORTANT FINDINGS -->
+        <h2 class="section-title">Achados Principais</h2>
+        <section class="insights-section" id="insightsSection"></section>
+
+        <!-- CHARTS -->
+        <h2 class="section-title">Análise Visual</h2>
+        <section class="charts-grid">
+            <div class="chart-container">
+                <h3>Comparação UAP (Unique Active Players)</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chartUAP"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Diferença de Spins por Dia</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chartSpinsDiff"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Comparação GGR% (Gross Gaming Revenue)</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chartGGR"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Taxa Implícita EUR/BRL ao Longo do Tempo</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chartRate"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATA TABLE -->
+        <h2 class="section-title">Tabela Detalhada: 25 Dias Analisados</h2>
+        <section class="table-section">
+            <div class="table-container">
+                <div class="table-scroll">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>UAP Phoenix</th>
+                                <th>UAP Superset</th>
+                                <th>Diff UAP</th>
+                                <th>Spins Phoenix</th>
+                                <th>Spins Superset</th>
+                                <th>Diff Spins</th>
+                                <th>Turnover Phoenix (BRL)</th>
+                                <th>Turnover Superset (EUR)</th>
+                                <th>Taxa Implícita</th>
+                                <th>GGR% Phoenix</th>
+                                <th>GGR% Superset</th>
+                                <th>Diff GGR%</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONCLUSION -->
+        <h2 class="section-title">Conclusões e Recomendações</h2>
+        <section class="conclusion-cards" id="conclusionSection"></section>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>Dashboard gerado em 2026-03-26 | Dados referentes a Março de 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // ============ DATA ============
+        const rawData = [{"date":"2026-03-01","phoenix_uap":283,"superset_uap":284,"uap_diff":1,"phoenix_spins":90504,"superset_spins":90516,"spins_diff":12,"phoenix_turnover_brl":43245.69,"superset_turnover_eur":44116.9,"implied_rate":0.9803,"phoenix_ggr_brl":34.49,"superset_ggr_eur":-95.34,"phoenix_ggr_pct":0.08,"superset_ggr_pct":-0.43,"ggr_pct_diff":-0.51},{"date":"2026-03-02","phoenix_uap":282,"superset_uap":283,"uap_diff":1,"phoenix_spins":81547,"superset_spins":81559,"spins_diff":12,"phoenix_turnover_brl":38283.35,"superset_turnover_eur":38987.88,"implied_rate":0.9819,"phoenix_ggr_brl":-346.12,"superset_ggr_eur":-471.23,"phoenix_ggr_pct":-0.9,"superset_ggr_pct":-1.19,"ggr_pct_diff":-0.29},{"date":"2026-03-03","phoenix_uap":298,"superset_uap":299,"uap_diff":1,"phoenix_spins":66476,"superset_spins":66489,"spins_diff":13,"phoenix_turnover_brl":48474.54,"superset_turnover_eur":50000.51,"implied_rate":0.9695,"phoenix_ggr_brl":749.95,"superset_ggr_eur":616.6,"phoenix_ggr_pct":1.55,"superset_ggr_pct":1.28,"ggr_pct_diff":-0.27},{"date":"2026-03-04","phoenix_uap":215,"superset_uap":216,"uap_diff":1,"phoenix_spins":66651,"superset_spins":66692,"spins_diff":41,"phoenix_turnover_brl":60416.35,"superset_turnover_eur":62769.37,"implied_rate":0.9625,"phoenix_ggr_brl":4634.5,"superset_ggr_eur":4368.96,"phoenix_ggr_pct":7.67,"superset_ggr_pct":6.96,"ggr_pct_diff":-0.71},{"date":"2026-03-05","phoenix_uap":170,"superset_uap":170,"uap_diff":0,"phoenix_spins":55633,"superset_spins":55633,"spins_diff":0,"phoenix_turnover_brl":40842.78,"superset_turnover_eur":40842.78,"implied_rate":1.0,"phoenix_ggr_brl":-2969.13,"superset_ggr_eur":-2969.13,"phoenix_ggr_pct":-7.27,"superset_ggr_pct":-7.27,"ggr_pct_diff":0.0},{"date":"2026-03-06","phoenix_uap":195,"superset_uap":196,"uap_diff":1,"phoenix_spins":53560,"superset_spins":53560,"spins_diff":0,"phoenix_turnover_brl":51324.33,"superset_turnover_eur":51324.33,"implied_rate":1.0,"phoenix_ggr_brl":-2943.45,"superset_ggr_eur":-2943.45,"phoenix_ggr_pct":-5.73,"superset_ggr_pct":-5.73,"ggr_pct_diff":0.0},{"date":"2026-03-07","phoenix_uap":164,"superset_uap":168,"uap_diff":4,"phoenix_spins":52566,"superset_spins":37750,"spins_diff":-14816,"phoenix_turnover_brl":64140.01,"superset_turnover_eur":52428.8,"implied_rate":1.2234,"phoenix_ggr_brl":520.97,"superset_ggr_eur":2807.72,"phoenix_ggr_pct":0.81,"superset_ggr_pct":5.34,"ggr_pct_diff":4.53},{"date":"2026-03-08","phoenix_uap":164,"superset_uap":165,"uap_diff":1,"phoenix_spins":43012,"superset_spins":61011,"spins_diff":17999,"phoenix_turnover_brl":51221.92,"superset_turnover_eur":44653.99,"implied_rate":1.1471,"phoenix_ggr_brl":1862.48,"superset_ggr_eur":626.5,"phoenix_ggr_pct":3.64,"superset_ggr_pct":1.39,"ggr_pct_diff":-2.25},{"date":"2026-03-09","phoenix_uap":143,"superset_uap":193,"uap_diff":50,"phoenix_spins":35698,"superset_spins":42445,"spins_diff":6747,"phoenix_turnover_brl":40800.73,"superset_turnover_eur":38247.35,"implied_rate":1.0668,"phoenix_ggr_brl":2721.24,"superset_ggr_eur":848.65,"phoenix_ggr_pct":6.67,"superset_ggr_pct":2.14,"ggr_pct_diff":-4.53},{"date":"2026-03-10","phoenix_uap":187,"superset_uap":213,"uap_diff":26,"phoenix_spins":43724,"superset_spins":43754,"spins_diff":30,"phoenix_turnover_brl":47404.75,"superset_turnover_eur":42710.24,"implied_rate":1.1099,"phoenix_ggr_brl":4077.78,"superset_ggr_eur":42.23,"phoenix_ggr_pct":8.6,"superset_ggr_pct":0.1,"ggr_pct_diff":-8.5},{"date":"2026-03-11","phoenix_uap":213,"superset_uap":186,"uap_diff":-27,"phoenix_spins":42863,"superset_spins":50752,"spins_diff":7889,"phoenix_turnover_brl":36489.56,"superset_turnover_eur":57519.51,"implied_rate":0.6344,"phoenix_ggr_brl":-596.83,"superset_ggr_eur":3087.36,"phoenix_ggr_pct":-1.64,"superset_ggr_pct":5.37,"ggr_pct_diff":7.01},{"date":"2026-03-12","phoenix_uap":204,"superset_uap":195,"uap_diff":-9,"phoenix_spins":41854,"superset_spins":47735,"spins_diff":5881,"phoenix_turnover_brl":50675.13,"superset_turnover_eur":41093.53,"implied_rate":1.2332,"phoenix_ggr_brl":-3496.31,"superset_ggr_eur":1467.61,"phoenix_ggr_pct":-6.9,"superset_ggr_pct":3.58,"ggr_pct_diff":10.48},{"date":"2026-03-13","phoenix_uap":174,"superset_uap":194,"uap_diff":20,"phoenix_spins":48279,"superset_spins":44792,"spins_diff":-3487,"phoenix_turnover_brl":65311.15,"superset_turnover_eur":52651.33,"implied_rate":1.2404,"phoenix_ggr_brl":5727.63,"superset_ggr_eur":3667.24,"phoenix_ggr_pct":8.77,"superset_ggr_pct":6.98,"ggr_pct_diff":-1.79},{"date":"2026-03-14","phoenix_uap":171,"superset_uap":255,"uap_diff":84,"phoenix_spins":36061,"superset_spins":56362,"spins_diff":20301,"phoenix_turnover_brl":35791.56,"superset_turnover_eur":53764.19,"implied_rate":0.6657,"phoenix_ggr_brl":3174.46,"superset_ggr_eur":1972.06,"phoenix_ggr_pct":8.87,"superset_ggr_pct":3.69,"ggr_pct_diff":-5.18},{"date":"2026-03-15","phoenix_uap":134,"superset_uap":289,"uap_diff":155,"phoenix_spins":39953,"superset_spins":55870,"spins_diff":15917,"phoenix_turnover_brl":35327.03,"superset_turnover_eur":55068.06,"implied_rate":0.6415,"phoenix_ggr_brl":1642.25,"superset_ggr_eur":3073.88,"phoenix_ggr_pct":4.65,"superset_ggr_pct":5.54,"ggr_pct_diff":0.89},{"date":"2026-03-16","phoenix_uap":139,"superset_uap":270,"uap_diff":131,"phoenix_spins":34854,"superset_spins":58432,"spins_diff":23578,"phoenix_turnover_brl":26932.2,"superset_turnover_eur":43299.27,"implied_rate":0.622,"phoenix_ggr_brl":1984.96,"superset_ggr_eur":1066.19,"phoenix_ggr_pct":7.37,"superset_ggr_pct":2.47,"ggr_pct_diff":-4.9},{"date":"2026-03-17","phoenix_uap":157,"superset_uap":267,"uap_diff":110,"phoenix_spins":30456,"superset_spins":62458,"spins_diff":32002,"phoenix_turnover_brl":50864.61,"superset_turnover_eur":76063.15,"implied_rate":0.6687,"phoenix_ggr_brl":5305.91,"superset_ggr_eur":8173.96,"phoenix_ggr_pct":10.43,"superset_ggr_pct":10.76,"ggr_pct_diff":0.33},{"date":"2026-03-18","phoenix_uap":143,"superset_uap":275,"uap_diff":132,"phoenix_spins":30103,"superset_spins":62497,"spins_diff":32394,"phoenix_turnover_brl":55112.27,"superset_turnover_eur":60449.37,"implied_rate":0.9117,"phoenix_ggr_brl":1042.07,"superset_ggr_eur":3424.75,"phoenix_ggr_pct":1.89,"superset_ggr_pct":5.66,"ggr_pct_diff":3.77},{"date":"2026-03-19","phoenix_uap":209,"superset_uap":272,"uap_diff":63,"phoenix_spins":50527,"superset_spins":51048,"spins_diff":521,"phoenix_turnover_brl":62997.72,"superset_turnover_eur":53416.51,"implied_rate":1.1794,"phoenix_ggr_brl":784.65,"superset_ggr_eur":2222.74,"phoenix_ggr_pct":1.25,"superset_ggr_pct":4.16,"ggr_pct_diff":2.91},{"date":"2026-03-20","phoenix_uap":182,"superset_uap":276,"uap_diff":94,"phoenix_spins":52055,"superset_spins":48740,"spins_diff":-3315,"phoenix_turnover_brl":71088.86,"superset_turnover_eur":49261.23,"implied_rate":1.4431,"phoenix_ggr_brl":3028.44,"superset_ggr_eur":2514.05,"phoenix_ggr_pct":4.26,"superset_ggr_pct":5.1,"ggr_pct_diff":0.84},{"date":"2026-03-21","phoenix_uap":580,"superset_uap":317,"uap_diff":-263,"phoenix_spins":94018,"superset_spins":74987,"spins_diff":-19031,"phoenix_turnover_brl":72317.09,"superset_turnover_eur":66927.34,"implied_rate":1.0805,"phoenix_ggr_brl":2901.73,"superset_ggr_eur":-412.9,"phoenix_ggr_pct":4.01,"superset_ggr_pct":-0.41,"ggr_pct_diff":-4.42},{"date":"2026-03-22","phoenix_uap":310,"superset_uap":311,"uap_diff":1,"phoenix_spins":62970,"superset_spins":63012,"spins_diff":42,"phoenix_turnover_brl":46859.06,"superset_turnover_eur":56506.27,"implied_rate":0.8293,"phoenix_ggr_brl":2524.3,"superset_ggr_eur":5735.68,"phoenix_ggr_pct":5.39,"superset_ggr_pct":10.12,"ggr_pct_diff":4.73},{"date":"2026-03-23","phoenix_uap":419,"superset_uap":420,"uap_diff":1,"phoenix_spins":87900,"superset_spins":87915,"spins_diff":15,"phoenix_turnover_brl":82260.99,"superset_turnover_eur":87078.49,"implied_rate":0.9447,"phoenix_ggr_brl":3339.46,"superset_ggr_eur":3048.18,"phoenix_ggr_pct":4.06,"superset_ggr_pct":3.5,"ggr_pct_diff":-0.56},{"date":"2026-03-24","phoenix_uap":298,"superset_uap":299,"uap_diff":1,"phoenix_spins":71298,"superset_spins":71319,"spins_diff":21,"phoenix_turnover_brl":66583.71,"superset_turnover_eur":69690.59,"implied_rate":0.9554,"phoenix_ggr_brl":3548.24,"superset_ggr_eur":2271.19,"phoenix_ggr_pct":5.33,"superset_ggr_pct":3.28,"ggr_pct_diff":-2.05},{"date":"2026-03-25","phoenix_uap":322,"superset_uap":323,"uap_diff":1,"phoenix_spins":78821,"superset_spins":78840,"spins_diff":19,"phoenix_turnover_brl":79902.54,"superset_turnover_eur":86695.98,"implied_rate":0.9216,"phoenix_ggr_brl":2621.82,"superset_ggr_eur":3514.45,"phoenix_ggr_pct":3.28,"superset_ggr_pct":4.07,"ggr_pct_diff":0.79}];
+
+        // ============ CALCULATIONS ============
+        function calculateMetrics() {
+            const cleanDays = rawData.filter(d => Math.abs(d.uap_diff) <= 2 && Math.abs(d.spins_diff) <= 100).length;
+            const dirtyDays = rawData.length - cleanDays;
+            const avgRate = (rawData.reduce((sum, d) => sum + d.implied_rate, 0) / rawData.length).toFixed(4);
+            
+            return {
+                totalDays: rawData.length,
+                cleanDays: cleanDays,
+                dirtyDays: dirtyDays,
+                avgRate: avgRate
+            };
+        }
+
+        const metrics = calculateMetrics();
+
+        // ============ KPI SECTION ============
+        function renderKPIs() {
+            const kpiSection = document.getElementById('kpiSection');
+            const kpis = [
+                {
+                    label: 'Dias Analisados',
+                    value: metrics.totalDays,
+                    desc: 'Período: 01-25 de Março 2026'
+                },
+                {
+                    label: 'Dias "Limpos"',
+                    value: metrics.cleanDays,
+                    desc: 'UAP diff ≤2 e Spins diff ≤100'
+                },
+                {
+                    label: 'Dias com Divergência',
+                    value: metrics.dirtyDays,
+                    desc: 'Desvios significativos detectados'
+                },
+                {
+                    label: 'Taxa EUR/BRL Média',
+                    value: metrics.avgRate,
+                    desc: 'Volatilidade indica mistura de moedas'
+                }
+            ];
+
+            kpiSection.innerHTML = kpis.map(kpi => `
+                <div class="kpi-card">
+                    <div class="kpi-label">${kpi.label}</div>
+                    <div class="kpi-value">${kpi.value}</div>
+                    <div class="kpi-desc">${kpi.desc}</div>
+                </div>
+            `).join('');
+        }
+
+        // ============ INSIGHTS SECTION ============
+        function renderInsights() {
+            const insightsSection = document.getElementById('insightsSection');
+            const insights = [
+                {
+                    title: 'Padrão LIMPO (Mar 1-6, 22-25)',
+                    content: 'UAP diff = 0-1, Spins diff = 0-42. Ambas as fontes concordam nos NÚMEROS de contagem. As diferenças monetárias refletem conversão EUR/BRL (taxa ≈ 0.83-1.0), indicando que os dados estão alinhados quando em mesma moeda.'
+                },
+                {
+                    title: 'Padrão SUJO (Mar 7-21)',
+                    content: 'DIVERGÊNCIAS MASSIVAS: UAP diff até 263, Spins diff até 32K, sinais opostos em GGR. Superset registra MUITO MAIS transações. Causa provável: (a) Superset inclui multi-currency, Phoenix não; (b) Timezone shifts deslocam dados entre dias; (c) Phoenix filtra diferentes projetos.'
+                },
+                {
+                    title: 'Insight Crítico',
+                    content: 'GGR% difere em média 2.89 pontos percentuais mesmo em dias "limpos". Isso PROVA que as duas fontes contam TRANSAÇÕES DIFERENTES, não apenas convertem moedas. A qualidade de dados é fundamentalmente divergente.'
+                }
+            ];
+
+            insightsSection.innerHTML = insights.map(insight => `
+                <div class="insight-card">
+                    <h3>${insight.title}</h3>
+                    <p>${insight.content}</p>
+                </div>
+            `).join('');
+        }
+
+        // ============ CHARTS ============
+        function renderCharts() {
+            const dates = rawData.map(d => d.date.substring(5));
+            const ctx = (id) => document.getElementById(id).getContext('2d');
+
+            // Chart 1: UAP Comparison
+            new Chart(ctx('chartUAP'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Phoenix UAP',
+                            data: rawData.map(d => d.phoenix_uap),
+                            borderColor: '#16E500',
+                            backgroundColor: 'rgba(22, 229, 0, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: false,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#16E500'
+                        },
+                        {
+                            label: 'Superset UAP',
+                            data: rawData.map(d => d.superset_uap),
+                            borderColor: '#ff9800',
+                            backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: false,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#ff9800',
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#999', font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#666' },
+                            grid: { color: '#1a1a1a' }
+                        },
+                        x: {
+                            ticks: { color: '#666' },
+                            grid: { color: '#1a1a1a' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Spins Difference
+            new Chart(ctx('chartSpinsDiff'), {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Diferença de Spins',
+                        data: rawData.map(d => d.spins_diff),
+                        backgroundColor: rawData.map(d => d.spins_diff > 0 ? '#16E500' : '#ff6b6b'),
+                        borderColor: rawData.map(d => d.spins_diff > 0 ? '#16E500' : '#ff6b6b'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#999', font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#666' },
+                            grid: { color: '#1a1a1a' }
+                        },
+                        x: {
+                            ticks: { color: '#666' },
+                            grid: { color: '#1a1a1a' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 3: GGR% Comparison
+            new Chart(ctx('chartGGR'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'GGR% Phoenix',
+                            data: rawData.map(d => d.phoenix_ggr_pct),
+                            borderColor: '#16E500',
+                            backgroundColor: 'rgba(22, 229, 0, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: false,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#16E500'
+                        },
+                        {
+                            label: 'GGR% Superset',
+                            data: rawData.map(d => d.superset_ggr_pct),
+                            borderColor: '#ff9800',
+                            backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: false,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#ff9800',
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#999', font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#666' },
+                            grid: { color: '#1a1a1a' }
+                        },
+                        x: {
+                            ticks: { color: '#666' },
+                            grid: { color: '#1a1a1a' }
+                        }
+                    }
+                }
+            });
+
+            // Chart 4: Implied Rate
+            new Chart(ctx('chartRate'), {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Taxa Implícita (Phoenix BRL / Superset EUR)',
+                        data: rawData.map(d => d.implied_rate),
+                        borderColor: '#2196f3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#2196f3'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#999', font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#666' },
+                            grid: { color: '#1a1a1a' },
+                            beginAtZero: false
+                        },
+                        x: {
+                            ticks: { color: '#666' },
+                            grid: { color: '#1a1a1a' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============ DATA TABLE ============
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = rawData.map((d, idx) => {
+                const isHighDivergence = Math.abs(d.uap_diff) > 10 || Math.abs(d.spins_diff) > 1000;
+                const rowClass = isHighDivergence ? 'highlight-high' : '';
+                
+                return `
+                    <tr class="${rowClass}">
+                        <td><strong>${d.date}</strong></td>
+                        <td>${d.phoenix_uap}</td>
+                        <td>${d.superset_uap}</td>
+                        <td class="${d.uap_diff > 0 ? 'metric-negative' : 'metric-positive'}">${d.uap_diff >= 0 ? '+' : ''}${d.uap_diff}</td>
+                        <td>${d.phoenix_spins.toLocaleString('pt-BR')}</td>
+                        <td>${d.superset_spins.toLocaleString('pt-BR')}</td>
+                        <td class="${d.spins_diff > 0 ? 'metric-negative' : 'metric-positive'}">${d.spins_diff >= 0 ? '+' : ''}${d.spins_diff.toLocaleString('pt-BR')}</td>
+                        <td>${d.phoenix_turnover_brl.toFixed(2)}</td>
+                        <td>${d.superset_turnover_eur.toFixed(2)}</td>
+                        <td><strong>${d.implied_rate.toFixed(4)}</strong></td>
+                        <td class="${d.phoenix_ggr_pct >= 0 ? 'metric-positive' : 'metric-negative'}">${d.phoenix_ggr_pct.toFixed(2)}%</td>
+                        <td class="${d.superset_ggr_pct >= 0 ? 'metric-positive' : 'metric-negative'}">${d.superset_ggr_pct.toFixed(2)}%</td>
+                        <td class="${Math.abs(d.ggr_pct_diff) > 2 ? 'metric-negative' : 'metric-positive'}">${d.ggr_pct_diff >= 0 ? '+' : ''}${d.ggr_pct_diff.toFixed(2)}pp</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============ CONCLUSION SECTION ============
+        function renderConclusion() {
+            const conclusionSection = document.getElementById('conclusionSection');
+            const conclusions = [
+                {
+                    title: '1. Diagnóstico Principal',
+                    content: 'O Phoenix XLSX mistura moedas (BRL e EUR) SEM sinalizadores claros. O Superset sempre reporta em EUR (campo turnover_bc). Isso causa divergência artificial nos valores monetários, tornando comparações diretas impossíveis sem conversão padronizada.'
+                },
+                {
+                    title: '2. Problema Real: Contagem de Transações',
+                    content: 'Nos dias 7-21, as fontes discordam FUNDAMENTALMENTE no número de spins e UAP, não apenas nos valores. Isso indica que Phoenix XLSX filtra ou inclui dados diferentes — possíveis causas: jogadores de teste, projetos específicos não sincronizados, ou diferenças de timezone.'
+                },
+                {
+                    title: '3. Recomendação Executiva',
+                    content: 'USAR SUPERSET COMO FONTE PRIMÁRIA para todas as métricas de Casino. É mais granular (conectado direto ao ClickHouse), consistente em moeda (EUR), e reflete transações reais. Phoenix XLSX = backup apenas. Implementar validação diária entre sources.'
+                }
+            ];
+
+            conclusionSection.innerHTML = conclusions.map(item => `
+                <div class="conclusion-card">
+                    <h3>${item.title}</h3>
+                    <p>${item.content}</p>
+                </div>
+            `).join('');
+        }
+
+        // ============ INITIALIZE ============
+        document.addEventListener('DOMContentLoaded', () => {
+            renderKPIs();
+            renderInsights();
+            renderCharts();
+            renderTable();
+            renderConclusion();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+slice_name: Casino - avg spin
+description: null
+certified_by: null
+certification_details: null
+viz_type: big_number_total
+params:
+  datasource: 5__table
+  viz_type: big_number_total
+  metric: avg_spin_eur
+  adhoc_filters:
+  - clause: WHERE
+    subject: spin_date
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  header_font_size: 0.4
+  subheader_font_size: 0.15
+  y_axis_format: SMART_NUMBER
+  time_format: smart_date
+  extra_form_data: {}
+  dashboards:
+  - 925
+query_context: null
+cache_timeout: null
+uuid: 61d2a10b-752a-4c22-8ea1-984d6714a890
+version: 1.0.0
+dataset_uuid: bce7aad0-f8c8-4d09-9f5f-fe068cd3914b

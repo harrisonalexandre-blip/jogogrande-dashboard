@@ -1,0 +1,53 @@
+slice_name: Cohort - Users
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  datasource: 34__table
+  viz_type: table
+  slice_id: 1454
+  query_mode: aggregate
+  groupby:
+  - client_id
+  - BTAG
+  - currency
+  - first_name
+  - client_status
+  - last_name
+  - client_phone_number
+  - client_email
+  temporal_columns_lookup:
+    create_time: true
+    client_registration_time: true
+  metrics:
+  - ftd_amount_eur
+  - payment_transaction
+  - payment_amount
+  - payment_amount_bc
+  all_columns: []
+  percent_metrics: []
+  adhoc_filters:
+  - clause: WHERE
+    comparator: No filter
+    expressionType: SIMPLE
+    operator: TEMPORAL_RANGE
+    subject: create_time
+  order_by_cols: []
+  order_desc: true
+  row_limit: 50000
+  server_page_length: 10
+  table_timestamp_format: smart_date
+  allow_render_html: true
+  show_cell_bars: true
+  color_pn: true
+  comparison_color_scheme: Green
+  comparison_type: values
+  extra_form_data: {}
+  dashboards:
+  - 1156
+query_context: null
+cache_timeout: null
+uuid: a331fbe9-4f72-4837-9a3a-ad87b85c73a2
+version: 1.0.0
+dataset_uuid: 64ccd1dd-ff55-463b-8c8b-e60fa438d268

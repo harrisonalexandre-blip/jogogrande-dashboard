@@ -1,0 +1,57 @@
+slice_name: Casino - spin count
+description: null
+certified_by: null
+certification_details: null
+viz_type: echarts_area
+params:
+  datasource: 5__table
+  viz_type: echarts_area
+  x_axis: spin_date
+  time_grain_sqla: P1D
+  metrics:
+  - casino_spin_count
+  groupby:
+  - currency
+  adhoc_filters:
+  - clause: WHERE
+    subject: spin_date
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    expressionType: SIMPLE
+  row_limit: 10000
+  truncate_metric: true
+  show_empty_columns: true
+  comparison_type: values
+  annotation_layers: []
+  forecastPeriods: 10
+  forecastInterval: 0.8
+  x_axis_title_margin: 15
+  y_axis_title_margin: 15
+  y_axis_title_position: Left
+  sort_series_type: sum
+  color_scheme: supersetColors
+  seriesType: line
+  opacity: 0.2
+  only_total: true
+  markerSize: 6
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  x_axis_time_format: smart_date
+  rich_tooltip: true
+  showTooltipTotal: true
+  showTooltipPercentage: true
+  tooltipTimeFormat: smart_date
+  y_axis_format: SMART_NUMBER
+  truncateXAxis: true
+  y_axis_bounds:
+  - null
+  - null
+  extra_form_data: {}
+  dashboards:
+  - 925
+query_context: null
+cache_timeout: null
+uuid: 2d953f83-eb00-4b69-9585-abc2d5e5915e
+version: 1.0.0
+dataset_uuid: bce7aad0-f8c8-4d09-9f5f-fe068cd3914b

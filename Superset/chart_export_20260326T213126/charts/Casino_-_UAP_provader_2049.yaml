@@ -1,0 +1,48 @@
+slice_name: Casino - UAP provader
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  datasource: 5__table
+  viz_type: table
+  slice_id: 794
+  query_mode: aggregate
+  groupby:
+  - intergrator_name
+  - provider_name
+  temporal_columns_lookup:
+    spin_date: true
+    client_registration_time: true
+  metrics:
+  - casino_uap
+  - ggr_percent
+  - casino_turnover_eur
+  - casino_payout_eur
+  - ggr_eur
+  - avg_spin_eur
+  all_columns: []
+  percent_metrics: []
+  adhoc_filters:
+  - clause: WHERE
+    comparator: No filter
+    expressionType: SIMPLE
+    operator: TEMPORAL_RANGE
+    subject: spin_date
+  order_by_cols: []
+  row_limit: 1000
+  order_desc: true
+  table_timestamp_format: smart_date
+  allow_render_html: true
+  show_cell_bars: true
+  color_pn: true
+  comparison_color_scheme: Green
+  comparison_type: values
+  extra_form_data: {}
+  dashboards:
+  - 925
+query_context: null
+cache_timeout: null
+uuid: d68d1cff-9759-49fa-8e9c-3d04e1e13259
+version: 1.0.0
+dataset_uuid: bce7aad0-f8c8-4d09-9f5f-fe068cd3914b

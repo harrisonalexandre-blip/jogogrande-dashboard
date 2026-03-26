@@ -1,0 +1,51 @@
+slice_name: Casino - Game
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  datasource: 5__table
+  viz_type: table
+  slice_id: 831
+  query_mode: aggregate
+  groupby:
+  - intergrator_name
+  - provider_name
+  - game_name
+  - game_id
+  temporal_columns_lookup:
+    spin_date: true
+    client_registration_time: true
+  metrics:
+  - casino_uap
+  - casino_turnover_eur
+  - casino_payout_eur
+  - ggr_eur
+  - ggr_percent
+  - avg_spin_eur
+  all_columns: []
+  percent_metrics: []
+  adhoc_filters:
+  - clause: WHERE
+    comparator: No filter
+    expressionType: SIMPLE
+    operator: TEMPORAL_RANGE
+    subject: spin_date
+  order_by_cols: []
+  row_limit: 50000
+  table_timestamp_format: smart_date
+  allow_render_html: true
+  show_cell_bars: true
+  color_pn: true
+  comparison_color_scheme: Green
+  comparison_type: values
+  extra_form_data: {}
+  dashboards:
+  - 925
+query_context: '{"datasource":{"id":5,"type":"table"},"force":false,"queries":[{"filters":[{"col":"spin_date","op":"TEMPORAL_RANGE","val":"No
+  filter"}],"extras":{"having":"","where":""},"applied_time_extras":{},"columns":["intergrator_name","provider_name","game_name","game_id"],"metrics":["casino_uap","casino_turnover_eur","casino_payout_eur","ggr_eur","ggr_percent","avg_spin_eur"],"orderby":[["casino_uap",false]],"annotation_layers":[],"row_limit":50000,"series_limit":0,"order_desc":true,"url_params":{},"custom_params":{},"custom_form_data":{},"post_processing":[],"time_offsets":[]}],"form_data":{"adhoc_filters":[{"clause":"WHERE","comparator":"No
+  filter","expressionType":"SIMPLE","operator":"TEMPORAL_RANGE","subject":"spin_date"}],"all_columns":[],"allow_render_html":true,"color_pn":true,"comparison_color_scheme":"Green","comparison_type":"values","dashboards":[925],"datasource":"5__table","extra_form_data":{},"groupby":["intergrator_name","provider_name","game_name","game_id"],"metrics":["casino_uap","casino_turnover_eur","casino_payout_eur","ggr_eur","ggr_percent","avg_spin_eur"],"order_by_cols":[],"percent_metrics":[],"query_mode":"aggregate","row_limit":50000,"show_cell_bars":true,"slice_id":2055,"table_timestamp_format":"smart_date","temporal_columns_lookup":{"client_registration_time":true,"spin_date":true},"viz_type":"table","force":false,"result_format":"json","result_type":"full"},"result_format":"json","result_type":"full"}'
+cache_timeout: null
+uuid: 4f86de12-017d-4f45-b666-4ba3ee7aea5d
+version: 1.0.0
+dataset_uuid: bce7aad0-f8c8-4d09-9f5f-fe068cd3914b

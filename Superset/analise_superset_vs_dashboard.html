@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise Superset vs Dashboard Atual | Jogo Grande</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --bg: #080808;
+            --bg-card: #111111;
+            --bg-card-alt: #161616;
+            --border: #222;
+            --green: #16E500;
+            --green-dim: #0d8f00;
+            --green-glow: rgba(22,229,0,0.15);
+            --red: #ff4444;
+            --yellow: #ffbb00;
+            --blue: #4488ff;
+            --purple: #aa66ff;
+            --cyan: #00cccc;
+            --text: #e8e8e8;
+            --text-dim: #888;
+            --text-bright: #ffffff;
+            --gap: 16px;
+            --radius: 10px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: var(--gap); }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin-bottom: var(--gap);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .logo {
+            width: 48px; height: 48px;
+            background: var(--green);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 20px; color: #000;
+        }
+        .header h1 { font-size: 22px; font-weight: 700; color: var(--text-bright); }
+        .header .subtitle { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-new { background: var(--green-glow); color: var(--green); border: 1px solid var(--green-dim); }
+        .badge-existing { background: rgba(68,136,255,0.1); color: var(--blue); border: 1px solid rgba(68,136,255,0.3); }
+        .badge-overlap { background: rgba(255,187,0,0.1); color: var(--yellow); border: 1px solid rgba(255,187,0,0.3); }
+
+        /* KPI ROW */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            text-align: center;
+        }
+        .kpi-card.highlight { border-color: var(--green-dim); box-shadow: 0 0 20px var(--green-glow); }
+        .kpi-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .kpi-value { font-size: 32px; font-weight: 800; color: var(--green); }
+        .kpi-value.blue { color: var(--blue); }
+        .kpi-value.yellow { color: var(--yellow); }
+        .kpi-value.red { color: var(--red); }
+        .kpi-sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+        /* SECTIONS */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: var(--gap);
+        }
+        .section-title {
+            font-size: 16px; font-weight: 700; color: var(--text-bright);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title .icon { font-size: 20px; }
+
+        /* CHART GRID */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+        .chart-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+        }
+        .chart-box h3 { font-size: 14px; font-weight: 600; color: var(--text-bright); margin-bottom: 12px; }
+        .chart-box canvas { max-height: 300px; }
+
+        /* DATA TABLES */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .data-table thead th {
+            text-align: left; padding: 10px 14px; border-bottom: 2px solid var(--border);
+            color: var(--text-dim); font-weight: 600; font-size: 11px;
+            text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+        }
+        .data-table tbody td { padding: 10px 14px; border-bottom: 1px solid #1a1a1a; }
+        .data-table tbody tr:hover { background: rgba(22,229,0,0.03); }
+
+        /* STATUS DOTS */
+        .status { display: inline-flex; align-items: center; gap: 6px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot-green { background: var(--green); }
+        .dot-blue { background: var(--blue); }
+        .dot-yellow { background: var(--yellow); }
+        .dot-red { background: var(--red); }
+
+        /* COMPARISON TABLE */
+        .comp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .comp-table th {
+            text-align: left; padding: 12px 16px; background: var(--bg-card-alt);
+            color: var(--text-dim); font-weight: 600; font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.5px; border-bottom: 1px solid var(--border);
+        }
+        .comp-table td { padding: 10px 16px; border-bottom: 1px solid #1a1a1a; vertical-align: top; }
+        .comp-table tr:hover { background: rgba(22,229,0,0.02); }
+        .comp-table .metric-name { font-weight: 600; color: var(--text-bright); }
+        .comp-table .source-tag {
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-size: 10px; font-weight: 600; text-transform: uppercase;
+        }
+        .source-phoenix { background: rgba(68,136,255,0.15); color: var(--blue); }
+        .source-superset { background: rgba(22,229,0,0.15); color: var(--green); }
+        .source-smartico { background: rgba(170,102,255,0.15); color: var(--purple); }
+        .source-psp { background: rgba(255,187,0,0.15); color: var(--yellow); }
+
+        /* INSIGHT CARDS */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--gap);
+        }
+        .insight-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            border-left: 4px solid var(--green);
+        }
+        .insight-card.warning { border-left-color: var(--yellow); }
+        .insight-card.critical { border-left-color: var(--red); }
+        .insight-card.info { border-left-color: var(--blue); }
+        .insight-card h4 { font-size: 14px; font-weight: 700; color: var(--text-bright); margin-bottom: 8px; }
+        .insight-card p { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+        /* ARCHITECTURE DIAGRAM */
+        .arch-diagram {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .arch-box {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+        }
+        .arch-box.active { border-color: var(--green); box-shadow: 0 0 15px var(--green-glow); }
+        .arch-box .label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; }
+        .arch-box .name { font-size: 15px; font-weight: 700; color: var(--text-bright); }
+        .arch-box .detail { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+        .arch-arrow { font-size: 24px; color: var(--green); text-align: center; }
+
+        /* TAB SYSTEM */
+        .tabs { display: flex; gap: 4px; margin-bottom: var(--gap); flex-wrap: wrap; }
+        .tab {
+            padding: 10px 20px; border-radius: 8px 8px 0 0;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-bottom: none; color: var(--text-dim);
+            cursor: pointer; font-size: 13px; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: var(--text); background: var(--bg-card-alt); }
+        .tab.active { color: var(--green); background: var(--bg-card-alt); border-color: var(--green-dim); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* FOOTER */
+        .footer {
+            text-align: center; padding: 20px;
+            font-size: 12px; color: var(--text-dim);
+            border-top: 1px solid var(--border);
+            margin-top: var(--gap);
+        }
+
+        /* LEGENDS */
+        .legend { display: flex; gap: 20px; flex-wrap: wrap; margin: 12px 0; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-dim); }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+        @media (max-width: 768px) {
+            .arch-diagram { grid-template-columns: 1fr; }
+            .arch-arrow { transform: rotate(90deg); }
+            .chart-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">JG</div>
+            <div>
+                <h1>Auditoria de Dados: Superset vs Dashboard</h1>
+                <div class="subtitle">Análise completa dos 23 chart exports do Apache Superset (ClickHouse) vs dados atuais</div>
+            </div>
+        </div>
+        <div style="text-align:right">
+            <div style="font-size:12px;color:var(--text-dim)">Data da análise</div>
+            <div style="font-size:16px;font-weight:700;color:var(--green)">26/03/2026</div>
+        </div>
+    </div>
+
+    <!-- KPIs RESUMO -->
+    <div class="kpi-row">
+        <div class="kpi-card highlight">
+            <div class="kpi-label">Datasets Superset</div>
+            <div class="kpi-value">4</div>
+            <div class="kpi-sub">ClickHouse via API Phoenix</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Charts Exportados</div>
+            <div class="kpi-value blue">23</div>
+            <div class="kpi-sub">Visualizações mapeadas</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Métricas Novas</div>
+            <div class="kpi-value" style="color:var(--green)">47</div>
+            <div class="kpi-sub">Que não temos hoje</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Sobreposição</div>
+            <div class="kpi-value yellow">18</div>
+            <div class="kpi-sub">Métricas em comum</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Fontes Hoje</div>
+            <div class="kpi-value blue">3</div>
+            <div class="kpi-sub">Phoenix XLSX + PSP + Smartico</div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('overview')">Visão Geral</div>
+        <div class="tab" onclick="switchTab('datasets')">4 Datasets</div>
+        <div class="tab" onclick="switchTab('comparison')">Comparação Métrica</div>
+        <div class="tab" onclick="switchTab('new-data')">Dados Novos</div>
+        <div class="tab" onclick="switchTab('architecture')">Arquitetura</div>
+        <div class="tab" onclick="switchTab('recommendations')">Recomendações</div>
+    </div>
+
+    <!-- TAB: OVERVIEW -->
+    <div id="tab-overview" class="tab-content active">
+        <div class="section">
+            <div class="section-title"><span class="icon">🔍</span> O que é o Superset?</div>
+            <p style="color:var(--text-dim);font-size:14px;line-height:1.8;margin-bottom:16px">
+                O sistema que você recebeu acesso é um <strong style="color:var(--text-bright)">Apache Superset</strong> conectado via
+                <strong style="color:var(--text-bright)">ClickHouse</strong> (data warehouse) diretamente à <strong style="color:var(--green)">Phoenix</strong> (plataforma do JogoGrande).
+                Isso significa que os dados são <strong style="color:var(--green)">processados via API em tempo real</strong>,
+                sem precisar do arquivo XLSX diário que recebemos por email.
+            </p>
+            <p style="color:var(--text-dim);font-size:14px;line-height:1.8">
+                Ele puxa dados de <strong style="color:var(--text-bright)">4 tabelas principais</strong> do ClickHouse (project_0):
+                <code style="color:var(--green);background:#1a1a1a;padding:2px 6px;border-radius:4px">client_balance</code>,
+                <code style="color:var(--green);background:#1a1a1a;padding:2px 6px;border-radius:4px">bet_change</code> (sportsbook),
+                <code style="color:var(--green);background:#1a1a1a;padding:2px 6px;border-radius:4px">silver.casino</code>, e
+                <code style="color:var(--green);background:#1a1a1a;padding:2px 6px;border-radius:4px">payment</code>.
+                São dados granulares por transação — muito mais detalhados do que o resumo diário que temos hoje.
+            </p>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-box">
+                <h3>Distribuição de Charts por Dashboard</h3>
+                <canvas id="chart-dashboards"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>Tipos de Visualização no Superset</h3>
+                <canvas id="chart-viztypes"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-box">
+                <h3>Cobertura de Métricas: Superset vs Dashboard Atual</h3>
+                <canvas id="chart-coverage"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>Datasets por Volume de Dados</h3>
+                <canvas id="chart-datasets-size"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: DATASETS -->
+    <div id="tab-datasets" class="tab-content">
+        <div class="section">
+            <div class="section-title"><span class="icon">🗄️</span> Os 4 Datasets do Superset (ClickHouse)</div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Dataset</th>
+                        <th>Tabela ClickHouse</th>
+                        <th>Métricas</th>
+                        <th>Colunas</th>
+                        <th>Charts</th>
+                        <th>Granularidade</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="metric-name">olap_casino</td>
+                        <td><code style="color:var(--green)">silver.casino</code></td>
+                        <td style="color:var(--green);font-weight:700">13</td>
+                        <td>32</td>
+                        <td>15</td>
+                        <td>Por spin/dia</td>
+                        <td><span class="badge badge-new">NOVO</span></td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name">olap_sportsbook</td>
+                        <td><code style="color:var(--green)">project_0.bet_change</code></td>
+                        <td style="color:var(--green);font-weight:700">14</td>
+                        <td>47</td>
+                        <td>1</td>
+                        <td>Por aposta</td>
+                        <td><span class="badge badge-new">NOVO</span></td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name">olap_payment</td>
+                        <td><code style="color:var(--green)">project_0.payment</code></td>
+                        <td style="color:var(--green);font-weight:700">10</td>
+                        <td>29</td>
+                        <td>5</td>
+                        <td>Por transação</td>
+                        <td><span class="badge badge-overlap">PARCIAL</span></td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name">Client Balances</td>
+                        <td><code style="color:var(--green)">project_0.client_balance</code></td>
+                        <td style="color:var(--green);font-weight:700">2</td>
+                        <td>11</td>
+                        <td>2</td>
+                        <td>Snapshot atual</td>
+                        <td><span class="badge badge-new">NOVO</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Detail for each dataset -->
+        <div class="section">
+            <div class="section-title"><span class="icon">🎰</span> olap_casino — O MAIS RICO em dados</div>
+            <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px">
+                15 dos 23 charts usam esse dataset. Ele puxa dados da tabela <code style="color:var(--green)">silver.casino</code>
+                e cruza com <code style="color:var(--green)">project_0.client</code> para enriquecer com dados do jogador.
+            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div>
+                    <h4 style="font-size:13px;color:var(--green);margin-bottom:8px">MÉTRICAS (13)</h4>
+                    <table class="data-table" style="font-size:12px">
+                        <thead><tr><th>Métrica</th><th>Fórmula</th><th>Temos?</th></tr></thead>
+                        <tbody>
+                            <tr><td>casino_ggr</td><td>sum(ggr)</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>ggr_eur</td><td>sum(ggr_bc)</td><td><span class="dot dot-red"></span> Não</td></tr>
+                            <tr><td>casino_turnover</td><td>sum(turnover)</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>casino_turnover_eur</td><td>sum(turnover_bc)</td><td><span class="dot dot-red"></span> Não</td></tr>
+                            <tr><td>casino_payout</td><td>sum(payout)</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>casino_payout_eur</td><td>sum(payout_bc)</td><td><span class="dot dot-red"></span> Não</td></tr>
+                            <tr><td>casino_uap</td><td>COUNT(DISTINCT client_id)</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>casino_spin_count</td><td>sum(spin_count)</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>avg_spin</td><td>sum(turnover)/sum(spin_count)</td><td><span class="dot dot-red"></span> Não</td></tr>
+                            <tr><td>avg_spin_eur</td><td>sum(turnover_bc)/sum(spin_count)</td><td><span class="dot dot-red"></span> Não</td></tr>
+                            <tr><td>rtp</td><td>1-(SUM(ggr)/SUM(turnover))</td><td><span class="dot dot-red"></span> Não</td></tr>
+                            <tr><td>ggr_percent</td><td>SUM(ggr)/SUM(turnover)*100</td><td><span class="dot dot-red"></span> Não</td></tr>
+                            <tr><td>count</td><td>COUNT(*)</td><td><span class="dot dot-red"></span> Não</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h4 style="font-size:13px;color:var(--green);margin-bottom:8px">DIMENSÕES NOVAS CHAVE</h4>
+                    <table class="data-table" style="font-size:12px">
+                        <thead><tr><th>Campo</th><th>Tipo</th><th>Valor</th></tr></thead>
+                        <tbody>
+                            <tr><td>provider_name</td><td>String</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                            <tr><td>game_name</td><td>String</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                            <tr><td>game_type</td><td>String</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                            <tr><td>integrator_name</td><td>String</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                            <tr><td>is_free_spin</td><td>Boolean</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                            <tr><td>money_balance_type</td><td>String</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                            <tr><td>client_country</td><td>String</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                            <tr><td>client_is_verified</td><td>Boolean</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                            <tr><td>BTAG</td><td>String</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                            <tr><td>client_registration_time</td><td>DateTime</td><td><span class="badge badge-new">NOVO</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">⚽</span> olap_sportsbook — Dados GRANULARES de apostas</div>
+            <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px">
+                Dados no nível de cada aposta individual. Cruza <code style="color:var(--green)">bet_change</code> +
+                <code style="color:var(--green)">bet_liability_distribution</code> + <code style="color:var(--green)">client</code> +
+                <code style="color:var(--green)">event</code>.
+            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div>
+                    <h4 style="font-size:13px;color:var(--green);margin-bottom:8px">MÉTRICAS (14)</h4>
+                    <table class="data-table" style="font-size:12px">
+                        <thead><tr><th>Métrica</th><th>Fórmula</th><th>Temos?</th></tr></thead>
+                        <tbody>
+                            <tr><td>ggr / ggr_eur</td><td>sum(win_amount/100*-1)</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>bets_amount / bets_amount_eur</td><td>sum(amount/100)</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>payout / payout_eur</td><td>amount - ggr</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>arpu / arpu_eur</td><td>revenue / distinct users</td><td><span class="dot dot-red"></span> Não</td></tr>
+                            <tr><td>avg_bet / avg_bet_eur</td><td>amount / distinct users</td><td><span class="dot dot-red"></span> Não</td></tr>
+                            <tr><td>uap</td><td>count(distinct client_id)</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>count</td><td>COUNT(distinct bet_id)</td><td><span class="dot dot-yellow"></span> Parcial</td></tr>
+                            <tr><td>pending / pending_eur</td><td>UNSETTLED bets amount</td><td><span class="dot dot-red"></span> Não</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h4 style="font-size:13px;color:var(--green);margin-bottom:8px">DIMENSÕES EXCLUSIVAS</h4>
+                    <table class="data-table" style="font-size:12px">
+                        <thead><tr><th>Campo</th><th>O que é</th></tr></thead>
+                        <tbody>
+                            <tr><td>sport_name</td><td>Nome do esporte (Futebol, etc)</td></tr>
+                            <tr><td>tournament_name</td><td>Campeonato (Brasileirão, etc)</td></tr>
+                            <tr><td>event_name</td><td>Nome do evento/jogo</td></tr>
+                            <tr><td>market_name</td><td>Tipo de mercado (Match Result, etc)</td></tr>
+                            <tr><td>bet_status</td><td>SETTLED, UNSETTLED, CASHOUT</td></tr>
+                            <tr><td>bet_amount_range</td><td>Faixas de valor de aposta</td></tr>
+                            <tr><td>provider_name</td><td>Provedor de odds</td></tr>
+                            <tr><td>outcome_status</td><td>WON, LOST, VOID</td></tr>
+                            <tr><td>client_fin_category</td><td>Categoria financeira do jogador</td></tr>
+                            <tr><td>market_grade</td><td>Grau do mercado</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">💳</span> olap_payment — Pagamentos detalhados</div>
+            <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px">
+                Dados transacionais de depósitos e saques. Alimenta cohorts de pagamento e análise de FTD.
+            </p>
+            <table class="data-table" style="font-size:12px">
+                <thead><tr><th>Métrica</th><th>Fórmula</th><th>Temos?</th><th>Diferença</th></tr></thead>
+                <tbody>
+                    <tr><td>deposit_amount / deposit_amount_bc</td><td>SUM(CASE DEPOSIT THEN amount)</td><td><span class="dot dot-yellow"></span></td><td>Temos ds (Deps Sum) mas sem granularidade por método</td></tr>
+                    <tr><td>wd_amount / wd_amount_bc</td><td>SUM(CASE WITHDRAWAL THEN amount)</td><td><span class="dot dot-yellow"></span></td><td>Temos ws (W/D Sum) mas sem detalhe</td></tr>
+                    <tr><td>payment_UAP</td><td>COUNTDistinct(client_id)</td><td><span class="dot dot-red"></span></td><td>Não temos UAP de pagamento separado</td></tr>
+                    <tr><td>payment_success_rate</td><td>PAID / COUNT(id)</td><td><span class="dot dot-red"></span></td><td>TOTALMENTE NOVO - taxa de sucesso</td></tr>
+                    <tr><td>ftd_amount_eur</td><td>min(first_deposit_amount_bc/100)</td><td><span class="dot dot-red"></span></td><td>Temos FTD count mas não o valor EUR</td></tr>
+                    <tr><td>payment_transaction</td><td>count(distinct transaction)</td><td><span class="dot dot-yellow"></span></td><td>Temos nd/nw mas não transactions distintas</td></tr>
+                    <tr><td>is_first_deposit (flag)</td><td>payment_order_number = 1</td><td><span class="dot dot-red"></span></td><td>Flag individual por transação - NOVO</td></tr>
+                    <tr><td>method_name</td><td>Método de pagamento</td><td><span class="dot dot-red"></span></td><td>PIX, Boleto, Cartão etc - NOVO</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">💰</span> Client Balances — Saldos em tempo real</div>
+            <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px">
+                Snapshot atual dos saldos dos jogadores. Totalmente novo — não temos nada parecido no dashboard atual.
+            </p>
+            <table class="data-table" style="font-size:12px">
+                <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td style="color:var(--green);font-weight:700">Client_Real_Balance</td><td>Int64</td><td>Saldo real do jogador (dinheiro depositado)</td></tr>
+                    <tr><td style="color:var(--green);font-weight:700">Client_Bonus_balance</td><td>Int64</td><td>Saldo de bônus do jogador</td></tr>
+                    <tr><td>Client_Currency</td><td>String</td><td>Moeda do cliente</td></tr>
+                    <tr><td>client_status</td><td>String</td><td>Status: ativo, bloqueado, etc</td></tr>
+                    <tr><td>client_is_test</td><td>Boolean</td><td>Se é conta de teste</td></tr>
+                    <tr><td>Wallet_CreateTime</td><td>DateTime</td><td>Quando a wallet foi criada</td></tr>
+                    <tr><td>Wallet_UpdateTime</td><td>DateTime</td><td>Última atualização do saldo</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB: COMPARISON -->
+    <div id="tab-comparison" class="tab-content">
+        <div class="section">
+            <div class="section-title"><span class="icon">⚖️</span> Comparação Métrica por Métrica</div>
+            <div class="legend">
+                <div class="legend-item"><span class="dot dot-green"></span> Dado NOVO (só Superset)</div>
+                <div class="legend-item"><span class="dot dot-yellow"></span> Sobreposição (temos, mas Superset é mais rico)</div>
+                <div class="legend-item"><span class="dot dot-blue"></span> Só Dashboard Atual (Superset não tem)</div>
+            </div>
+
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>Área</th>
+                        <th>Métrica</th>
+                        <th>Dashboard Atual</th>
+                        <th>Superset</th>
+                        <th>Veredicto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- CASINO -->
+                    <tr style="background:rgba(22,229,0,0.03)">
+                        <td rowspan="8" style="font-weight:700;color:var(--green);vertical-align:middle">🎰 Casino</td>
+                        <td class="metric-name">GGR</td>
+                        <td><span class="source-tag source-phoenix">Phoenix XLSX</span> cg (diário, BRL)</td>
+                        <td><span class="source-tag source-superset">Superset</span> casino_ggr + ggr_eur (por spin, BRL+EUR)</td>
+                        <td><span class="dot dot-yellow"></span> Superset: por jogo/provider/dia</td>
+                    </tr>
+                    <tr style="background:rgba(22,229,0,0.03)">
+                        <td class="metric-name">Turnover</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> c_to (diário)</td>
+                        <td><span class="source-tag source-superset">Superset</span> casino_turnover + _eur</td>
+                        <td><span class="dot dot-yellow"></span> Superset: por jogo/provider</td>
+                    </tr>
+                    <tr style="background:rgba(22,229,0,0.03)">
+                        <td class="metric-name">Payout</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> c_po (diário)</td>
+                        <td><span class="source-tag source-superset">Superset</span> casino_payout + _eur</td>
+                        <td><span class="dot dot-yellow"></span> Superset: granular</td>
+                    </tr>
+                    <tr style="background:rgba(22,229,0,0.03)">
+                        <td class="metric-name">UAP Casino</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> c_uap (diário)</td>
+                        <td><span class="source-tag source-superset">Superset</span> casino_uap (distinct client_id)</td>
+                        <td><span class="dot dot-yellow"></span> Superset: por provider/jogo</td>
+                    </tr>
+                    <tr style="background:rgba(22,229,0,0.03)">
+                        <td class="metric-name">Spin Count</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> c_sc (diário)</td>
+                        <td><span class="source-tag source-superset">Superset</span> casino_spin_count</td>
+                        <td><span class="dot dot-yellow"></span> Mesmo dado, mais granular</td>
+                    </tr>
+                    <tr style="background:rgba(22,229,0,0.03)">
+                        <td class="metric-name">RTP %</td>
+                        <td>❌ Não temos</td>
+                        <td><span class="source-tag source-superset">Superset</span> 1-(ggr/turnover)</td>
+                        <td><span class="dot dot-green"></span> <strong>NOVO</strong> — crítico!</td>
+                    </tr>
+                    <tr style="background:rgba(22,229,0,0.03)">
+                        <td class="metric-name">GGR %</td>
+                        <td>❌ Não temos</td>
+                        <td><span class="source-tag source-superset">Superset</span> ggr/turnover*100</td>
+                        <td><span class="dot dot-green"></span> <strong>NOVO</strong></td>
+                    </tr>
+                    <tr style="background:rgba(22,229,0,0.03)">
+                        <td class="metric-name">Avg Spin</td>
+                        <td>❌ Não temos</td>
+                        <td><span class="source-tag source-superset">Superset</span> turnover/spin_count</td>
+                        <td><span class="dot dot-green"></span> <strong>NOVO</strong></td>
+                    </tr>
+                    <!-- SPORTSBOOK -->
+                    <tr>
+                        <td rowspan="6" style="font-weight:700;color:var(--blue);vertical-align:middle">⚽ Sportsbook</td>
+                        <td class="metric-name">GGR</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> sb_ggr / sg</td>
+                        <td><span class="source-tag source-superset">Superset</span> ggr + ggr_eur</td>
+                        <td><span class="dot dot-yellow"></span> Superset: por esporte/torneio</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name">Turnover</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> sb_to</td>
+                        <td><span class="source-tag source-superset">Superset</span> bets_amount + _eur</td>
+                        <td><span class="dot dot-yellow"></span> Superset: por mercado/evento</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name">ARPU</td>
+                        <td>❌ Não temos</td>
+                        <td><span class="source-tag source-superset">Superset</span> revenue / users</td>
+                        <td><span class="dot dot-green"></span> <strong>NOVO</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name">Pending Bets</td>
+                        <td>❌ Não temos</td>
+                        <td><span class="source-tag source-superset">Superset</span> UNSETTLED amount</td>
+                        <td><span class="dot dot-green"></span> <strong>NOVO</strong> — risco em aberto</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name">Bet Count</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> sb_bc</td>
+                        <td><span class="source-tag source-superset">Superset</span> COUNT(distinct bet_id)</td>
+                        <td><span class="dot dot-yellow"></span> Mesmo, mais granular</td>
+                    </tr>
+                    <tr>
+                        <td class="metric-name">Avg Bet</td>
+                        <td>❌ Não temos</td>
+                        <td><span class="source-tag source-superset">Superset</span> amount / users</td>
+                        <td><span class="dot dot-green"></span> <strong>NOVO</strong></td>
+                    </tr>
+                    <!-- PAYMENT -->
+                    <tr style="background:rgba(255,187,0,0.03)">
+                        <td rowspan="5" style="font-weight:700;color:var(--yellow);vertical-align:middle">💳 Payment</td>
+                        <td class="metric-name">Depósitos</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> ds + nd</td>
+                        <td><span class="source-tag source-superset">Superset</span> deposit_amount + _bc</td>
+                        <td><span class="dot dot-yellow"></span> Superset: por método + flag FTD</td>
+                    </tr>
+                    <tr style="background:rgba(255,187,0,0.03)">
+                        <td class="metric-name">Saques</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> ws + nw</td>
+                        <td><span class="source-tag source-superset">Superset</span> wd_amount + _bc</td>
+                        <td><span class="dot dot-yellow"></span> Superset: por método</td>
+                    </tr>
+                    <tr style="background:rgba(255,187,0,0.03)">
+                        <td class="metric-name">Success Rate</td>
+                        <td>❌ Não temos</td>
+                        <td><span class="source-tag source-superset">Superset</span> PAID/COUNT</td>
+                        <td><span class="dot dot-green"></span> <strong>NOVO</strong> — taxa de aprovação</td>
+                    </tr>
+                    <tr style="background:rgba(255,187,0,0.03)">
+                        <td class="metric-name">FTD Amount EUR</td>
+                        <td>❌ Só count (ftd)</td>
+                        <td><span class="source-tag source-superset">Superset</span> first_deposit_amount_bc</td>
+                        <td><span class="dot dot-green"></span> <strong>NOVO</strong> — valor do 1º dep</td>
+                    </tr>
+                    <tr style="background:rgba(255,187,0,0.03)">
+                        <td class="metric-name">Método Pagamento</td>
+                        <td>❌ Não temos</td>
+                        <td><span class="source-tag source-superset">Superset</span> method_name (PIX, etc)</td>
+                        <td><span class="dot dot-green"></span> <strong>NOVO</strong></td>
+                    </tr>
+                    <!-- ONLY IN DASHBOARD -->
+                    <tr style="background:rgba(68,136,255,0.03)">
+                        <td rowspan="4" style="font-weight:700;color:var(--cyan);vertical-align:middle">📊 Só Dashboard</td>
+                        <td class="metric-name">NGR</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> ngr (calculado)</td>
+                        <td>❌ Não tem direto</td>
+                        <td><span class="dot dot-blue"></span> Precisamos manter</td>
+                    </tr>
+                    <tr style="background:rgba(68,136,255,0.03)">
+                        <td class="metric-name">Registros (NR)</td>
+                        <td><span class="source-tag source-phoenix">Phoenix</span> nr</td>
+                        <td>❌ Não tem</td>
+                        <td><span class="dot dot-blue"></span> Só no Phoenix XLSX</td>
+                    </tr>
+                    <tr style="background:rgba(68,136,255,0.03)">
+                        <td class="metric-name">Affiliate Data</td>
+                        <td><span class="source-tag source-smartico">Smartico API</span></td>
+                        <td>❌ Não tem</td>
+                        <td><span class="dot dot-blue"></span> Fonte exclusiva Smartico</td>
+                    </tr>
+                    <tr style="background:rgba(68,136,255,0.03)">
+                        <td class="metric-name">PSP Transactions</td>
+                        <td><span class="source-tag source-psp">PSP CSV</span></td>
+                        <td>❌ Não tem</td>
+                        <td><span class="dot dot-blue"></span> Fonte exclusiva PSP</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB: NEW DATA -->
+    <div id="tab-new-data" class="tab-content">
+        <div class="section">
+            <div class="section-title"><span class="icon">🆕</span> Dados TOTALMENTE NOVOS que o Superset traz</div>
+            <p style="color:var(--text-dim);font-size:14px;margin-bottom:20px">
+                Esses são dados que <strong style="color:var(--green)">não existem em lugar nenhum no nosso dashboard atual</strong>.
+                São as maiores oportunidades de inteligência.
+            </p>
+        </div>
+
+        <div class="insights-grid">
+            <div class="insight-card">
+                <h4>💰 Saldo Real-Time dos Jogadores</h4>
+                <p>Saber quanto dinheiro (real + bônus) está nas contas dos jogadores AGORA. Permite prever cash-out e monitorar liquidez. Nenhuma outra fonte tem isso.</p>
+            </div>
+            <div class="insight-card">
+                <h4>🎮 Performance por Jogo/Provider</h4>
+                <p>Sabemos agora QUAL jogo, de QUAL provider, gera mais GGR. Podemos identificar jogos "vampiros" (RTP alto = prejuízo) e jogos lucrativos.</p>
+            </div>
+            <div class="insight-card warning">
+                <h4>📊 RTP (Return to Player) %</h4>
+                <p>Métrica crítica que mostra quanto % do turnover volta pro jogador. RTP alto demais = prejuízo. Essencial pra negociar com providers de casino.</p>
+            </div>
+            <div class="insight-card">
+                <h4>⚽ Análise por Esporte/Torneio/Evento</h4>
+                <p>Dados detalhados de CADA aposta: qual esporte, qual campeonato, qual jogo, qual mercado. Permite entender perfil de apostador.</p>
+            </div>
+            <div class="insight-card warning">
+                <h4>⏳ Apostas Pendentes (Pending)</h4>
+                <p>Valor total de apostas UNSETTLED — dinheiro em risco que ainda não foi liquidado. Essencial pra gestão de risco em tempo real.</p>
+            </div>
+            <div class="insight-card">
+                <h4>📈 ARPU (Revenue per User)</h4>
+                <p>Receita média por jogador ativo. Tanto pra Casino quanto Sportsbook. Métrica essencial de unit economics.</p>
+            </div>
+            <div class="insight-card">
+                <h4>💳 Taxa de Sucesso de Pagamento</h4>
+                <p>% de transações PAID vs tentativas totais. Permite identificar problemas com gateway, método de pagamento específico, etc.</p>
+            </div>
+            <div class="insight-card">
+                <h4>🔍 Método de Pagamento</h4>
+                <p>Breakdown por PIX, Boleto, Cartão etc. Permite otimizar checkout e entender preferências dos jogadores.</p>
+            </div>
+            <div class="insight-card">
+                <h4>📊 Cohort Analysis Nativa</h4>
+                <p>5 pivot tables de cohort: por Casino, Sport, Payment, Usuários, e Número de Pagamento. Análise de retenção por mês de registro.</p>
+            </div>
+            <div class="insight-card critical">
+                <h4>🏷️ BTAG (Affiliate Tag)</h4>
+                <p>Tag de afiliado presente em TODOS os datasets (Casino, Sport, Payment). Permite cruzar performance do jogador com a fonte de tráfego.</p>
+            </div>
+            <div class="insight-card">
+                <h4>🌍 País do Cliente</h4>
+                <p>client_country em todos os datasets. Permite segmentar performance por geografia.</p>
+            </div>
+            <div class="insight-card">
+                <h4>✅ Status de Verificação</h4>
+                <p>client_is_verified — flag de KYC. Permite comparar comportamento de jogadores verificados vs não verificados.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: ARCHITECTURE -->
+    <div id="tab-architecture" class="tab-content">
+        <div class="section">
+            <div class="section-title"><span class="icon">🏗️</span> Arquitetura de Dados — Antes vs Depois</div>
+
+            <h4 style="color:var(--yellow);margin-bottom:12px;font-size:14px">HOJE — Fluxo Manual</h4>
+            <div class="arch-diagram">
+                <div class="arch-box">
+                    <div class="label">Fonte</div>
+                    <div class="name">Phoenix Platform</div>
+                    <div class="detail">Envia XLSX por email ~5h</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-box">
+                    <div class="label">Processamento</div>
+                    <div class="name">Pipeline Manual</div>
+                    <div class="detail">Harrison salva + task roda</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-box">
+                    <div class="label">Saída</div>
+                    <div class="name">Dashboard Vercel</div>
+                    <div class="detail">32 métricas diárias</div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px">
+                <div class="arch-box" style="border-color:var(--yellow)">
+                    <div class="label">Fonte 2</div>
+                    <div class="name">PSP CSV</div>
+                    <div class="detail">Export manual Elevex</div>
+                </div>
+                <div class="arch-box" style="border-color:var(--purple)">
+                    <div class="label">Fonte 3</div>
+                    <div class="name">Smartico API</div>
+                    <div class="detail">Dados de afiliados</div>
+                </div>
+                <div class="arch-box" style="border-color:var(--blue)">
+                    <div class="label">Fonte 4</div>
+                    <div class="name">CONTROLE.xlsx</div>
+                    <div class="detail">Planilha manual mensal</div>
+                </div>
+            </div>
+
+            <h4 style="color:var(--green);margin-bottom:12px;font-size:14px">COM SUPERSET — Fluxo API Direto</h4>
+            <div class="arch-diagram">
+                <div class="arch-box active">
+                    <div class="label">Fonte</div>
+                    <div class="name" style="color:var(--green)">ClickHouse DWH</div>
+                    <div class="detail">API direta da Phoenix</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-box active">
+                    <div class="label">Processamento</div>
+                    <div class="name" style="color:var(--green)">Automático</div>
+                    <div class="detail">SQL pré-definido, real-time</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-box active">
+                    <div class="label">Saída</div>
+                    <div class="name" style="color:var(--green)">4 Datasets, 39+ métricas</div>
+                    <div class="detail">Granular por transação</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">🔗</span> Conexão Técnica</div>
+            <table class="data-table" style="font-size:12px">
+                <thead><tr><th>Parâmetro</th><th>Valor</th></tr></thead>
+                <tbody>
+                    <tr><td>Database</td><td><code style="color:var(--green)">ClickHouse Connect (Superset)</code></td></tr>
+                    <tr><td>Driver</td><td><code>clickhousedb+connect</code></td></tr>
+                    <tr><td>Host</td><td><code>3.78.164.59:8123</code> (AWS EU)</td></tr>
+                    <tr><td>Schema</td><td><code>project_0</code> (+ <code>silver</code> para casino)</td></tr>
+                    <tr><td>User</td><td><code>dwh_user</code></td></tr>
+                    <tr><td>Project ID Filter</td><td><code>176</code> (JogoGrande)</td></tr>
+                    <tr><td>SQL Lab</td><td>Habilitado (expose_in_sqllab: true)</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB: RECOMMENDATIONS -->
+    <div id="tab-recommendations" class="tab-content">
+        <div class="section">
+            <div class="section-title"><span class="icon">🎯</span> Recomendações Estratégicas</div>
+        </div>
+
+        <div class="insights-grid" style="margin-bottom:var(--gap)">
+            <div class="insight-card" style="border-left-color:var(--green)">
+                <h4>1. NÃO SUBSTITUIR — COMPLEMENTAR</h4>
+                <p>O Superset NÃO substitui nosso dashboard. Ele tem Casino/Sport/Payment detalhados, mas NÃO tem: Registros (NR), NGR calculado, dados Smartico (afiliados), dados PSP (conciliação). A estratégia é INTEGRAR os dois.</p>
+            </div>
+            <div class="insight-card" style="border-left-color:var(--green)">
+                <h4>2. Incorporar RTP + GGR% Imediatamente</h4>
+                <p>RTP (Return to Player) é a métrica mais crítica que ganhamos. Um jogo com RTP > 97% pode estar sangrando dinheiro. Precisa estar no dashboard PRINCIPAL.</p>
+            </div>
+            <div class="insight-card warning">
+                <h4>3. Criar Alerta de Pending Bets</h4>
+                <p>Valor de apostas não liquidadas é RISCO em aberto. O agente analista deve monitorar e alertar quando ultrapassar threshold definido por vocês.</p>
+            </div>
+            <div class="insight-card" style="border-left-color:var(--green)">
+                <h4>4. Dashboard de Casino por Provider/Jogo</h4>
+                <p>Criar aba específica com ranking de providers e jogos por GGR, RTP e volume. Isso permite negociar com providers e remover jogos não lucrativos.</p>
+            </div>
+            <div class="insight-card warning">
+                <h4>5. Cross-Reference BTAG com Smartico</h4>
+                <p>O BTAG do Superset + dados Smartico permite fechar o loop: qual afiliado → quais jogadores → quanto gastaram em Casino/Sport → qual o ROI real do afiliado.</p>
+            </div>
+            <div class="insight-card critical">
+                <h4>6. Validação Cruzada de Números</h4>
+                <p>PRIORIDADE: Cruzar os valores de depósitos/saques do Superset com o que temos do Phoenix XLSX e do PSP CSV. Se houver divergência, temos um problema de integridade de dados.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">📋</span> Roadmap do Agente Analista</div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fase</th>
+                        <th>Ação</th>
+                        <th>Dados Usados</th>
+                        <th>Prioridade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color:var(--green);font-weight:700">Fase 1</td>
+                        <td>Validação cruzada: Superset vs Phoenix XLSX vs PSP</td>
+                        <td>olap_payment + daily XLSX + PSP CSV</td>
+                        <td><span class="badge badge-new" style="background:var(--red);color:#fff;border:none">URGENTE</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--green);font-weight:700">Fase 2</td>
+                        <td>Incorporar RTP, GGR%, Avg Spin ao dashboard</td>
+                        <td>olap_casino</td>
+                        <td><span class="badge badge-new" style="background:var(--yellow);color:#000;border:none">ALTA</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--green);font-weight:700">Fase 3</td>
+                        <td>Nova aba "Casino Detalhado" (provider/jogo)</td>
+                        <td>olap_casino</td>
+                        <td><span class="badge badge-new" style="background:var(--yellow);color:#000;border:none">ALTA</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--blue);font-weight:700">Fase 4</td>
+                        <td>Alertas automáticos: Pending Bets + RTP anomalias</td>
+                        <td>olap_sportsbook + olap_casino</td>
+                        <td><span class="badge badge-existing">MÉDIA</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--blue);font-weight:700">Fase 5</td>
+                        <td>Cruzamento BTAG ↔ Smartico (ROI real do afiliado)</td>
+                        <td>Todos os datasets + Smartico</td>
+                        <td><span class="badge badge-existing">MÉDIA</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--purple);font-weight:700">Fase 6</td>
+                        <td>Client Balances: monitor de liquidez e cash-out</td>
+                        <td>Client Balances (Current state)</td>
+                        <td><span class="badge badge-overlap">FUTURO</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--purple);font-weight:700">Fase 7</td>
+                        <td>Cohort analysis integrada no dashboard</td>
+                        <td>Todos + olap_payment cohorts</td>
+                        <td><span class="badge badge-overlap">FUTURO</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        Análise gerada em 26/03/2026 | Jogo Grande BI — Agente Analista de Dados | 23 chart exports processados, 4 datasets, 39+ métricas mapeadas
+    </div>
+</div>
+
+<script>
+    // TAB SWITCHING
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // CHART COLORS
+    const COLORS = ['#16E500','#4488ff','#ffbb00','#ff4444','#aa66ff','#00cccc','#ff88aa','#88ff44'];
+
+    // Chart 1: Distribuição por Dashboard
+    new Chart(document.getElementById('chart-dashboards').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: ['JogoGrande - Casino (15 charts)', 'JogoGrande ID 176 CRM (8 charts)'],
+            datasets: [{
+                data: [15, 8],
+                backgroundColor: [COLORS[0] + 'CC', COLORS[1] + 'CC'],
+                borderColor: '#111',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            cutout: '55%',
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true, padding: 16 } }
+            }
+        }
+    });
+
+    // Chart 2: Tipos de Visualização
+    new Chart(document.getElementById('chart-viztypes').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Table', 'Pivot Table', 'Area Chart', 'Big Number'],
+            datasets: [{
+                label: 'Quantidade',
+                data: [10, 5, 5, 3],
+                backgroundColor: [COLORS[0]+'99', COLORS[1]+'99', COLORS[2]+'99', COLORS[3]+'99'],
+                borderColor: [COLORS[0], COLORS[1], COLORS[2], COLORS[3]],
+                borderWidth: 1, borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: '#222' }, ticks: { color: '#888' } },
+                y: { grid: { display: false }, ticks: { color: '#ccc' } }
+            }
+        }
+    });
+
+    // Chart 3: Cobertura de Métricas
+    new Chart(document.getElementById('chart-coverage').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Casino', 'Sportsbook', 'Payment', 'Balances', 'Affiliates', 'Registros'],
+            datasets: [
+                {
+                    label: 'Superset',
+                    data: [13, 14, 10, 2, 0, 0],
+                    backgroundColor: COLORS[0] + '99',
+                    borderColor: COLORS[0],
+                    borderWidth: 1, borderRadius: 4
+                },
+                {
+                    label: 'Dashboard Atual',
+                    data: [6, 7, 4, 0, 20, 2],
+                    backgroundColor: COLORS[1] + '99',
+                    borderColor: COLORS[1],
+                    borderWidth: 1, borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#888', usePointStyle: true, padding: 16 } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#888' } },
+                y: { grid: { color: '#222' }, ticks: { color: '#888' }, title: { display: true, text: 'Nº Métricas', color: '#666' } }
+            }
+        }
+    });
+
+    // Chart 4: Datasets por Volume
+    new Chart(document.getElementById('chart-datasets-size').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['olap_casino', 'olap_sportsbook', 'olap_payment', 'Client Balances'],
+            datasets: [
+                {
+                    label: 'Colunas',
+                    data: [32, 47, 29, 11],
+                    backgroundColor: COLORS[2] + '99',
+                    borderColor: COLORS[2],
+                    borderWidth: 1, borderRadius: 4
+                },
+                {
+                    label: 'Métricas',
+                    data: [13, 14, 10, 2],
+                    backgroundColor: COLORS[0] + '99',
+                    borderColor: COLORS[0],
+                    borderWidth: 1, borderRadius: 4
+                },
+                {
+                    label: 'Charts',
+                    data: [15, 1, 5, 2],
+                    backgroundColor: COLORS[3] + '99',
+                    borderColor: COLORS[3],
+                    borderWidth: 1, borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#888', usePointStyle: true, padding: 16 } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#888' } },
+                y: { grid: { color: '#222' }, ticks: { color: '#888' } }
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+slice_name: Cohort - Casino JogoGrande176
+description: null
+certified_by: null
+certification_details: null
+viz_type: pivot_table_v2
+params:
+  datasource: 5__table
+  viz_type: pivot_table_v2
+  slice_id: 4524
+  groupbyColumns:
+  - spin_date
+  groupbyRows:
+  - client_registration_time
+  time_grain_sqla: P1M
+  temporal_columns_lookup:
+    spin_date: true
+    client_registration_time: true
+  metrics:
+  - casino_uap
+  - casino_turnover_eur
+  - casino_payout_eur
+  - ggr_eur
+  - avg_spin_eur
+  - ggr_percent
+  metricsLayout: COLUMNS
+  adhoc_filters:
+  - expressionType: SIMPLE
+    subject: spin_date
+    operator: TEMPORAL_RANGE
+    comparator: No filter
+    clause: WHERE
+    sqlExpression: null
+    isExtra: false
+    isNew: false
+    datasourceWarning: false
+    filterOptionName: filter_oukfsou8oj_flc35ad10lw
+  - expressionType: SIMPLE
+    subject: project_id
+    operator: IN
+    operatorId: IN
+    comparator:
+    - 176
+    clause: WHERE
+    sqlExpression: null
+    isExtra: false
+    isNew: false
+    datasourceWarning: false
+    filterOptionName: filter_0z68w7dfao7_siepi0niz4q
+  row_limit: 10000
+  order_desc: true
+  aggregateFunction: Sum
+  valueFormat: SMART_NUMBER
+  date_format: smart_date
+  rowOrder: key_a_to_z
+  colOrder: key_a_to_z
+  allow_render_html: true
+  extra_form_data: {}
+  dashboards:
+  - 2674
+query_context: '{"datasource":{"id":5,"type":"table"},"force":false,"queries":[{"filters":[{"col":"spin_date","op":"TEMPORAL_RANGE","val":"No
+  filter"},{"col":"project_id","op":"IN","val":[176]}],"extras":{"time_grain_sqla":"P1M","having":"","where":""},"applied_time_extras":{},"columns":[{"timeGrain":"P1M","columnType":"BASE_AXIS","sqlExpression":"spin_date","label":"spin_date","expressionType":"SQL"},{"timeGrain":"P1M","columnType":"BASE_AXIS","sqlExpression":"client_registration_time","label":"client_registration_time","expressionType":"SQL"}],"metrics":["casino_uap","casino_turnover_eur","casino_payout_eur","ggr_eur","avg_spin_eur","ggr_percent"],"orderby":[["casino_uap",false]],"annotation_layers":[],"row_limit":10000,"series_limit":0,"order_desc":true,"url_params":{},"custom_params":{},"custom_form_data":{}}],"form_data":{"datasource":"5__table","viz_type":"pivot_table_v2","slice_id":4524,"groupbyColumns":["spin_date"],"groupbyRows":["client_registration_time"],"time_grain_sqla":"P1M","temporal_columns_lookup":{"spin_date":true,"client_registration_time":true},"metrics":["casino_uap","casino_turnover_eur","casino_payout_eur","ggr_eur","avg_spin_eur","ggr_percent"],"metricsLayout":"COLUMNS","adhoc_filters":[{"expressionType":"SIMPLE","subject":"spin_date","operator":"TEMPORAL_RANGE","comparator":"No
+  filter","clause":"WHERE","sqlExpression":null,"isExtra":false,"isNew":false,"datasourceWarning":false,"filterOptionName":"filter_oukfsou8oj_flc35ad10lw"},{"expressionType":"SIMPLE","subject":"project_id","operator":"IN","operatorId":"IN","comparator":[176],"clause":"WHERE","sqlExpression":null,"isExtra":false,"isNew":false,"datasourceWarning":false,"filterOptionName":"filter_0z68w7dfao7_siepi0niz4q"}],"row_limit":10000,"order_desc":true,"aggregateFunction":"Sum","valueFormat":"SMART_NUMBER","date_format":"smart_date","rowOrder":"key_a_to_z","colOrder":"key_a_to_z","allow_render_html":true,"extra_form_data":{},"dashboards":[2674],"force":false,"result_format":"json","result_type":"full"},"result_format":"json","result_type":"full"}'
+cache_timeout: null
+uuid: 86674ba4-180d-4922-bf4c-14f7cb4283f0
+version: 1.0.0
+dataset_uuid: bce7aad0-f8c8-4d09-9f5f-fe068cd3914b
