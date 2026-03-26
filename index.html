@@ -164,7 +164,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
     <span style="font-size:10px;color:var(--text2);letter-spacing:3px;text-transform:uppercase">Business Intelligence Dashboard</span>
   </div>
   <div class="time-bar" id="global-time-bar">
-    <div class="time-btn active" onclick="setTime('yesterday',this)">Ontem</div>
+    <div class="time-btn active" onclick="setTime('today',this)">Hoje</div>
+    <div class="time-btn" onclick="setTime('yesterday',this)">Ontem</div>
     <div class="time-btn" onclick="setTime('week',this)">Esta Semana</div>
     <div class="time-btn" onclick="setTime('month',this)">Este Mês</div>
     <div class="time-btn" onclick="setTime('year',this)">2026</div>
@@ -461,29 +462,38 @@ let charts={};
 function mc(id,cfg){const x=document.getElementById(id);if(!x)return null;if(charts[id]){charts[id].destroy()}charts[id]=new Chart(x.getContext('2d'),cfg);return charts[id]}
 
 // ═══ TIME FILTER LOGIC ═══
-let currentPeriod='yesterday';
+let currentPeriod='today';
+
+function _todayStr(){var n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')}
+function _yesterdayStr(){var n=new Date();n.setDate(n.getDate()-1);return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')}
 
 function getFilteredData(period){
   const lastDay=D[D.length-1];
-  const lastDate=lastDay.date;
   switch(period){
-    case 'yesterday':
-      return D.filter(d=>d.date===lastDate);
+    case 'today': {
+      var td=_todayStr();
+      var r=D.filter(d=>d.date===td);
+      // Se não tem dados de hoje ainda, mostra o último dia disponível + aviso
+      if(r.length===0){r=D.filter(d=>d.date===lastDay.date);window._noDataToday=true}else{window._noDataToday=false}
+      return r;
+    }
+    case 'yesterday': {
+      var yd=_yesterdayStr();
+      var r=D.filter(d=>d.date===yd);
+      if(r.length===0){r=D.filter(d=>d.date===lastDay.date)}
+      return r;
+    }
     case 'week': {
-      // Pegar semana ISO do último dia de dados
-      const lw=lastDay.wk, ly=lastDay.yr;
-      const weekDays=D.filter(d=>d.wk===lw && d.yr===ly);
-      // Se semana atual tem poucos dias (< 3) e não é a única semana, incluir semana anterior também
-      if(weekDays.length < 3){
-        const prevWk=lw-1>0?lw-1:52;
-        const prevYr=lw-1>0?ly:ly-1;
-        const prevDays=D.filter(d=>d.wk===prevWk && d.yr===prevYr);
-        return [...prevDays, ...weekDays];
-      }
-      return weekDays;
+      var td=_todayStr();
+      // Calcular início da semana (segunda-feira)
+      var now=new Date();var dow=now.getDay();var diff=dow===0?6:dow-1;
+      var mon=new Date(now);mon.setDate(mon.getDate()-diff);
+      var monStr=mon.getFullYear()+'-'+String(mon.getMonth()+1).padStart(2,'0')+'-'+String(mon.getDate()).padStart(2,'0');
+      return D.filter(d=>d.date>=monStr&&d.date<=td);
     }
     case 'month': {
-      return D.filter(d=>d.month===lastDay.month);
+      var now=new Date();var prefix=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+      return D.filter(d=>d.date.startsWith(prefix));
     }
     case 'year': {
       return D.filter(d=>d.yr===2026);
@@ -494,7 +504,7 @@ function getFilteredData(period){
   }
 }
 
-let filteredData=getFilteredData('yesterday');
+let filteredData=getFilteredData('today');
 
 function toggleCustomPeriod(el){
   var cp=document.getElementById('custom-period');
@@ -531,7 +541,15 @@ function getPeriodLabel(period){
   const last=D[D.length-1];
   const months={'2025-11':'Nov/25','2025-12':'Dez/25','2026-01':'Jan/26','2026-02':'Fev/26','2026-03':'Mar/26'};
   switch(period){
-    case 'yesterday': return 'Ontem ('+last.df+')';
+    case 'today': {
+      var td=_todayStr();var dd=td.substring(8,10)+'/'+td.substring(5,7);
+      if(window._noDataToday)return 'Hoje ('+dd+') — dados até '+last.df;
+      return 'Hoje ('+dd+')';
+    }
+    case 'yesterday': {
+      var yd=_yesterdayStr();var dd=yd.substring(8,10)+'/'+yd.substring(5,7);
+      return 'Ontem ('+dd+')';
+    }
     case 'week': {
       const fd=filteredData;
       return 'Semana '+fd[0].df+' → '+fd[fd.length-1].df;
