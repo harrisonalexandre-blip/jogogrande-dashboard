@@ -30,7 +30,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .sheets-btn{background:var(--greenA);border:1px solid rgba(14,165,90,.3);color:var(--green);padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;transition:.2s;cursor:pointer}
 .sheets-btn:hover{background:rgba(14,165,90,.25);border-color:var(--green)}
 .upd{font-size:10px;color:var(--text3)}
-.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:2px;overflow-x:auto}
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;display:flex;gap:1px;overflow-x:auto}
 .tab{padding:8px 10px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text2);border-bottom:2px solid transparent;transition:.2s;letter-spacing:.3px;white-space:nowrap}
 .tab:hover{color:var(--text)}.tab.active{color:var(--green);border-bottom-color:var(--green)}
 .ctn{max-width:1600px;margin:0 auto;padding:20px 24px}
@@ -266,12 +266,13 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tab" data-roles="admin,socio" onclick="sp('fin',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a4.5 4.5 0 0 0 0 9h5a4.5 4.5 0 0 1 0 9H6"></path></svg>FINANCEIRO</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('soc',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>SÓCIOS</div>
   <div class="tab" data-roles="admin,socio,crm" onclick="sp('crm',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="17" x2="22" y2="17"></line><path d="M6 3v4M10 3v4M14 3v4M18 3v4"></path></svg>CRM</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('afil',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M2 12c0-2.76 1.12-5.26 2.93-7.07S7.24 2 10 2c1.24 0 2.43.2 3.57.58.24.08.48.16.72.25"></path><path d="M22 12c0 2.76-1.12 5.26-2.93 7.07S16.76 22 14 22c-1.24 0-2.43-.2-3.57-.58-.24-.08-.48-.16-.72-.25"></path><path d="M10 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM14 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path><path d="M12 6v12"></path></svg>AFILIADOS</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('recon',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>CONCILIAÇÃO</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('casino',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>CASINO DETALHADO</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('alertas',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>ALERTAS <span id="alert-badge" style="background:var(--red);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:4px;font-weight:800;display:none">0</span></div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('caixa',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="5" width="18" height="14" rx="1" ry="1"></rect><path d="M12 9v6"></path><path d="M9 12h6"></path></svg>CAIXA <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
-  <div class="tab" data-roles="admin" onclick="sp('acessos',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>ACESSOS</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('afil',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M2 12c0-2.76 1.12-5.26 2.93-7.07S7.24 2 10 2c1.24 0 2.43.2 3.57.58.24.08.48.16.72.25"></path><path d="M22 12c0 2.76-1.12 5.26-2.93 7.07S16.76 22 14 22c-1.24 0-2.43-.2-3.57-.58-.24-.08-.48-.16-.72-.25"></path><path d="M10 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM14 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path><path d="M12 6v12"></path></svg>AFILIADOS</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('recon',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>CONCIL.</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('casino',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>CASINO DET.</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('alertas',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>ALERTAS <span id="alert-badge" style="background:var(--red);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;margin-left:2px;font-weight:800;display:none">0</span></div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('btag',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>BTAG ROI</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('caixa',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="3" y="5" width="18" height="14" rx="1" ry="1"></rect><path d="M12 9v6"></path><path d="M9 12h6"></path></svg>CAIXA</div>
+  <div class="tab" data-roles="admin" onclick="sp('acessos',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>ACESSOS</div>
 </div>
 <div class="ctn">
 
@@ -527,6 +528,28 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <div class="tb"><div class="th"><h3>Historico de Alertas (ultimos 30 dias)</h3></div>
 <table><thead><tr><th>Data</th><th>Severidade</th><th>Categoria</th><th>Descricao</th><th>Valor</th></tr></thead>
 <tbody id="alert-history-tb"></tbody></table></div>
+</div>
+
+<!-- ═══ PAGE: BTAG ROI ═══ -->
+<div id="pg-btag" class="page">
+<p class="sec">BTAG Cross-Reference · ROI por Afiliado · Smartico x Superset</p>
+<div class="kg" id="kp-btag"></div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot g"></span>ROI por Afiliado (Top 15)</div><canvas id="c-btag-roi"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot gl"></span>Net P&L vs Comissoes Pagas</div><canvas id="c-btag-scatter"></canvas></div>
+</div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot b"></span>Depositos por Afiliado (Top 10)</div><canvas id="c-btag-dep"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot c"></span>FTD Rate por Afiliado (%)</div><canvas id="c-btag-ftdr"></canvas></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:16px 0">
+  <div class="cb" style="padding:16px"><div class="ct"><span class="dot g"></span>TOP PERFORMERS</div><div id="btag-top" style="margin-top:10px"></div></div>
+  <div class="cb" style="padding:16px"><div class="ct"><span class="dot gl"></span>ATENCAO</div><div id="btag-watch" style="margin-top:10px"></div></div>
+  <div class="cb" style="padding:16px"><div class="ct"><span class="dot r"></span>ROI NEGATIVO</div><div id="btag-neg" style="margin-top:10px"></div></div>
+</div>
+<div class="tb"><div class="th"><h3>Cross-Reference Completo: BTAG x Smartico</h3><input class="si" id="btag-search" placeholder="Buscar afiliado..." oninput="filterBtag()"></div>
+<table><thead><tr><th>Afiliado (BTAG)</th><th>Tipo</th><th>Regs</th><th>FTD</th><th>FTD%</th><th>Depositos</th><th>Saques</th><th>Net P&L</th><th>Comissao</th><th>ROI</th><th>Status</th></tr></thead>
+<tbody id="btag-tb"></tbody></table></div>
 </div>
 
 <!-- ═══ PAGE: CAIXA (Em Construção) ═══ -->
@@ -1678,6 +1701,99 @@ function rRecon(){
   document.getElementById('recon-table-daily').innerHTML=dH+dB;
 }
 
+// ═══ BTAG CROSS-REFERENCE ═══
+function getBtagData(){
+  if(typeof AFF==='undefined'||!AFF.affs)return[];
+  return AFF.affs.map(a=>{
+    const roi=a.cm>0?Math.round((a.np/a.cm)*100):a.np>0?9999:0;
+    const fr=a.rg>0?Math.round(a.ftd/a.rg*1000)/10:0;
+    const tipo=a.cm>0&&a.np>0?'RevShare':a.cm>0?'CPA/Hybrid':'Direto';
+    const depPerFtd=a.ftd>0?Math.round(a.da/a.ftd):0;
+    let status='neutral';
+    if(roi>200)status='star';else if(roi>50)status='good';else if(roi>=0)status='watch';else status='negative';
+    return{n:a.n,tipo,rg:a.rg,ftd:a.ftd,fr,da:a.da,wa:a.wa,np:a.np,cm:a.cm,roi,dpf:depPerFtd,vol:a.vol,status};
+  }).filter(a=>a.rg>0||a.da>0).sort((a,b)=>b.np-a.np);
+}
+function rBtag(){
+  const data=getBtagData();
+  if(!data.length){document.getElementById('kp-btag').innerHTML='<div style="color:var(--text3);padding:20px">Sem dados de afiliados carregados.</div>';return;}
+  const totNP=data.reduce((s,a)=>s+a.np,0);
+  const totComm=data.reduce((s,a)=>s+a.cm,0);
+  const totDep=data.reduce((s,a)=>s+a.da,0);
+  const totFtd=data.reduce((s,a)=>s+a.ftd,0);
+  const totReg=data.reduce((s,a)=>s+a.rg,0);
+  const posROI=data.filter(a=>a.roi>0).length;
+  const negROI=data.filter(a=>a.np<0).length;
+  const avgROI=totComm>0?Math.round(totNP/totComm*100):0;
+  document.getElementById('kp-btag').innerHTML=[
+    {l:'AFILIADOS ATIVOS',v:fN(data.length),s:posROI+' positivos / '+negROI+' negativos',c:''},
+    {l:'NET P&L TOTAL',v:fR(totNP),s:'Receita liquida afiliados',c:totNP>=0?'green':'red'},
+    {l:'COMISSOES PAGAS',v:fR(totComm),s:'CPA + RevShare',c:'purple'},
+    {l:'ROI MEDIO',v:avgROI+'%',s:'Net P&L / Comissoes',c:avgROI>100?'green':avgROI>0?'gold':'red'},
+    {l:'DEPOSITOS TOTAL',v:fR(totDep),s:fN(totFtd)+' FTDs',c:'cyan'},
+    {l:'DEP MEDIO/FTD',v:fR(totFtd>0?Math.round(totDep/totFtd):0),s:'Ticket medio',c:'blue'},
+  ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
+  // ROI chart (top 15 with commissions)
+  const withComm=data.filter(a=>a.cm>100).sort((a,b)=>b.roi-a.roi).slice(0,15);
+  mc('c-btag-roi',{type:'bar',data:{labels:withComm.map(a=>a.n.substring(0,18)),datasets:[{label:'ROI %',
+    data:withComm.map(a=>Math.min(a.roi,500)),
+    backgroundColor:withComm.map(a=>a.roi>200?'rgba(14,165,90,.6)':a.roi>50?'rgba(255,215,64,.6)':'rgba(255,68,68,.6)'),
+    borderWidth:0,borderRadius:6}]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{color:'#555',callback:v=>v+'%'}},y:{ticks:{color:'#ccc',font:{size:10}},grid:{display:false}}}}});
+  // Scatter: NP vs Commissions
+  const scatterData=data.filter(a=>a.cm>0||Math.abs(a.np)>100).map(a=>({x:a.cm,y:a.np,r:Math.max(3,Math.min(15,Math.sqrt(a.da)/50)),label:a.n}));
+  mc('c-btag-scatter',{type:'bubble',data:{datasets:[
+    {label:'ROI+',data:scatterData.filter(d=>d.y>=0),backgroundColor:'rgba(14,165,90,.4)',borderColor:'#0EA55A',borderWidth:1},
+    {label:'ROI-',data:scatterData.filter(d=>d.y<0),backgroundColor:'rgba(255,68,68,.4)',borderColor:'#FF4444',borderWidth:1}
+  ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}},tooltip:{callbacks:{label:ctx=>{const d=ctx.raw;return d.label+': P&L '+fR(d.y)+' | Comm '+fR(d.x)}}}},
+    scales:{x:{...CD.scales.y,title:{display:true,text:'Comissoes Pagas (R$)',color:'#555'},ticks:{color:'#555',callback:v=>fR(v,false)}},y:{...CD.scales.y,title:{display:true,text:'Net P&L (R$)',color:'#555'},ticks:{color:'#555',callback:v=>fR(v,false)}}}}});
+  // Deposits bar
+  const top10dep=data.filter(a=>a.da>0).sort((a,b)=>b.da-a.da).slice(0,10);
+  mc('c-btag-dep',{type:'bar',data:{labels:top10dep.map(a=>a.n.substring(0,18)),datasets:[{label:'Depositos R$',
+    data:top10dep.map(a=>a.da),backgroundColor:'rgba(0,229,255,.5)',borderWidth:0,borderRadius:6}]},
+    options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{color:'#555',callback:v=>fR(v,false)}},y:{ticks:{color:'#ccc',font:{size:10}},grid:{display:false}}}}});
+  // FTD Rate
+  const ftdAff=data.filter(a=>a.rg>=10).sort((a,b)=>b.fr-a.fr).slice(0,15);
+  mc('c-btag-ftdr',{type:'bar',data:{labels:ftdAff.map(a=>a.n.substring(0,18)),datasets:[{label:'FTD Rate %',
+    data:ftdAff.map(a=>a.fr),
+    backgroundColor:ftdAff.map(a=>a.fr>30?'rgba(14,165,90,.6)':a.fr>15?'rgba(255,215,64,.6)':'rgba(255,68,68,.6)'),
+    borderWidth:0,borderRadius:4}]},options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
+  // Classification cards
+  function renderBtagCards(cid,items){
+    const el=document.getElementById(cid);
+    if(!items.length){el.innerHTML='<div style="color:var(--text3);font-size:11px">Nenhum</div>';return;}
+    el.innerHTML=items.slice(0,5).map(a=>{
+      const ic=a.status==='star'?'var(--green)':a.status==='good'?'var(--gold)':a.status==='watch'?'var(--blue)':'var(--red)';
+      return `<div style="border-left:3px solid ${ic};padding:6px 10px;margin-bottom:6px;border-radius:6px;background:rgba(255,255,255,.02)">
+        <div style="display:flex;justify-content:space-between"><strong style="font-size:11px;color:var(--text1)">${a.n}</strong><span style="font-size:10px;color:${ic};font-weight:700">ROI ${a.roi>500?'500+':a.roi}%</span></div>
+        <div style="font-size:10px;color:var(--text3)">P&L: ${fR(a.np)} | Comm: ${fR(a.cm)} | ${a.tipo}</div></div>`;
+    }).join('');
+  }
+  renderBtagCards('btag-top',data.filter(a=>a.status==='star'&&a.cm>100));
+  renderBtagCards('btag-watch',data.filter(a=>a.status==='watch'&&a.cm>100));
+  renderBtagCards('btag-neg',data.filter(a=>a.np<0).sort((a,b)=>a.np-b.np));
+  // Full table
+  renderBtagTable(data);
+}
+function renderBtagTable(data){
+  document.getElementById('btag-tb').innerHTML=data.map(a=>{
+    const rc=a.roi>200?'var(--green)':a.roi>50?'var(--gold)':a.roi>=0?'var(--text2)':'var(--red)';
+    const sc=a.status==='star'?'var(--green)':a.status==='good'?'var(--gold)':a.status==='watch'?'var(--blue)':'var(--red)';
+    const sl=a.status==='star'?'TOP':a.status==='good'?'BOM':a.status==='watch'?'ATEN\u00c7\u00c3O':'NEGATIVO';
+    return `<tr><td><strong>${a.n}</strong></td><td style="color:var(--text3)">${a.tipo}</td>
+      <td>${fN(a.rg)}</td><td>${fN(a.ftd)}</td><td>${a.fr}%</td>
+      <td style="color:var(--cyan)">${fR(a.da)}</td><td>${fR(a.wa)}</td>
+      <td class="${a.np>=0?'bp':'bn'}">${fR(a.np)}</td>
+      <td style="color:var(--purple)">${fR(a.cm)}</td>
+      <td style="color:${rc};font-weight:700">${a.roi>500?'500+':a.roi}%</td>
+      <td style="color:${sc};font-weight:700;font-size:10px">${sl}</td></tr>`;
+  }).join('');
+}
+function filterBtag(){
+  const q=document.getElementById('btag-search').value.toLowerCase();
+  const all=getBtagData();
+  renderBtagTable(q?all.filter(a=>a.n.toLowerCase().includes(q)):all);
+}
+
 // ═══ ALERTAS ENGINE ═══
 function generateAlerts(){
   const alerts=[];
@@ -1858,7 +1974,7 @@ function sp(n,el){
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
   else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
-  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
+  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
 document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); });
 
