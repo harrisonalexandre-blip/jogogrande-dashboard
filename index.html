@@ -269,6 +269,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tab" data-roles="admin,socio" onclick="sp('afil',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M2 12c0-2.76 1.12-5.26 2.93-7.07S7.24 2 10 2c1.24 0 2.43.2 3.57.58.24.08.48.16.72.25"></path><path d="M22 12c0 2.76-1.12 5.26-2.93 7.07S16.76 22 14 22c-1.24 0-2.43-.2-3.57-.58-.24-.08-.48-.16-.72-.25"></path><path d="M10 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM14 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path><path d="M12 6v12"></path></svg>AFILIADOS</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('recon',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>CONCILIAÇÃO</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('casino',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>CASINO DETALHADO</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('alertas',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>ALERTAS <span id="alert-badge" style="background:var(--red);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:4px;font-weight:800;display:none">0</span></div>
   <div class="tab" data-roles="admin,socio" onclick="sp('caixa',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="5" width="18" height="14" rx="1" ry="1"></rect><path d="M12 9v6"></path><path d="M9 12h6"></path></svg>CAIXA <span style="font-size:9px;color:var(--text3);font-weight:400">(em breve)</span></div>
   <div class="tab" data-roles="admin" onclick="sp('acessos',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>ACESSOS</div>
 </div>
@@ -488,21 +489,21 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ═══ PAGE: CASINO DETALHADO ═══ -->
 <div id="pg-casino" class="page">
-<p class="sec">Casino Detalhado · Provider & Jogos · Superset Data (EUR)</p>
+<p class="sec">Casino Detalhado · Provider & Jogos · Superset Data</p>
 <div class="kg" id="kp-casino"></div>
 <div class="cg cg2">
   <div class="cb"><div class="ct"><span class="dot g"></span>RTP % por Dia (Retorno ao Jogador)</div><canvas id="c-rtp"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot gl"></span>GGR % por Dia</div><canvas id="c-ggrp"></canvas></div>
 </div>
 <div class="cg cg2">
-  <div class="cb"><div class="ct"><span class="dot b"></span>Avg Spin EUR por Dia</div><canvas id="c-avgspin"></canvas></div>
-  <div class="cb"><div class="ct"><span class="dot c"></span>GGR EUR por Provider (Top 10)</div><canvas id="c-provggr"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot b"></span>Avg Spin R$ por Dia</div><canvas id="c-avgspin"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot c"></span>GGR R$ por Provider (Top 10)</div><canvas id="c-provggr"></canvas></div>
 </div>
-<div class="tb"><div class="th"><h3>Top Providers por Turnover (EUR)</h3></div>
-<table><thead><tr><th>Provider</th><th>Turnover</th><th>Payout</th><th>GGR</th><th>GGR %</th><th>RTP %</th><th>Jogos</th></tr></thead>
+<div class="tb"><div class="th"><h3>Top Providers por Turnover</h3></div>
+<table><thead><tr><th>Provider</th><th>Turnover R$</th><th>Payout R$</th><th>GGR R$</th><th>GGR %</th><th>RTP %</th><th>Jogos</th></tr></thead>
 <tbody id="prov-tb"></tbody></table></div>
-<div class="tb"><div class="th"><h3>Top Jogos por Turnover (EUR)</h3><input class="si" id="game-search" placeholder="Buscar jogo..." oninput="filterGames()"></div>
-<table><thead><tr><th>Provider</th><th>Jogo</th><th>UAP</th><th>Turnover</th><th>Payout</th><th>GGR</th><th>GGR %</th><th>Avg Spin</th></tr></thead>
+<div class="tb"><div class="th"><h3>Top Jogos por Turnover</h3><input class="si" id="game-search" placeholder="Buscar jogo..." oninput="filterGames()"></div>
+<table><thead><tr><th>Provider</th><th>Jogo</th><th>UAP</th><th>Turnover R$</th><th>Payout R$</th><th>GGR R$</th><th>GGR %</th><th>Avg Spin R$</th></tr></thead>
 <tbody id="game-tb"></tbody></table></div>
 </div>
 
@@ -1663,6 +1664,9 @@ const SS_PROVS=[{"pv":"Evolution","to":2708893.78,"po":2630574.36,"ggr":78319.42
 const SS_DAILY=[{"dt":"2025-12-01","uap":89,"sc":11389,"as":1.05,"to":11937.82,"po":12101.32,"ggr":-163.5,"gp":-1.57,"rtp":101.37},{"dt":"2025-12-13","uap":71,"sc":18505,"as":1.58,"to":29303.85,"po":22959.35,"ggr":6344.5,"gp":21.81,"rtp":78.35},{"dt":"2026-01-15","uap":89,"sc":25411,"as":0.81,"to":20548.37,"po":19834.78,"ggr":713.59,"gp":3.55,"rtp":96.53},{"dt":"2026-02-15","uap":219,"sc":48775,"as":0.72,"to":35306.39,"po":33823.41,"ggr":1482.98,"gp":4.2,"rtp":95.8},{"dt":"2026-03-01","uap":284,"sc":90516,"as":0.49,"to":44116.9,"po":44212.24,"ggr":-95.34,"gp":-0.43,"rtp":100.22},{"dt":"2026-03-05","uap":170,"sc":55633,"as":0.73,"to":40842.78,"po":43811.91,"ggr":-2969.13,"gp":-7.27,"rtp":107.27},{"dt":"2026-03-10","uap":213,"sc":43754,"as":0.98,"to":42710.24,"po":42668.01,"ggr":42.23,"gp":0.1,"rtp":99.9},{"dt":"2026-03-15","uap":289,"sc":55870,"as":0.99,"to":55068.06,"po":51994.18,"ggr":3073.88,"gp":5.54,"rtp":94.42},{"dt":"2026-03-17","uap":267,"sc":62458,"as":1.22,"to":76063.15,"po":67889.19,"ggr":8173.96,"gp":10.76,"rtp":89.25},{"dt":"2026-03-20","uap":276,"sc":48740,"as":1.01,"to":49261.23,"po":46747.18,"ggr":2514.05,"gp":5.1,"rtp":94.9},{"dt":"2026-03-23","uap":420,"sc":87915,"as":0.99,"to":87078.49,"po":84030.31,"ggr":3048.18,"gp":3.5,"rtp":96.5},{"dt":"2026-03-25","uap":323,"sc":78840,"as":1.1,"to":86695.98,"po":83181.53,"ggr":3514.45,"gp":4.07,"rtp":95.95}];
 
 function rCasino(){
+  const EB=6.14;
+  const fBRL=v=>{const a=Math.abs(v);return(v<0?'-':'')+'R$ '+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e3?(a/1e3).toFixed(1)+'K':fN(Math.round(a)))};
+  const fEUR=v=>'\u20ac'+fN(Math.round(v));
   const totTo=SS_PROVS.reduce((s,p)=>s+p.to,0);
   const totGGR=SS_PROVS.reduce((s,p)=>s+p.ggr,0);
   const avgRTP=Math.round((1-totGGR/totTo)*10000)/100;
@@ -1670,11 +1674,11 @@ function rCasino(){
   const totGames=SS_PROVS.reduce((s,p)=>s+p.gc,0);
   const lastDay=SS_DAILY[SS_DAILY.length-1];
   document.getElementById('kp-casino').innerHTML=[
-    {l:'TURNOVER TOTAL',v:'\u20ac'+fN(Math.round(totTo)),s:'Todos os providers',c:'gold'},
-    {l:'GGR TOTAL',v:'\u20ac'+fN(Math.round(totGGR)),s:'Gross Gaming Revenue',c:''},
+    {l:'TURNOVER TOTAL',v:fBRL(totTo*EB),s:'<span style="opacity:.5;font-size:10px">'+fEUR(totTo)+'</span> · Todos os providers',c:'gold'},
+    {l:'GGR TOTAL',v:fBRL(totGGR*EB),s:'<span style="opacity:.5;font-size:10px">'+fEUR(totGGR)+'</span> · Gross Gaming Revenue',c:''},
     {l:'GGR %',v:avgGGRP.toFixed(2)+'%',s:'Margem casino',c:'blue'},
     {l:'RTP M\u00c9DIO',v:avgRTP.toFixed(2)+'%',s:'Retorno ao jogador',c:avgRTP>97?'red':avgRTP>95?'gold':'green'},
-    {l:'AVG SPIN (HOJE)',v:'\u20ac'+lastDay.as.toFixed(2),s:'Aposta m\u00e9dia por spin',c:'cyan'},
+    {l:'AVG SPIN (HOJE)',v:'R$ '+(lastDay.as*EB).toFixed(2),s:'<span style="opacity:.5;font-size:10px">\u20ac'+lastDay.as.toFixed(2)+'</span> · Aposta m\u00e9dia por spin',c:'cyan'},
     {l:'PROVIDERS',v:fN(SS_PROVS.length),s:fN(totGames)+' jogos ativos',c:'purple'},
   ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
 
@@ -1690,18 +1694,18 @@ function rCasino(){
     borderColor:SS_DAILY.map(d=>d.gp>=0?'#0EA55A':'#FF4444'),borderWidth:1,borderRadius:4}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
 
-  mc('c-avgspin',{type:'line',data:{labels:dlb,datasets:[{label:'Avg Spin \u20ac',data:SS_DAILY.map(d=>d.as),
+  mc('c-avgspin',{type:'line',data:{labels:dlb,datasets:[{label:'Avg Spin R$',data:SS_DAILY.map(d=>Math.round(d.as*EB*100)/100),
     borderColor:'#4488FF',backgroundColor:'rgba(68,136,255,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:4}]},
-    options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'\u20ac'+v.toFixed(2)}}}}});
+    options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'R$ '+v.toFixed(2)}}}}});
 
-  mc('c-provggr',{type:'bar',data:{labels:SS_PROVS.slice(0,10).map(p=>p.pv),datasets:[{label:'GGR \u20ac',
-    data:SS_PROVS.slice(0,10).map(p=>p.ggr),
+  mc('c-provggr',{type:'bar',data:{labels:SS_PROVS.slice(0,10).map(p=>p.pv),datasets:[{label:'GGR R$',
+    data:SS_PROVS.slice(0,10).map(p=>Math.round(p.ggr*EB)),
     backgroundColor:['rgba(14,165,90,.6)','rgba(68,136,255,.6)','rgba(255,215,64,.6)','rgba(255,68,68,.6)','rgba(187,134,252,.6)','rgba(0,229,255,.6)','rgba(14,165,90,.4)','rgba(68,136,255,.4)','rgba(255,215,64,.4)','rgba(255,68,68,.4)'],
-    borderWidth:0,borderRadius:6}]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{color:'#555',callback:v=>'\u20ac'+fN(Math.round(v))}},y:{ticks:{color:'#ccc',font:{size:11}},grid:{display:false}}}}});
+    borderWidth:0,borderRadius:6}]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{color:'#555',callback:v=>'R$ '+fN(Math.round(v))}},y:{ticks:{color:'#ccc',font:{size:11}},grid:{display:false}}}}});
 
   document.getElementById('prov-tb').innerHTML=SS_PROVS.map((p,i)=>`<tr>
-    <td><strong>${p.pv}</strong></td><td style="color:var(--gold)">\u20ac${fN(Math.round(p.to))}</td>
-    <td>\u20ac${fN(Math.round(p.po))}</td><td class="${p.ggr>=0?'bp':'bn'}">${p.ggr>=0?'+':''}\u20ac${fN(Math.round(p.ggr))}</td>
+    <td><strong>${p.pv}</strong></td><td style="color:var(--gold)">${fBRL(p.to*EB)} <span style="opacity:.35;font-size:10px">${fEUR(p.to)}</span></td>
+    <td>${fBRL(p.po*EB)} <span style="opacity:.35;font-size:10px">${fEUR(p.po)}</span></td><td class="${p.ggr>=0?'bp':'bn'}">${p.ggr>=0?'+':''}${fBRL(p.ggr*EB)} <span style="opacity:.35;font-size:10px">${fEUR(p.ggr)}</span></td>
     <td style="color:${p.gp>=3?'var(--green)':p.gp>=0?'var(--gold)':'var(--red)'}">${p.gp.toFixed(2)}%</td>
     <td style="color:${p.rtp>97?'var(--red)':p.rtp>95?'var(--gold)':'var(--green)'}">${p.rtp.toFixed(2)}%</td>
     <td>${p.gc}</td></tr>`).join('');
@@ -1709,12 +1713,15 @@ function rCasino(){
   renderGameTable(SS_GAMES);
 }
 function renderGameTable(games){
+  const EB=6.14;
+  const fBRL2=v=>{const a=Math.abs(v);return(v<0?'-':'')+'R$ '+(a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e3?(a/1e3).toFixed(1)+'K':fN(Math.round(a)))};
   document.getElementById('game-tb').innerHTML=games.map(g=>`<tr>
     <td style="color:var(--text2)">${g.pv}</td><td><strong>${g.gm}</strong></td><td>${fN(g.uap)}</td>
-    <td style="color:var(--gold)">\u20ac${fN(Math.round(g.to))}</td><td>\u20ac${fN(Math.round(g.po))}</td>
-    <td class="${g.ggr>=0?'bp':'bn'}">${g.ggr>=0?'+':''}\u20ac${fN(Math.round(g.ggr))}</td>
+    <td style="color:var(--gold)">${fBRL2(g.to*EB)} <span style="opacity:.35;font-size:10px">\u20ac${fN(Math.round(g.to))}</span></td>
+    <td>${fBRL2(g.po*EB)} <span style="opacity:.35;font-size:10px">\u20ac${fN(Math.round(g.po))}</span></td>
+    <td class="${g.ggr>=0?'bp':'bn'}">${g.ggr>=0?'+':''}${fBRL2(g.ggr*EB)} <span style="opacity:.35;font-size:10px">\u20ac${fN(Math.round(g.ggr))}</span></td>
     <td style="color:${g.gp>=3?'var(--green)':g.gp>=0?'var(--gold)':'var(--red)'}">${g.gp.toFixed(2)}%</td>
-    <td>\u20ac${g.as.toFixed(2)}</td></tr>`).join('');
+    <td>R$ ${(g.as*EB).toFixed(2)} <span style="opacity:.35;font-size:10px">\u20ac${g.as.toFixed(2)}</span></td></tr>`).join('');
 }
 function filterGames(){
   const q=document.getElementById('game-search').value.toLowerCase();
