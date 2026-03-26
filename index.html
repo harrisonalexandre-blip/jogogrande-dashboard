@@ -600,7 +600,7 @@ function calcKPIs(data,period){
   const sg=data.reduce((a,d)=>a+d.sg,0);
   var nd=data.reduce((a,d)=>a+d.nd,0);
   const uap=data.length>0?data.reduce((a,d)=>a+d.uap,0)/data.length:0;
-  const mi=data.reduce((a,d)=>a+(d.mi||0),0);
+  var mi=data.reduce((a,d)=>a+(d.mi||0),0);
   // Enriquecer com DigiToPay (RECON) — dados atualizados a cada 1h
   var dtpDs=0,dtpWs=0,dtpNd=0,dtpDn=0,dtpSn=0,dtpUsed=false;
   if(typeof RECON!=='undefined'){
@@ -612,13 +612,17 @@ function calcKPIs(data,period){
       if(period==='today'){reconMatch=RECON.filter(function(r){return r.d===_todayStr()})}
       else if(period==='yesterday'){reconMatch=RECON.filter(function(r){return r.d===_yesterdayStr()})}
     }
+    var dtpMi=0;
     reconMatch.forEach(function(r){
       dtpDs+=(r.dtp_dep||0);dtpWs+=(r.dtp_saq||0);
       dtpDn+=(r.dtp_dep_n||0);dtpSn+=(r.dtp_saq_n||0);
+      dtpMi+=(r.dtp_mi||0);
     });
     dtpNd=dtpDn;
     // Se PHX não tem dados (ds===0) mas DTP tem, usar DTP como fonte primária
     if(ds===0&&dtpDs>0){ds=dtpDs;ws=dtpWs;nd=dtpDn;dtpUsed=true}
+    // Sempre usar MI do DTP se disponível (mais preciso que PHX)
+    if(dtpMi>0){mi=dtpMi}
     // Se PHX tem dados, DTP serve como complemento para validação (não sobrescreve)
   }
   return {nr,ftd,ds,ws,nc:ds-ws,ngr,cg,sg,nd,mi,uap:Math.round(uap),
