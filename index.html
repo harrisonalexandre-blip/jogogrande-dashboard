@@ -1641,7 +1641,7 @@ function getAffDateRange(){
     }
     if(currentPeriod==='lifetime')return{from:allDates[0],to:lastDate};
     if(currentPeriod==='today'){var today=localDateStr(new Date());var hasToday=allDates.indexOf(today)>=0;return{from:hasToday?today:lastDate,to:hasToday?today:lastDate};}
-    if(currentPeriod==='yesterday')return{from:lastDate,to:lastDate};
+    if(currentPeriod==='yesterday'){var yd=new Date();yd.setDate(yd.getDate()-1);var yds=localDateStr(yd);var hasYd=allDates.indexOf(yds)>=0;if(hasYd)return{from:yds,to:yds};var secondLast=allDates.length>=2?allDates[allDates.length-2]:lastDate;return{from:secondLast,to:secondLast};}
     if(currentPeriod==='week'){
       var ld=new Date(lastDate+'T12:00:00');var dow=ld.getDay();var diff=dow===0?6:dow-1;
       var wStart=new Date(ld);wStart.setDate(ld.getDate()-diff);
