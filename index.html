@@ -726,15 +726,19 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   <div class="cb"><div class="ct"><span class="dot b"></span>FTD Rate por Cohort (%)</div><canvas id="c-coh-ftdr"></canvas></div>
 </div>
 <div class="cg cg2">
-  <div class="cb"><div class="ct"><span class="dot gl"></span>Net PL Acumulado por Safra (R$)</div><canvas id="c-coh-netpl"></canvas></div>
-  <div class="cb"><div class="ct"><span class="dot c"></span>Churn FTD por Semana (%)</div><canvas id="c-coh-churn"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot gl"></span>Payback por Safra (semanas até Net PL cobrir Commission)</div><canvas id="c-coh-payback"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot c"></span>Net PL Acumulado vs Commission por Safra (R$)</div><canvas id="c-coh-nplvscomm"></canvas></div>
+</div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot g"></span>Net PL Acumulado por Safra (R$)</div><canvas id="c-coh-netpl"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot b"></span>Churn FTD por Semana (%)</div><canvas id="c-coh-churn"></canvas></div>
 </div>
 <div class="tb"><div class="th"><h3>Retenção de FTD por Cohort · Net PL acumulado por safra ao longo das semanas (R$)</h3></div>
 <div id="coh-heatmap-netpl" style="overflow-x:auto"></div></div>
 <div class="tb"><div class="th"><h3>Churn de FTD por Cohort · % de FTDs que pararam de depositar a cada semana</h3></div>
 <div id="coh-heatmap-churn" style="overflow-x:auto"></div></div>
 <div class="tb"><div class="th"><h3>Métricas por Cohort Semanal</h3></div>
-<table><thead><tr><th>Cohort</th><th>Regs</th><th>FTD</th><th>FTD%</th><th>Net PL</th><th>Net PL/FTD</th><th>Depositos</th><th>Saques</th><th>NGR</th><th>LTV/FTD</th></tr></thead>
+<table><thead><tr><th>Cohort</th><th>Regs</th><th>FTD</th><th>FTD%</th><th>Commission</th><th>Net PL</th><th>ROI</th><th>Payback</th><th>Depositos</th><th>Saques</th><th>NGR</th><th>LTV/FTD</th></tr></thead>
 <tbody id="coh-tb"></tbody></table></div>
 </div>
 
@@ -895,18 +899,21 @@ function mc(id,cfg){const x=document.getElementById(id);if(!x)return null;if(cha
 // ═══ TIME FILTER LOGIC ═══
 let currentPeriod='yesterday';
 
+function localDateStr(dt){
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+}
 function getFilteredData(period){
   const lastDay=D[D.length-1];
   const lastDate=lastDay.date;
   switch(period){
     case 'today': {
-      const today=new Date().toISOString().slice(0,10);
+      const today=localDateStr(new Date());
       const todayData=D.filter(d=>d.date===today);
       return todayData.length?todayData:D.filter(d=>d.date===lastDate);
     }
     case 'yesterday': {
       const yd=new Date();yd.setDate(yd.getDate()-1);
-      const yds=yd.toISOString().slice(0,10);
+      const yds=localDateStr(yd);
       const ydData=D.filter(d=>d.date===yds);
       return ydData.length?ydData:D.filter(d=>d.date===lastDate);
     }
@@ -973,14 +980,14 @@ function getPeriodLabel(period){
   const months={'2025-11':'Nov/25','2025-12':'Dez/25','2026-01':'Jan/26','2026-02':'Fev/26','2026-03':'Mar/26'};
   switch(period){
     case 'today': {
-      const today=new Date().toISOString().slice(0,10);
+      const today=localDateStr(new Date());
       const hasToday=D.some(d=>d.date===today);
       const dd=today.substring(8,10)+'/'+today.substring(5,7);
       return hasToday?'Hoje ('+dd+')':'Hoje ('+dd+') — dados até '+last.df;
     }
     case 'yesterday': {
       const yd2=new Date();yd2.setDate(yd2.getDate()-1);
-      const yds2=yd2.toISOString().slice(0,10);
+      const yds2=localDateStr(yd2);
       const dd2=yds2.substring(8,10)+'/'+yds2.substring(5,7);
       const hasYd=D.some(d=>d.date===yds2);
       return hasYd?'Ontem ('+dd2+')':'Ontem ('+dd2+') — dados até '+last.df;
@@ -1406,7 +1413,7 @@ function getAffDateRange(){
     return{from:window._affFrom,to:window._affTo};
   }
   if(currentPeriod==='lifetime')return{from:allDates[0],to:lastDate};
-  if(currentPeriod==='today'){var today=new Date().toISOString().slice(0,10);var hasToday=allDates.indexOf(today)>=0;return{from:hasToday?today:lastDate,to:hasToday?today:lastDate};}
+  if(currentPeriod==='today'){var today=localDateStr(new Date());var hasToday=allDates.indexOf(today)>=0;return{from:hasToday?today:lastDate,to:hasToday?today:lastDate};}
   if(currentPeriod==='yesterday')return{from:lastDate,to:lastDate};
   if(currentPeriod==='week'){
     var ld=new Date(lastDate+'T12:00:00');var dow=ld.getDay();var diff=dow===0?6:dow-1;
@@ -1985,7 +1992,7 @@ async function fetchTronBalance(){
 function getWeekKey(date){
   const d=new Date(date+'T00:00:00');
   const day=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));
-  return mon.toISOString().slice(0,10);
+  return localDateStr(mon);
 }
 function getWeekLabel(wkStart){
   const s=new Date(wkStart+'T00:00:00');
@@ -2196,17 +2203,18 @@ function buildNetPLMatrix(cohorts){
     const c=cohorts[i];
     const share=c.ftd/totalFTD;
     const commission=typeof AFF!=='undefined'&&AFF.affs?AFF.affs.reduce((s,a)=>s+a.cm,0)*share:0;
-    const weeks=[];let totalNPL=0;
+    const weeks=[];let totalNPL=0;let paybackWeek=null;let cumForPayback=0;
     for(let w=0;w<maxWeeks;w++){
       const j=i+w;
       if(j>=cohorts.length){weeks.push(null);continue;}
       const wk=cohorts[j];
-      // Net PL = NGR da semana × share da safra
       const npl=Math.round(wk.ngr*share);
       weeks.push(npl);totalNPL+=npl;
+      cumForPayback+=npl;
+      if(paybackWeek===null&&commission>0&&cumForPayback>=commission)paybackWeek=w;
     }
     const roi=commission>0?Math.round(totalNPL/commission*100)/100:0;
-    rows.push({ml:c.ml,ftd:c.ftd,commission:Math.round(commission),roi,totalNPL,weeks});
+    rows.push({ml:c.ml,ftd:c.ftd,commission:Math.round(commission),roi,totalNPL,paybackWeek,weeks});
   }
   return{rows,maxWeeks};
 }
@@ -2243,14 +2251,19 @@ function rCohorts(){
   const avgFTDR=totNR>0?Math.round(totFTD/totNR*1000)/10:0;
   const avgLTV=totFTD>0?Math.round(totDep/totFTD):0;
   const netPLperFTD=totFTD>0?Math.round(netPL/totFTD):0;
-  const bestCoh=cohorts.reduce((b,c)=>c.ftd>5&&c.ngr>b.ngr?c:b,{ngr:-Infinity,ml:'N/A'});
+  // Pre-calculate payback from nplMatrix
+  const nplM=buildNetPLMatrix(cohorts);
+  const safrasComPayback=nplM.rows.filter(r=>r.paybackWeek!==null&&r.ftd>0);
+  const avgPayback=safrasComPayback.length>0?Math.round(safrasComPayback.reduce((s,r)=>s+r.paybackWeek,0)/safrasComPayback.length*10)/10:null;
+  const fastestPB=safrasComPayback.length>0?safrasComPayback.reduce((b,r)=>r.paybackWeek<b.paybackWeek?r:b,safrasComPayback[0]):null;
+  const noPBcount=nplM.rows.filter(r=>r.paybackWeek===null&&r.ftd>0&&r.commission>0).length;
   document.getElementById('kp-cohorts').innerHTML=[
+    {l:'PAYBACK MEDIO',v:avgPayback!==null?avgPayback+' sem':'N/A',s:safrasComPayback.length+'/'+nplM.rows.filter(r=>r.ftd>0).length+' safras se pagaram',c:avgPayback!==null&&avgPayback<=4?'green':avgPayback<=8?'gold':'red'},
+    {l:'PAYBACK MAIS RAPIDO',v:fastestPB?fastestPB.ml:'N/A',s:fastestPB?'Week '+fastestPB.paybackWeek:'',c:'green'},
+    {l:'SEM PAYBACK',v:noPBcount,s:'Safras que ainda nao cobriram commission',c:noPBcount===0?'green':noPBcount<=3?'gold':'red'},
     {l:'TOTAL FTD',v:fN(totFTD),s:cohorts.length+' safras semanais',c:'gold'},
-    {l:'NET PL TOTAL',v:fR(netPL),s:'Dep - Saq de todos FTDs',c:netPL>=0?'green':'red'},
-    {l:'NET PL / FTD',v:fR(netPLperFTD),s:'Media por player FTD',c:netPLperFTD>=0?'green':'red'},
+    {l:'NET PL TOTAL',v:fR(netPL),s:'Dep - Saq acumulado',c:netPL>=0?'green':'red'},
     {l:'FTD RATE MEDIO',v:avgFTDR+'%',s:'Conversao reg→FTD',c:avgFTDR>25?'green':avgFTDR>15?'gold':'red'},
-    {l:'LTV MEDIO/FTD',v:fR(avgLTV),s:'Deposito total / FTD',c:'cyan'},
-    {l:'MELHOR SAFRA (NGR)',v:bestCoh.ml,s:'NGR: '+fR(bestCoh.ngr),c:'green'},
   ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
   const labels=cohorts.map(c=>c.ml);
   // Chart 1: Cohort size (Regs + FTD)
@@ -2263,7 +2276,25 @@ function rCohorts(){
     borderColor:'#FFD740',backgroundColor:'rgba(255,215,64,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:5,
     pointBackgroundColor:cohorts.map(c=>c.ftdr>25?'#0EA55A':c.ftdr>15?'#FFD740':'#FF4444')}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
-  // Chart 3: Net PL acumulado por safra (top 6 maiores)
+  // Chart 3: Payback por safra (barras = semanas até payback)
+  const pbData=nplM.rows.filter(r=>r.ftd>0);
+  const pbLabels=pbData.map(r=>r.ml);
+  const pbWeeks=pbData.map(r=>r.paybackWeek!==null?r.paybackWeek:null);
+  const maxPB=Math.max(...pbWeeks.filter(v=>v!==null),1);
+  mc('c-coh-payback',{type:'bar',data:{labels:pbLabels,datasets:[
+    {label:'Semanas até Payback',data:pbWeeks.map(v=>v!==null?v:maxPB+3),
+      backgroundColor:pbWeeks.map(v=>v===null?'rgba(255,68,68,.4)':v<=3?'rgba(14,165,90,.6)':v<=6?'rgba(255,215,64,.5)':'rgba(255,136,68,.5)'),
+      borderRadius:4,borderWidth:0},
+    {label:'Média ('+((avgPayback||0).toFixed(1))+' sem)',data:pbWeeks.map(()=>avgPayback||0),type:'line',borderColor:'#FFD740',borderWidth:2,borderDash:[6,3],pointRadius:0,fill:false}
+  ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}},tooltip:{callbacks:{label:function(ctx){
+    const v=pbWeeks[ctx.dataIndex];return v!==null?'Payback: Week '+v:'Sem payback (commission > Net PL)'}}}},
+    scales:{...CD.scales,y:{...CD.scales.y,title:{display:true,text:'Semanas',color:'#666'},ticks:{...CD.scales.y.ticks,callback:v=>v}}}}});
+  // Chart 4: Net PL Total vs Commission por safra
+  mc('c-coh-nplvscomm',{type:'bar',data:{labels:pbLabels,datasets:[
+    {label:'Commission',data:pbData.map(r=>r.commission),backgroundColor:'rgba(255,68,68,.5)',borderRadius:4,borderWidth:0},
+    {label:'Net PL Total',data:pbData.map(r=>r.totalNPL),backgroundColor:pbData.map(r=>r.totalNPL>=r.commission?'rgba(14,165,90,.6)':'rgba(255,215,64,.5)'),borderRadius:4,borderWidth:0}
+  ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
+  // Chart 5: Net PL acumulado por safra (top 6 maiores)
   const top6=cohorts.filter(c=>c.ftd>0).sort((a,b)=>b.ftd-a.ftd).slice(0,6);
   const colors=['#0EA55A','#00E5FF','#FFD740','#FF4444','#CE93D8','#4488FF'];
   const nplDS=top6.map((c,ci)=>{
@@ -2295,7 +2326,7 @@ function rCohorts(){
   ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,max:100,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
 
   // HEATMAP 1: Net PL por safra — formato planilha com Week 0..N + totais
-  const nplM=buildNetPLMatrix(cohorts);
+  // nplM already computed above for KPIs
   const ths='padding:6px 4px;border-bottom:2px solid #45475a;text-align:center;font-size:9px;color:var(--text2);white-space:nowrap';
   const tds='padding:4px 5px;text-align:right;font-size:9px;border-bottom:1px solid #1a1e28';
   const maxW=nplM.maxWeeks;
@@ -2305,21 +2336,24 @@ function rCohorts(){
   h1+='<th style="'+ths+'">Commission</th>';
   h1+='<th style="'+ths+'">ROI Net PL</th>';
   h1+='<th style="'+ths+';min-width:70px">Total Net PL</th>';
+  h1+='<th style="'+ths+';background:rgba(255,215,64,.1)">Payback</th>';
   for(let w=0;w<maxW;w++)h1+='<th style="'+ths+';min-width:60px">Week '+w+'</th>';
   h1+='</tr></thead><tbody>';
   // Column totals
   const colTotals=new Array(maxW).fill(0);let grandFTD=0,grandComm=0,grandNPL=0;
   nplM.rows.forEach(row=>{
     grandFTD+=row.ftd;grandComm+=row.commission;grandNPL+=row.totalNPL;
-    // Find max absolute value for color scaling
     const maxAbs=Math.max(...row.weeks.filter(v=>v!==null).map(v=>Math.abs(v)),1);
     const roiColor=row.roi>1?'var(--green)':row.roi>0?'var(--gold)':'var(--red)';
     const nplColor=row.totalNPL>=0?'var(--green)':'var(--red)';
+    const pbColor=row.paybackWeek!==null?(row.paybackWeek<=3?'var(--green)':row.paybackWeek<=6?'var(--gold)':'var(--red)'):'var(--red)';
+    const pbText=row.paybackWeek!==null?'W'+row.paybackWeek:(row.commission>0?'--':'N/A');
     h1+='<tr><td style="'+tds+';text-align:left;font-weight:700;color:var(--text1)">'+row.ml+'</td>';
     h1+='<td style="'+tds+';color:var(--text2)">'+fN(row.ftd)+'</td>';
     h1+='<td style="'+tds+';color:var(--text2)">'+fR(row.commission)+'</td>';
     h1+='<td style="'+tds+';color:'+roiColor+';font-weight:600">'+row.roi.toFixed(2)+'</td>';
     h1+='<td style="'+tds+';color:'+nplColor+';font-weight:700">'+fR(row.totalNPL)+'</td>';
+    h1+='<td style="'+tds+';text-align:center;color:'+pbColor+';font-weight:800;background:rgba(255,215,64,.05)">'+pbText+'</td>';
     for(let w=0;w<maxW;w++){
       const v=row.weeks[w];
       if(v===null){h1+='<td style="'+tds+';background:#0a0e14"></td>';}
@@ -2342,6 +2376,7 @@ function rCohorts(){
   h1+='<td style="'+tds+';color:var(--green)">'+fR(grandComm)+'</td>';
   h1+='<td style="'+tds+';color:var(--green)">'+grandROI.toFixed(2)+'</td>';
   h1+='<td style="'+tds+';color:var(--green)">'+fR(grandNPL)+'</td>';
+  h1+='<td style="'+tds+';text-align:center;color:var(--green);background:rgba(255,215,64,.05)">'+(avgPayback!==null?avgPayback.toFixed(1)+' sem':'--')+'</td>';
   for(let w=0;w<maxW;w++){
     const v=colTotals[w];const cl=v>=0?'var(--green)':'var(--red)';
     h1+='<td style="'+tds+';text-align:center;color:'+cl+';font-weight:800">'+fR(v)+'</td>';
@@ -2376,13 +2411,21 @@ function rCohorts(){
   h2+='</tbody></table>';
   document.getElementById('coh-heatmap-churn').innerHTML=h2;
 
-  // Cohort metrics table
-  document.getElementById('coh-tb').innerHTML=cohorts.map(c=>{
-    const npl=c.ds-c.ws;const nplPerFTD=c.ftd>0?Math.round(npl/c.ftd):0;
+  // Cohort metrics table — with payback from nplM
+  document.getElementById('coh-tb').innerHTML=cohorts.map((c,ci)=>{
+    const npl=c.ds-c.ws;
+    const row=nplM.rows[ci]||{};
+    const comm=row.commission||0;
+    const roi=row.roi||0;
+    const pb=row.paybackWeek;
+    const pbTx=pb!==null?'W'+pb:(comm>0?'--':'N/A');
+    const pbCl=pb!==null?(pb<=3?'var(--green)':pb<=6?'var(--gold)':'var(--red)'):'var(--red)';
     return `<tr><td><strong>${c.ml}</strong></td><td>${fN(c.nr)}</td><td style="color:var(--gold)">${fN(c.ftd)}</td>
       <td style="color:${c.ftdr>25?'var(--green)':c.ftdr>15?'var(--gold)':'var(--red)'}">${c.ftdr}%</td>
+      <td style="color:var(--text2)">${fR(comm)}</td>
       <td class="${npl>=0?'bp':'bn'}">${fR(npl)}</td>
-      <td class="${nplPerFTD>=0?'bp':'bn'}">${fR(nplPerFTD)}</td>
+      <td style="color:${roi>1?'var(--green)':roi>0?'var(--gold)':'var(--red)'}">${roi.toFixed(2)}</td>
+      <td style="color:${pbCl};font-weight:700">${pbTx}</td>
       <td style="color:var(--cyan)">${fR(c.ds)}</td><td style="color:var(--red)">${fR(c.ws)}</td>
       <td class="${c.ngr>=0?'bp':'bn'}">${fR(c.ngr)}</td>
       <td style="color:var(--gold)">${fR(c.ltv)}</td></tr>`;
@@ -2671,23 +2714,23 @@ function getFilteredSSDaily(){
   if(!all.length) return all;
   switch(currentPeriod){
     case 'today': {
-      const today=new Date().toISOString().slice(0,10);
+      const today=localDateStr(new Date());
       const f=all.filter(d=>d.dt===today);
       return f.length?f:[all[all.length-1]];
     }
     case 'yesterday': {
-      const yd=new Date();yd.setDate(yd.getDate()-1);const yds=yd.toISOString().slice(0,10);
+      const yd=new Date();yd.setDate(yd.getDate()-1);const yds=localDateStr(yd);
       const f=all.filter(d=>d.dt===yds);
       return f.length?f:[all[all.length-1]];
     }
     case 'week': {
       const now=new Date();const dow=now.getDay();const mon=new Date(now);mon.setDate(now.getDate()-(dow===0?6:dow-1));
-      const ws=mon.toISOString().slice(0,10);
+      const ws=localDateStr(mon);
       const f=all.filter(d=>d.dt>=ws);
       return f.length?f:all.slice(-3);
     }
     case 'month': {
-      const ms=new Date().toISOString().slice(0,8)+'01';
+      const ms=localDateStr(new Date()).slice(0,8)+'01';
       const f=all.filter(d=>d.dt>=ms);
       return f.length?f:all.slice(-5);
     }
@@ -2817,7 +2860,7 @@ function buildTicker(){
   items.push({l:'EUR/BRL',v:'R$ '+liveRates.eur.toFixed(4),c:'up'});
   items.push({l:'USDT/BRL',v:'R$ '+liveRates.usdt.toFixed(2),c:'up'});
   // TODAY
-  const today=new Date().toISOString().slice(0,10);
+  const today=localDateStr(new Date());
   const td=D.filter(d=>d.date===today);
   if(td.length){
     const t=td[0];
@@ -2828,7 +2871,7 @@ function buildTicker(){
     items.push({l:'HOJE \u00b7 FTD',v:t.ftd.toString(),c:'up'});
   }
   // YESTERDAY
-  const yd=new Date();yd.setDate(yd.getDate()-1);const yds=yd.toISOString().slice(0,10);
+  const yd=new Date();yd.setDate(yd.getDate()-1);const yds=localDateStr(yd);
   const ydd=D.filter(d=>d.date===yds);
   if(ydd.length){
     const y=ydd[0];
@@ -2838,7 +2881,7 @@ function buildTicker(){
   }
   // THIS WEEK
   const now=new Date();const dow=now.getDay();const monday=new Date(now);monday.setDate(now.getDate()-(dow===0?6:dow-1));
-  const weekStart=monday.toISOString().slice(0,10);
+  const weekStart=localDateStr(monday);
   const wk=D.filter(d=>d.date>=weekStart);
   if(wk.length){
     const wNgr=wk.reduce((a,d)=>a+d.ngr,0);
