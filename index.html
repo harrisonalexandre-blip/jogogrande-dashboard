@@ -80,8 +80,8 @@ body.sb-open .ticker-bar{margin-left:200px}
 /* LAYOUT */
 .main-wrap{margin-left:52px;transition:margin-left .25s}
 body.sb-open .main-wrap{margin-left:200px}
-.hdr{margin-left:52px;transition:margin-left .25s}
-body.sb-open .hdr{margin-left:200px}
+.hdr{margin-left:0}
+body.sb-open .hdr{margin-left:0}
 .ctn{max-width:1600px;margin:0 auto;padding:20px 24px}
 .page{display:none}.page.active{display:block}
 .sec{font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin:0 0 12px}
@@ -279,7 +279,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <nav class="sidebar" id="sidebar">
   <div class="sb-logo" onclick="toggleSidebar()">
     <img src="https://d1nxk8io3iz4ej.cloudfront.net/cms/icons/f8836d75-7a52-4ccf-ab9e-06795d794282-81.svg" alt="JG">
-    <span>JOGO GRANDE</span>
   </div>
   <div class="sb-menu">
     <div class="sb-group-title">Principal</div>
@@ -741,7 +740,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ═══ PAGE: CAIXA (Em Construção) ═══ -->
 <div id="pg-caixa" class="page">
-<p class="sec">Fluxo de Caixa · Controle Financeiro Semanal</p>
+<p class="sec">Fluxo de Caixa · Controle Financeiro Semanal <span style="background:var(--goldA);color:var(--gold);font-size:10px;font-weight:800;padding:3px 10px;border-radius:6px;margin-left:10px;letter-spacing:1px;vertical-align:middle">EM DESENVOLVIMENTO</span></p>
 <!-- KPI Cards -->
 <div class="kg" id="kp-caixa"></div>
 <!-- Wallet + Resumo Saques -->
@@ -2299,7 +2298,7 @@ function rCohorts(){
   const nplM=buildNetPLMatrix(cohorts);
   const ths='padding:6px 4px;border-bottom:2px solid #45475a;text-align:center;font-size:9px;color:var(--text2);white-space:nowrap';
   const tds='padding:4px 5px;text-align:right;font-size:9px;border-bottom:1px solid #1a1e28';
-  const maxW=Math.min(nplM.maxWeeks,16);
+  const maxW=nplM.maxWeeks;
   let h1='<table style="width:100%;border-collapse:collapse"><thead><tr>';
   h1+='<th style="'+ths+';text-align:left;min-width:80px">Safra</th>';
   h1+='<th style="'+ths+'">FTD</th>';
