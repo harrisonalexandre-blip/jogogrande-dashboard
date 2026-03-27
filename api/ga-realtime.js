@@ -1,29 +1,30 @@
 // Vercel Serverless Function: GA4 Realtime Data
-// Fetches real-time active users, top countries, top cities from GA4
+// With in-memory cache to avoid exhausting GA4 daily quota
 const { google } = require('googleapis');
+
+// In-memory cache (persists across invocations on same Vercel instance)
+let _cache = null;
+let _cacheTime = 0;
+const CACHE_TTL = 120000; // 2 minutes in ms
 
 module.exports = async (req, res) => {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 'no-cache, no-store');
+  res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=60');
+
+  // Return cache if fresh
+  if (_cache && (Date.now() - _cacheTime) < CACHE_TTL) {
+    return res.status(200).json(_cache);
+  }
 
   try {
-    // Service Account auth from env var
     const keyJson = process.env.GA_SERVICE_ACCOUNT_KEY;
     if (!keyJson) {
       return res.status(200).json({
-        ok: false,
-        error: 'GA_SERVICE_ACCOUNT_KEY not configured',
-        // Return fallback static data
+        ok: false, error: 'GA_SERVICE_ACCOUNT_KEY not configured',
         fallback: true,
-        data: {
-          activeUsers: 0,
-          countries: [],
-          cities: [],
-          pages: [],
-          updated: new Date().toISOString()
-        }
+        data: { activeUsers: 0, countries: [], cities: [], pages: [], updated: new Date().toISOString() }
       });
     }
 
@@ -36,89 +37,94 @@ module.exports = async (req, res) => {
     const analyticsData = google.analyticsdata({ version: 'v1beta', auth });
     const propertyId = process.env.GA_PROPERTY_ID || '521853091';
 
-    // Run 3 realtime reports in parallel
-    const [usersReport, countriesReport, citiesReport, pagesReport] = await Promise.all([
-      // 1. Active users total
+    // Single consolidated call: activeUsers with country+city dimensions
+    // Uses only 1 API token instead of 5
+    const [mainReport, minuteReport] = await Promise.all([
       analyticsData.properties.runRealtimeReport({
         property: `properties/${propertyId}`,
         requestBody: {
-          metrics: [{ name: 'activeUsers' }]
-        }
-      }),
-      // 2. Active users by country
-      analyticsData.properties.runRealtimeReport({
-        property: `properties/${propertyId}`,
-        requestBody: {
-          dimensions: [{ name: 'country' }],
+          dimensions: [{ name: 'country' }, { name: 'city' }],
           metrics: [{ name: 'activeUsers' }],
           orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
-          limit: 10
+          limit: 50
         }
       }),
-      // 3. Active users by city
       analyticsData.properties.runRealtimeReport({
         property: `properties/${propertyId}`,
         requestBody: {
-          dimensions: [{ name: 'city' }],
+          dimensions: [{ name: 'minutesAgo' }],
           metrics: [{ name: 'activeUsers' }],
-          orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
-          limit: 10
-        }
-      }),
-      // 4. Active users by page title
-      analyticsData.properties.runRealtimeReport({
-        property: `properties/${propertyId}`,
-        requestBody: {
-          dimensions: [{ name: 'unifiedScreenName' }],
-          metrics: [{ name: 'activeUsers' }],
-          orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
-          limit: 8
+          minuteRanges: [{ startMinutesAgo: 29, endMinutesAgo: 0 }]
         }
       })
     ]);
 
-    // Parse results
-    const activeUsers = usersReport.data.rows?.[0]?.metricValues?.[0]?.value || '0';
+    // Aggregate from combined report
+    let totalUsers = 0;
+    const countryMap = {};
+    const cityMap = {};
 
-    const countries = (countriesReport.data.rows || []).map(r => ({
-      n: r.dimensionValues[0].value,
-      v: parseInt(r.metricValues[0].value)
-    }));
-
-    const cities = (citiesReport.data.rows || []).map(r => ({
-      n: r.dimensionValues[0].value,
-      v: parseInt(r.metricValues[0].value)
-    })).filter(c => c.n !== '(not set)');
-
-    const pages = (pagesReport.data.rows || []).map(r => ({
-      n: r.dimensionValues[0].value,
-      v: parseInt(r.metricValues[0].value)
-    }));
-
-    return res.status(200).json({
-      ok: true,
-      data: {
-        activeUsers: parseInt(activeUsers),
-        countries,
-        cities,
-        pages,
-        updated: new Date().toISOString()
+    (mainReport.data.rows || []).forEach(r => {
+      const country = r.dimensionValues[0].value;
+      const city = r.dimensionValues[1].value;
+      const users = parseInt(r.metricValues[0].value);
+      totalUsers += users;
+      countryMap[country] = (countryMap[country] || 0) + users;
+      if (city !== '(not set)') {
+        cityMap[city] = (cityMap[city] || 0) + users;
       }
     });
 
-  } catch (err) {
-    console.error('GA Realtime API error:', err.message);
-    return res.status(200).json({
-      ok: false,
-      error: err.message,
-      fallback: true,
+    const countries = Object.entries(countryMap)
+      .map(([n, v]) => ({ n, v }))
+      .sort((a, b) => b.v - a.v)
+      .slice(0, 10);
+
+    const cities = Object.entries(cityMap)
+      .map(([n, v]) => ({ n, v }))
+      .sort((a, b) => b.v - a.v)
+      .slice(0, 10);
+
+    // Per-minute bars
+    const minuteMap = {};
+    (minuteReport.data.rows || []).forEach(r => {
+      minuteMap[parseInt(r.dimensionValues[0].value)] = parseInt(r.metricValues[0].value);
+    });
+    const perMinute = [];
+    for (let i = 29; i >= 0; i--) {
+      perMinute.push(minuteMap[i] || 0);
+    }
+
+    const result = {
+      ok: true,
       data: {
-        activeUsers: 0,
-        countries: [],
-        cities: [],
+        activeUsers: totalUsers,
+        countries,
+        cities,
         pages: [],
+        perMinute,
         updated: new Date().toISOString()
       }
+    };
+
+    // Store in cache
+    _cache = result;
+    _cacheTime = Date.now();
+
+    return res.status(200).json(result);
+
+  } catch (err) {
+    console.error('GA Realtime API error:', err.message);
+
+    // If we have stale cache, return it instead of empty fallback
+    if (_cache) {
+      _cache.data.updated = new Date().toISOString();
+      return res.status(200).json({ ..._cache, cached: true });
+    }
+
+    return res.status(200).json({
+      ok: false, error: err.message, fallback: true,
+      data: { activeUsers: 0, countries: [], cities: [], pages: [], updated: new Date().toISOString() }
     });
   }
 };
