@@ -1471,10 +1471,11 @@ function calcKPIs(data,period){
   const cg=data.reduce((a,d)=>a+d.cg,0);
   const sg=data.reduce((a,d)=>a+d.sg,0);
   const nd=data.reduce((a,d)=>a+d.nd,0);
+  const nw=data.reduce((a,d)=>a+(d.nw||0),0);
   const uap=data.length>0?data.reduce((a,d)=>a+d.uap,0)/data.length:0;
   const mi=data.reduce((a,d)=>a+(d.mi||0),0);
   const fda=data.reduce((a,d)=>a+(d.fda||0),0);
-  return {nr,ftd,ds,ws,nc:ds-ws,ngr,cg,sg,nd,mi,fda,uap:Math.round(uap),
+  return {nr,ftd,ds,ws,nc:ds-ws,ngr,cg,sg,nd,nw,mi,fda,uap:Math.round(uap),
     conv:nr>0?ftd/nr*100:0,days:data.length};
 }
 
