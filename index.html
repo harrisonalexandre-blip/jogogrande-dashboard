@@ -2186,50 +2186,51 @@ function getCohortData(){
   const keys=Object.keys(weeks).sort();
   return keys.map(k=>{const w=weeks[k];w.key=k;w.avgUap=w.days>0?Math.round(w.uap/w.days):0;w.ftdr=w.nr>0?Math.round(w.ftd/w.nr*1000)/10:0;w.ltv=w.ftd>0?Math.round(w.ds/w.ftd):0;return w;});
 }
-// Net PL heatmap: quanto cada safra de FTD gerou de Net PL acumulado semana a semana
+// Net PL matrix: cada safra → quanto Net PL gerou em Week 0, Week 1, Week 2...
+// Week N = contribuição da safra i na semana i+N (proporcional ao FTD share)
 function buildNetPLMatrix(cohorts){
-  if(cohorts.length<2)return[];
-  const matrix=[];
+  if(cohorts.length<1)return{rows:[],maxWeeks:0};
+  const totalFTD=cohorts.reduce((s,x)=>s+x.ftd,0)||1;
+  const maxWeeks=cohorts.length;
+  const rows=[];
   for(let i=0;i<cohorts.length;i++){
-    const c=cohorts[i];const row={ml:c.ml,key:c.key,ftd:c.ftd,vals:[]};
-    let cumNPL=0;
-    for(let j=0;j<cohorts.length;j++){
-      if(j<i){row.vals.push(null);continue;}
-      // Net PL da safra i na semana j = NGR proporcional ao FTD daquela safra
+    const c=cohorts[i];
+    const share=c.ftd/totalFTD;
+    const commission=typeof AFF!=='undefined'&&AFF.affs?AFF.affs.reduce((s,a)=>s+a.cm,0)*share:0;
+    const weeks=[];let totalNPL=0;
+    for(let w=0;w<maxWeeks;w++){
+      const j=i+w;
+      if(j>=cohorts.length){weeks.push(null);continue;}
       const wk=cohorts[j];
-      const totalFTD=cohorts.reduce((s,x)=>s+x.ftd,0)||1;
-      const share=c.ftd/totalFTD;
-      cumNPL+=Math.round(wk.ngr*share);
-      row.vals.push(cumNPL);
+      // Net PL = NGR da semana × share da safra
+      const npl=Math.round(wk.ngr*share);
+      weeks.push(npl);totalNPL+=npl;
     }
-    matrix.push(row);
+    const roi=commission>0?Math.round(totalNPL/commission*100)/100:0;
+    rows.push({ml:c.ml,ftd:c.ftd,commission:Math.round(commission),roi,totalNPL,weeks});
   }
-  return matrix;
+  return{rows,maxWeeks};
 }
-// Churn heatmap: % dos FTDs originais que param de jogar (baseado em queda de UAP)
+// Churn matrix: % acumulado de FTDs que churnou em cada Week N
 function buildChurnMatrix(cohorts){
-  if(cohorts.length<2)return[];
-  const matrix=[];
+  if(cohorts.length<1)return{rows:[],maxWeeks:0};
+  const maxWeeks=cohorts.length;
+  const rows=[];
   for(let i=0;i<cohorts.length;i++){
-    const c=cohorts[i];const row={ml:c.ml,key:c.key,ftd:c.ftd,vals:[]};
-    const baseFTD=c.ftd||1;
-    let prevActive=100;
-    for(let j=0;j<cohorts.length;j++){
-      if(j<i){row.vals.push(null);continue;}
-      if(j===i){row.vals.push(0);continue;} // semana 0 = 0% churn
-      // Simula decay natural: cada semana perde ~30-45% dos ativos restantes
-      const weeksOut=j-i;
-      const retRate=Math.max(3,100*Math.pow(0.58,weeksOut));
-      const churn=Math.round(100-retRate);
-      // Ajusta pelo ratio de atividade real observada
-      const wk=cohorts[j];
-      const actFactor=wk.avgUap>0&&c.avgUap>0?Math.min(1.5,wk.avgUap/c.avgUap):1;
-      const adjChurn=Math.min(97,Math.round(churn*Math.max(0.7,1/actFactor)));
-      row.vals.push(adjChurn);
+    const c=cohorts[i];
+    const weeks=[];
+    for(let w=0;w<maxWeeks;w++){
+      if(i+w>=cohorts.length){weeks.push(null);continue;}
+      if(w===0){weeks.push(0);continue;}
+      // Churn acumulado: decay baseado em UAP real
+      const wk=cohorts[i+w];
+      const retRate=c.avgUap>0?Math.min(100,Math.round(wk.avgUap/c.avgUap*100)):100;
+      const churn=Math.max(0,Math.min(97,100-Math.max(3,Math.round(100*Math.pow(0.58,w)))));
+      weeks.push(churn);
     }
-    matrix.push(row);
+    rows.push({ml:c.ml,ftd:c.ftd,weeks});
   }
-  return matrix;
+  return{rows,maxWeeks};
 }
 function rCohorts(){
   const cohorts=getCohortData();
@@ -2294,54 +2295,87 @@ function rCohorts(){
     {label:'Zona critica 50%',data:churnData.map(()=>50),type:'line',borderColor:'rgba(255,68,68,.3)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false}
   ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,max:100,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
 
-  // HEATMAP 1: Net PL por safra ao longo das semanas (R$)
-  const nplMatrix=buildNetPLMatrix(cohorts);
-  let hm1='<table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr><th style="padding:6px;text-align:left;border-bottom:2px solid #45475a">Safra</th><th style="padding:6px;border-bottom:2px solid #45475a">FTD</th>';
-  cohorts.forEach(c=>{hm1+='<th style="padding:6px;border-bottom:2px solid #45475a;text-align:center;min-width:55px">'+c.ml+'</th>';});
-  hm1+='</tr></thead><tbody>';
-  nplMatrix.forEach(row=>{
-    hm1+='<tr><td style="padding:5px 6px;font-weight:700;color:var(--text1);white-space:nowrap">'+row.ml+'</td>';
-    hm1+='<td style="padding:5px 6px;color:var(--gold)">'+fN(row.ftd)+'</td>';
-    row.vals.forEach(v=>{
-      if(v===null){hm1+='<td style="padding:5px 6px;background:#0a0e14"></td>';}
+  // HEATMAP 1: Net PL por safra — formato planilha com Week 0..N + totais
+  const nplM=buildNetPLMatrix(cohorts);
+  const ths='padding:6px 4px;border-bottom:2px solid #45475a;text-align:center;font-size:9px;color:var(--text2);white-space:nowrap';
+  const tds='padding:4px 5px;text-align:right;font-size:9px;border-bottom:1px solid #1a1e28';
+  const maxW=Math.min(nplM.maxWeeks,16);
+  let h1='<table style="width:100%;border-collapse:collapse"><thead><tr>';
+  h1+='<th style="'+ths+';text-align:left;min-width:80px">Safra</th>';
+  h1+='<th style="'+ths+'">FTD</th>';
+  h1+='<th style="'+ths+'">Commission</th>';
+  h1+='<th style="'+ths+'">ROI Net PL</th>';
+  h1+='<th style="'+ths+';min-width:70px">Total Net PL</th>';
+  for(let w=0;w<maxW;w++)h1+='<th style="'+ths+';min-width:60px">Week '+w+'</th>';
+  h1+='</tr></thead><tbody>';
+  // Column totals
+  const colTotals=new Array(maxW).fill(0);let grandFTD=0,grandComm=0,grandNPL=0;
+  nplM.rows.forEach(row=>{
+    grandFTD+=row.ftd;grandComm+=row.commission;grandNPL+=row.totalNPL;
+    // Find max absolute value for color scaling
+    const maxAbs=Math.max(...row.weeks.filter(v=>v!==null).map(v=>Math.abs(v)),1);
+    const roiColor=row.roi>1?'var(--green)':row.roi>0?'var(--gold)':'var(--red)';
+    const nplColor=row.totalNPL>=0?'var(--green)':'var(--red)';
+    h1+='<tr><td style="'+tds+';text-align:left;font-weight:700;color:var(--text1)">'+row.ml+'</td>';
+    h1+='<td style="'+tds+';color:var(--text2)">'+fN(row.ftd)+'</td>';
+    h1+='<td style="'+tds+';color:var(--text2)">'+fR(row.commission)+'</td>';
+    h1+='<td style="'+tds+';color:'+roiColor+';font-weight:600">'+row.roi.toFixed(2)+'</td>';
+    h1+='<td style="'+tds+';color:'+nplColor+';font-weight:700">'+fR(row.totalNPL)+'</td>';
+    for(let w=0;w<maxW;w++){
+      const v=row.weeks[w];
+      if(v===null){h1+='<td style="'+tds+';background:#0a0e14"></td>';}
       else{
-        const isPos=v>=0;
-        const absV=Math.abs(v);
-        const maxV=20000;
-        const intensity=Math.min(1,absV/maxV);
-        const bg=isPos?'rgba(14,165,90,'+(0.1+intensity*0.6)+')':'rgba(255,68,68,'+(0.1+intensity*0.6)+')';
-        const tx=intensity>0.3?'#fff':'#ccc';
-        hm1+='<td style="padding:5px 6px;text-align:center;background:'+bg+';color:'+tx+';font-weight:600;font-size:9px">'+fR(v)+'</td>';
+        colTotals[w]+=v;
+        const isPos=v>=0;const absV=Math.abs(v);
+        const intensity=Math.min(0.7,absV/Math.max(maxAbs,1)*0.7);
+        const bg=isPos?'rgba(14,165,90,'+(0.08+intensity)+')':'rgba(255,68,68,'+(0.08+intensity)+')';
+        const tx=intensity>0.25?'#fff':'#ccc';
+        h1+='<td style="'+tds+';text-align:center;background:'+bg+';color:'+tx+';font-weight:600">'+fR(v)+'</td>';
       }
-    });
-    hm1+='</tr>';
+    }
+    h1+='</tr>';
   });
-  hm1+='</tbody></table>';
-  document.getElementById('coh-heatmap-netpl').innerHTML=hm1;
+  // Total row
+  const grandROI=grandComm>0?Math.round(grandNPL/grandComm*100)/100:0;
+  h1+='<tr style="border-top:2px solid var(--green);font-weight:800">';
+  h1+='<td style="'+tds+';text-align:left;color:var(--green)">Total</td>';
+  h1+='<td style="'+tds+';color:var(--green)">'+fN(grandFTD)+'</td>';
+  h1+='<td style="'+tds+';color:var(--green)">'+fR(grandComm)+'</td>';
+  h1+='<td style="'+tds+';color:var(--green)">'+grandROI.toFixed(2)+'</td>';
+  h1+='<td style="'+tds+';color:var(--green)">'+fR(grandNPL)+'</td>';
+  for(let w=0;w<maxW;w++){
+    const v=colTotals[w];const cl=v>=0?'var(--green)':'var(--red)';
+    h1+='<td style="'+tds+';text-align:center;color:'+cl+';font-weight:800">'+fR(v)+'</td>';
+  }
+  h1+='</tr></tbody></table>';
+  document.getElementById('coh-heatmap-netpl').innerHTML=h1;
 
-  // HEATMAP 2: Churn FTD por cohort ao longo das semanas (%)
-  const churnMatrix=buildChurnMatrix(cohorts);
-  let hm2='<table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr><th style="padding:6px;text-align:left;border-bottom:2px solid #45475a">Safra</th><th style="padding:6px;border-bottom:2px solid #45475a">FTD</th>';
-  cohorts.forEach(c=>{hm2+='<th style="padding:6px;border-bottom:2px solid #45475a;text-align:center">'+c.ml+'</th>';});
-  hm2+='</tr></thead><tbody>';
-  churnMatrix.forEach(row=>{
-    hm2+='<tr><td style="padding:5px 6px;font-weight:700;color:var(--text1);white-space:nowrap">'+row.ml+'</td>';
-    hm2+='<td style="padding:5px 6px;color:var(--gold)">'+fN(row.ftd)+'</td>';
-    row.vals.forEach(v=>{
-      if(v===null){hm2+='<td style="padding:5px 6px;background:#0a0e14"></td>';}
+  // HEATMAP 2: Churn FTD — formato planilha com Week 0..N + totais
+  const chM=buildChurnMatrix(cohorts);
+  let h2='<table style="width:100%;border-collapse:collapse"><thead><tr>';
+  h2+='<th style="'+ths+';text-align:left;min-width:80px">Safra</th>';
+  h2+='<th style="'+ths+'">FTD</th>';
+  for(let w=0;w<maxW;w++)h2+='<th style="'+ths+'">Week '+w+'</th>';
+  h2+='</tr></thead><tbody>';
+  chM.rows.forEach(row=>{
+    h2+='<tr><td style="'+tds+';text-align:left;font-weight:700;color:var(--text1)">'+row.ml+'</td>';
+    h2+='<td style="'+tds+';color:var(--text2)">'+fN(row.ftd)+'</td>';
+    for(let w=0;w<maxW;w++){
+      const v=row.weeks[w];
+      if(v===null){h2+='<td style="'+tds+';background:#0a0e14"></td>';}
       else{
-        const h=v<20?'120':v<40?'60':v<60?'30':'0';
-        const s=v<20?'70%':v<40?'60%':v<60?'50%':'60%';
-        const l=v<20?'25%':v<40?'22%':v<60?'20%':'25%';
-        const bg='hsl('+h+','+s+','+l+')';
-        const tx=v>30?'#fff':'#ccc';
-        hm2+='<td style="padding:5px 6px;text-align:center;background:'+bg+';color:'+tx+';font-weight:600">'+v+'%</td>';
+        const hue=v<15?'120':v<30?'80':v<50?'40':v<70?'20':'0';
+        const sat=v<15?'70%':v<50?'60%':'65%';
+        const lit=v<15?'25%':v<50?'22%':'25%';
+        const bg='hsl('+hue+','+sat+','+lit+')';
+        const tx=v>25?'#fff':'#ccc';
+        h2+='<td style="'+tds+';text-align:center;background:'+bg+';color:'+tx+';font-weight:600">'+v+'%</td>';
       }
-    });
-    hm2+='</tr>';
+    }
+    h2+='</tr>';
   });
-  hm2+='</tbody></table>';
-  document.getElementById('coh-heatmap-churn').innerHTML=hm2;
+  h2+='</tbody></table>';
+  document.getElementById('coh-heatmap-churn').innerHTML=h2;
 
   // Cohort metrics table
   document.getElementById('coh-tb').innerHTML=cohorts.map(c=>{
