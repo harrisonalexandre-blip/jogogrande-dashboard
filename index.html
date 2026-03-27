@@ -739,11 +739,74 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ═══ PAGE: CAIXA (Em Construção) ═══ -->
 <div id="pg-caixa" class="page">
-<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;gap:16px">
-<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline"><rect x="2" y="7" width="20" height="12" rx="1" ry="1"></rect><path d="M12 7V4M7 7V4M17 7V4M2 19h20M7 11h1M16 11h1M7 15h1M16 15h1"></path></svg>
-<h2 style="font-size:22px;font-weight:900;color:var(--green)">CAIXA</h2>
-<p style="color:var(--text2);font-size:14px;max-width:400px">Módulo de controle de caixa em construção.<br>Em breve: entradas/saídas USDT e BRL, saldo consolidado, histórico de movimentações e conciliação.</p>
-<div style="background:var(--greenA);border:1px solid rgba(14,165,90,.3);padding:10px 20px;border-radius:8px;color:var(--green);font-size:12px;font-weight:700">🚧 EM CONSTRUÇÃO</div>
+<p class="sec">Fluxo de Caixa · Controle Financeiro Semanal</p>
+<!-- KPI Cards -->
+<div class="kg" id="kp-caixa"></div>
+<!-- Wallet + Resumo Saques -->
+<div class="cg cg2">
+  <div class="cb">
+    <div class="ct"><span class="dot g"></span>Saldo Wallet Tron (USDT) — Tempo Real</div>
+    <div id="cx-wallet" style="text-align:center;padding:10px 0">
+      <div style="font-size:32px;font-weight:900;color:var(--green)" id="cx-usdt-bal">carregando...</div>
+      <div style="font-size:14px;color:var(--text2);margin-top:4px" id="cx-usdt-brl"></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px">TJ5wXTj97VmzjYdfnFxxmPBHRiRRphafcw · TRC20</div>
+    </div>
+  </div>
+  <div class="cb">
+    <div class="ct"><span class="dot gl"></span>Distribuição de Saques por Destino</div>
+    <canvas id="c-cx-dest" style="max-height:220px"></canvas>
+  </div>
+</div>
+<!-- Fechamento Semanal -->
+<div class="tb">
+  <div class="th"><h3>Fechamento Semanal</h3>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select id="cx-week-sel" onchange="renderCaixaWeek()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:8px;font-size:12px;font-family:inherit"></select>
+    </div>
+  </div>
+  <div id="cx-closing" style="margin-top:10px"></div>
+</div>
+<!-- Resumo Transações por Categoria -->
+<div class="cg cg2" style="margin-top:14px">
+  <div class="cb">
+    <div class="ct"><span class="dot b"></span>Saques Acumulados por Semana (R$)</div>
+    <canvas id="c-cx-weekly"></canvas>
+  </div>
+  <div class="cb">
+    <div class="ct"><span class="dot c"></span>Fluxo de Caixa Semanal (R$)</div>
+    <canvas id="c-cx-flow"></canvas>
+  </div>
+</div>
+<!-- Transaction Cards -->
+<div class="cg cg2" style="margin-top:14px">
+  <div class="tb" style="margin:0">
+    <div class="th" style="cursor:pointer" onclick="toggleCxDetail('cripto')">
+      <h3 style="color:var(--green)">🔗 Cripto (ELEVEX GROUP) <span id="cx-cripto-total" style="font-weight:900"></span></h3>
+      <span style="color:var(--text3);font-size:10px" id="cx-cripto-toggle">▼ Ver detalhes</span>
+    </div>
+    <div id="cx-cripto-detail" style="display:none;max-height:300px;overflow-y:auto"></div>
+  </div>
+  <div class="tb" style="margin:0">
+    <div class="th" style="cursor:pointer" onclick="toggleCxDetail('banco')">
+      <h3 style="color:var(--cyan)">🏦 Banco (TELEMEDIA) <span id="cx-banco-total" style="font-weight:900"></span></h3>
+      <span style="color:var(--text3);font-size:10px" id="cx-banco-toggle">▼ Ver detalhes</span>
+    </div>
+    <div id="cx-banco-detail" style="display:none;max-height:300px;overflow-y:auto"></div>
+  </div>
+</div>
+<div class="tb" style="margin-top:14px">
+  <div class="th" style="cursor:pointer" onclick="toggleCxDetail('other')">
+    <h3 style="color:var(--gold)">❓ A Identificar <span id="cx-other-total" style="font-weight:900"></span></h3>
+    <span style="color:var(--text3);font-size:10px" id="cx-other-toggle">▼ Ver detalhes</span>
+  </div>
+  <div id="cx-other-detail" style="display:none;max-height:300px;overflow-y:auto"></div>
+</div>
+<!-- Histórico de Fechamentos -->
+<div class="tb" style="margin-top:14px">
+  <div class="th"><h3>Histórico de Fechamentos Semanais</h3></div>
+  <table><thead><tr><th>Semana</th><th>Depósitos</th><th>Saques</th><th>Taxas DTP</th><th>Ads</th><th>Despesas</th><th>Lucro</th><th>Status</th></tr></thead>
+  <tbody id="cx-hist-tb"></tbody></table>
+</div>
 </div>
 </div>
 
@@ -1887,6 +1950,227 @@ function rRecon(){
   document.getElementById('recon-table-daily').innerHTML=dH+dB;
 }
 
+// ═══ CAIXA — Fluxo de Caixa ═══
+let cxWalletUSDT=0;
+const CX_CLOSINGS_KEY='jg_caixa_closings';
+
+function getCxClosings(){
+  try{return JSON.parse(localStorage.getItem(CX_CLOSINGS_KEY)||'{}');}catch(e){return {};}
+}
+function saveCxClosings(data){localStorage.setItem(CX_CLOSINGS_KEY,JSON.stringify(data));}
+
+async function fetchTronBalance(){
+  try{
+    const res=await fetch('https://api.trongrid.io/v1/accounts/TJ5wXTj97VmzjYdfnFxxmPBHRiRRphafcw');
+    const data=await res.json();
+    if(data.data&&data.data[0]){
+      const trc20=data.data[0].trc20||[];
+      for(const t of trc20){
+        if(t['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t']){
+          cxWalletUSDT=parseInt(t['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'])/1e6;
+        }
+      }
+    }
+  }catch(e){console.warn('Tron fetch error',e);}
+  const el=document.getElementById('cx-usdt-bal');
+  if(el){
+    el.textContent='$ '+cxWalletUSDT.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' USDT';
+    const brlVal=cxWalletUSDT*liveRates.usdt;
+    document.getElementById('cx-usdt-brl').textContent='≈ R$ '+brlVal.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' (USDT/BRL '+liveRates.usdt.toFixed(2)+')';
+  }
+  setTimeout(fetchTronBalance,120000);
+}
+
+function getWeekKey(date){
+  const d=new Date(date+'T00:00:00');
+  const day=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));
+  return mon.toISOString().slice(0,10);
+}
+function getWeekLabel(wkStart){
+  const s=new Date(wkStart+'T00:00:00');
+  const e=new Date(s);e.setDate(s.getDate()+6);
+  return s.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' a '+e.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+}
+
+function categorizeTx(recon){
+  // Simulated categorization based on RECON daily data
+  // In real scenario this would come from DTP API with descriptions
+  // For now, estimate: ~60% cripto, ~25% banco (TELEMEDIA), ~15% other
+  const total=recon.reduce((s,r)=>s+r.dtp_saq,0);
+  return {
+    cripto:Math.round(total*0.60*100)/100,
+    banco:Math.round(total*0.25*100)/100,
+    other:Math.round(total*0.15*100)/100,
+    total:total
+  };
+}
+
+function getWeeklyData(){
+  const weeks={};
+  D.forEach(d=>{
+    const wk=getWeekKey(d.date);
+    if(!weeks[wk])weeks[wk]={key:wk,label:getWeekLabel(wk),ds:0,ws:0,ngr:0,nr:0,ftd:0,mi:0,cg:0,sg:0,days:[]};
+    weeks[wk].ds+=d.ds;weeks[wk].ws+=d.ws;weeks[wk].ngr+=d.ngr;
+    weeks[wk].nr+=d.nr;weeks[wk].ftd+=d.ftd;weeks[wk].mi+=(d.mi||0);
+    weeks[wk].cg+=d.cg;weeks[wk].sg+=d.sg;weeks[wk].days.push(d.date);
+  });
+  // Add RECON data per week
+  RECON.forEach(r=>{
+    const wk=getWeekKey(r.d);
+    if(weeks[wk]){
+      if(!weeks[wk].dtp_saq)weeks[wk].dtp_saq=0;
+      if(!weeks[wk].dtp_dep)weeks[wk].dtp_dep=0;
+      weeks[wk].dtp_saq+=r.dtp_saq;
+      weeks[wk].dtp_dep+=r.dtp_dep;
+    }
+  });
+  return Object.values(weeks).sort((a,b)=>b.key.localeCompare(a.key));
+}
+
+function toggleCxDetail(type){
+  const el=document.getElementById('cx-'+type+'-detail');
+  const tg=document.getElementById('cx-'+type+'-toggle');
+  if(el.style.display==='none'){el.style.display='block';tg.textContent='▲ Ocultar';}
+  else{el.style.display='none';tg.textContent='▼ Ver detalhes';}
+}
+
+function renderCaixaWeek(){
+  const sel=document.getElementById('cx-week-sel');
+  const wkKey=sel.value;
+  const weeks=getWeeklyData();
+  const wk=weeks.find(w=>w.key===wkKey);
+  if(!wk){document.getElementById('cx-closing').innerHTML='<div style="color:var(--text3)">Sem dados</div>';return;}
+  const closings=getCxClosings();
+  const saved=closings[wkKey]||{ads:0,expenses:0,notes:''};
+  const taxaDTP=Math.round(wk.dtp_saq*0.02*100)/100; // ~2% taxa estimada
+  const receita=wk.ds;
+  const saques=wk.ws;
+  const ads=saved.ads||0;
+  const expenses=saved.expenses||0;
+  const lucro=receita-saques-taxaDTP-ads-expenses;
+  
+  // Partner distribution
+  const partnerRows=Object.entries(SOCIOS).filter(([n,s])=>!s.isAffbr).map(([name,s])=>{
+    const pct=s.pcts.bf;
+    const val=lucro>0?lucro*pct/100:0;
+    return '<tr><td>'+name+'</td><td>'+pct+'%</td><td style="color:'+(val>=0?'var(--green)':'var(--red)')+'">'+fR(val)+'</td></tr>';
+  }).join('');
+
+  document.getElementById('cx-closing').innerHTML=`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <table style="width:100%">
+        <tr><td style="padding:8px 0;color:var(--text2)">Depósitos (Receita)</td><td style="text-align:right;font-weight:700;color:var(--green)">${fR(receita)}</td></tr>
+        <tr><td style="padding:8px 0;color:var(--text2)">(-) Saques Pagos</td><td style="text-align:right;font-weight:700;color:var(--red)">${fR(saques)}</td></tr>
+        <tr><td style="padding:8px 0;color:var(--text2)">(-) Taxas DTP (~2%)</td><td style="text-align:right;font-weight:700;color:var(--red)">${fR(taxaDTP)}</td></tr>
+        <tr><td style="padding:8px 0;color:var(--text2)">(-) Gastos Ads</td>
+          <td style="text-align:right"><input type="number" value="${ads}" onchange="saveCxField('${wkKey}','ads',this.value)" style="background:var(--bg3);border:1px solid var(--border);color:var(--gold);padding:4px 8px;border-radius:6px;font-size:12px;width:120px;text-align:right;font-weight:700"></td></tr>
+        <tr><td style="padding:8px 0;color:var(--text2)">(-) Outras Despesas</td>
+          <td style="text-align:right"><input type="number" value="${expenses}" onchange="saveCxField('${wkKey}','expenses',this.value)" style="background:var(--bg3);border:1px solid var(--border);color:var(--gold);padding:4px 8px;border-radius:6px;font-size:12px;width:120px;text-align:right;font-weight:700"></td></tr>
+        <tr style="border-top:2px solid var(--green)"><td style="padding:12px 0;font-weight:900;font-size:14px">= LUCRO LÍQUIDO</td>
+          <td style="text-align:right;font-weight:900;font-size:18px;color:${lucro>=0?'var(--green)':'var(--red)'}">${fR(lucro)}</td></tr>
+      </table>
+      <div style="margin-top:8px"><textarea placeholder="Notas do fechamento..." onchange="saveCxField('${wkKey}','notes',this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-size:11px;min-height:50px;font-family:inherit;resize:vertical">${saved.notes||''}</textarea></div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Distribuição entre Sócios</div>
+      <table style="width:100%"><thead><tr><th>Sócio</th><th>%</th><th>Valor</th></tr></thead>
+      <tbody>${partnerRows}</tbody></table>
+      <div style="margin-top:12px;padding:10px;background:var(--greenB);border-radius:8px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Sua Parte (Harrison 10.68%)</div>
+        <div style="font-size:20px;font-weight:900;color:var(--green);margin-top:4px">${fR(lucro>0?lucro*10.68/100:0)}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveCxField(wk,field,value){
+  const closings=getCxClosings();
+  if(!closings[wk])closings[wk]={ads:0,expenses:0,notes:''};
+  closings[wk][field]=field==='notes'?value:parseFloat(value)||0;
+  saveCxClosings(closings);
+  renderCaixaWeek();
+}
+
+function rCaixa(){
+  fetchTronBalance();
+  const weeks=getWeeklyData();
+  if(!weeks.length)return;
+  const thisWk=weeks[0];
+  const allDep=D.reduce((s,d)=>s+d.ds,0);
+  const allSaq=D.reduce((s,d)=>s+d.ws,0);
+  const allMi=D.reduce((s,d)=>s+(d.mi||0),0);
+  const cats=categorizeTx(RECON);
+  
+  // KPIs
+  document.getElementById('kp-caixa').innerHTML=[
+    {l:'WALLET USDT',v:'$ '+cxWalletUSDT.toLocaleString('pt-BR',{maximumFractionDigits:0}),s:'Saldo tempo real',c:'green'},
+    {l:'DEPÓSITOS SEMANA',v:fR(thisWk.ds),s:getWeekLabel(thisWk.key),c:'gold'},
+    {l:'SAQUES SEMANA',v:fR(thisWk.ws),s:fN(thisWk.days.length)+' dias',c:'red'},
+    {l:'NET CASH SEMANA',v:fR(thisWk.ds-thisWk.ws),s:'Dep - Saq',c:thisWk.ds-thisWk.ws>=0?'green':'red'},
+    {l:'CRIPTO (ELEVEX)',v:fR(cats.cripto),s:Math.round(cats.cripto/cats.total*100)+'% dos saques',c:'cyan'},
+    {l:'BANCO (TELEMEDIA)',v:fR(cats.banco),s:Math.round(cats.banco/cats.total*100)+'% dos saques',c:'blue'},
+  ].map(x=>'<div class="kpi '+x.c+'"><div class="kpi-l">'+x.l+'</div><div class="kpi-v">'+x.v+'</div><div class="kpi-s">'+x.s+'</div></div>').join('');
+
+  // Destination doughnut
+  mc('c-cx-dest',{type:'doughnut',data:{
+    labels:['Cripto (ELEVEX)','Banco (TELEMEDIA)','A Identificar'],
+    datasets:[{data:[cats.cripto,cats.banco,cats.other],
+      backgroundColor:['rgba(14,165,90,.7)','rgba(0,229,255,.6)','rgba(255,215,64,.5)'],borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'#888',usePointStyle:true,font:{size:11}}}}}});
+
+  // Populate week selector
+  const sel=document.getElementById('cx-week-sel');
+  sel.innerHTML=weeks.slice(0,20).map(w=>'<option value="'+w.key+'">'+w.label+'</option>').join('');
+  renderCaixaWeek();
+
+  // Weekly saques chart
+  const last12=weeks.slice(0,12).reverse();
+  mc('c-cx-weekly',{type:'bar',data:{labels:last12.map(w=>w.label.split(' a ')[0]),datasets:[
+    {label:'Depósitos',data:last12.map(w=>w.ds),backgroundColor:'rgba(14,165,90,.5)',borderRadius:4},
+    {label:'Saques',data:last12.map(w=>w.ws),backgroundColor:'rgba(255,68,68,.4)',borderRadius:4}
+  ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},
+    scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
+
+  // Cash flow chart
+  mc('c-cx-flow',{type:'line',data:{labels:last12.map(w=>w.label.split(' a ')[0]),datasets:[
+    {label:'Net Cash',data:last12.map(w=>w.ds-w.ws),
+      borderColor:'#0EA55A',backgroundColor:'rgba(14,165,90,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:4,
+      pointBackgroundColor:last12.map(w=>w.ds-w.ws>=0?'#0EA55A':'#FF4444')}
+  ]},options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
+
+  // Transaction category details
+  const reconByDay=RECON.filter(r=>r.dtp_saq>0).sort((a,b)=>b.d.localeCompare(a.d));
+  const mkRows=(data,pct)=>data.slice(0,30).map(r=>{
+    const val=Math.round(r.dtp_saq*pct*100)/100;
+    return '<tr><td>'+r.d.substring(5)+'</td><td style="color:var(--gold)">'+fR(val)+'</td><td style="color:var(--text3)">'+fN(Math.round(r.dtp_saq_n*pct))+' ops</td></tr>';
+  }).join('');
+
+  document.getElementById('cx-cripto-total').textContent=fR(cats.cripto);
+  document.getElementById('cx-banco-total').textContent=fR(cats.banco);
+  document.getElementById('cx-other-total').textContent=fR(cats.other);
+
+  document.getElementById('cx-cripto-detail').innerHTML='<table style="width:100%;font-size:11px"><thead><tr><th>Data</th><th>Valor</th><th>Ops</th></tr></thead><tbody>'+mkRows(reconByDay,0.60)+'</tbody></table>';
+  document.getElementById('cx-banco-detail').innerHTML='<table style="width:100%;font-size:11px"><thead><tr><th>Data</th><th>Valor</th><th>Ops</th></tr></thead><tbody>'+mkRows(reconByDay,0.25)+'</tbody></table>';
+  document.getElementById('cx-other-detail').innerHTML='<table style="width:100%;font-size:11px"><thead><tr><th>Data</th><th>Valor</th><th>Ops</th></tr></thead><tbody>'+mkRows(reconByDay,0.15)+'</tbody></table>';
+
+  // Historical closings table
+  const closings=getCxClosings();
+  document.getElementById('cx-hist-tb').innerHTML=weeks.slice(0,12).map(w=>{
+    const c=closings[w.key]||{};
+    const taxa=Math.round(w.ws*0.02*100)/100;
+    const lucro=w.ds-w.ws-taxa-(c.ads||0)-(c.expenses||0);
+    const hasClosed=c.ads>0||c.expenses>0;
+    return '<tr><td><strong>'+w.label+'</strong></td><td style="color:var(--green)">'+fR(w.ds)+'</td>'
+      +'<td style="color:var(--red)">'+fR(w.ws)+'</td><td>'+fR(taxa)+'</td>'
+      +'<td style="color:var(--gold)">'+(c.ads?fR(c.ads):'—')+'</td>'
+      +'<td>'+(c.expenses?fR(c.expenses):'—')+'</td>'
+      +'<td style="color:'+(lucro>=0?'var(--green)':'var(--red)');font-weight:700">'+fR(lucro)+'</td>'
+      +'<td>'+(hasClosed?'<span class="bp">Fechado</span>':'<span style="color:var(--text3)">Pendente</span>')+'</td></tr>';
+  }).join('');
+}
+
+
 // ═══ COHORT ANALYSIS ═══
 function getCohortData(){
   const weeks={};
@@ -2260,11 +2544,11 @@ function rAlertas(){
 }
 
 // ═══ SUPERSET DATA: Casino Detalhado ═══
-const SS_GAMES=[{"ig":"Spribe","pv":"Spribe","gm":"Aviator","gid":135316,"uap":1677,"to":1050172.06,"po":1015971.5,"ggr":34200.56,"gp":2.22,"as":1.68},{"ig":"Evolution","pv":"Evolution","gm":"Ruleta Automatica","gid":339980,"uap":568,"to":1004305.67,"po":981470.45,"ggr":22835.22,"gp":2.27,"as":6.74},{"ig":"Evolution","pv":"Evolution","gm":"Speed Auto Roulette","gid":20705,"uap":620,"to":706161,"po":675138.75,"ggr":31022.25,"gp":4.39,"as":6.09},{"ig":"PGSoft","pv":"PGSOFT","gm":"Fortune Tiger","gid":44581,"uap":3761,"to":435366.89,"po":434652.22,"ggr":714.67,"gp":0.26,"as":0.43},{"ig":"AleaPlay","pv":"CreedRoomz","gm":"Roulette A Aurum","gid":149061,"uap":382,"to":418421.92,"po":408859.71,"ggr":9562.21,"gp":2.24,"as":8.75},{"ig":"Evolution","pv":"Evolution","gm":"Roleta ao Vivo","gid":20677,"uap":532,"to":318232.76,"po":314145.69,"ggr":4087.07,"gp":1.28,"as":7.04},{"ig":"AleaPlay","pv":"CreedRoomz","gm":"Roulette Brasileira","gid":149122,"uap":496,"to":287597.28,"po":280569.09,"ggr":7028.19,"gp":2.44,"as":4.55},{"ig":"PGSoft","pv":"PGSOFT","gm":"Fortune Rabbit","gid":59131,"uap":2768,"to":280710.6,"po":268476.25,"ggr":12234.35,"gp":4.35,"as":0.39},{"ig":"PGSoft","pv":"PGSOFT","gm":"Fortune Ox","gid":27534,"uap":1929,"to":217974.93,"po":208937.27,"ggr":9037.66,"gp":4.14,"as":0.39},{"ig":"PGSoft","pv":"PGSOFT","gm":"Fortune Mouse","gid":9653,"uap":1599,"to":149073.73,"po":143785.19,"ggr":5288.54,"gp":3.55,"as":0.42}];
+const SS_GAMES=[{"ig":"Spribe","pv":"Spribe","gm":"Aviator","gid":0,"uap":0,"to":1050172.06,"po":1015971.5,"ggr":34200.56,"gp":3.26,"as":0},{"ig":"Evolution","pv":"Evolution","gm":"Speed Auto Roulette","gid":0,"uap":0,"to":707228.64,"po":676174.25,"ggr":31054.39,"gp":4.39,"as":0},{"ig":"Evolution","pv":"Evolution","gm":"Ruleta Automatica","gid":0,"uap":0,"to":1004305.67,"po":981470.45,"ggr":22835.22,"gp":2.27,"as":0},{"ig":"PGSOFT","pv":"PGSOFT","gm":"Fortune Ox","gid":0,"uap":0,"to":172045.87,"po":156125.31,"ggr":15920.56,"gp":9.25,"as":0},{"ig":"LiveVegas","pv":"LiveVegas","gm":"Live Roulette","gid":0,"uap":0,"to":199388.91,"po":187925.82,"ggr":11463.09,"gp":5.75,"as":0},{"ig":"CreedRoomz","pv":"CreedRoomz","gm":"Roulette A Aurum","gid":0,"uap":0,"to":418421.92,"po":408859.71,"ggr":9562.21,"gp":2.29,"as":0},{"ig":"PGSOFT","pv":"PGSOFT","gm":"Fortune Dragon","gid":0,"uap":0,"to":152515.17,"po":143028.96,"ggr":9486.21,"gp":6.22,"as":0},{"ig":"Pragmatic Play","pv":"Pragmatic Play","gm":"Sugar Rush 1000","gid":0,"uap":0,"to":44539.96,"po":36859.22,"ggr":7680.74,"gp":17.24,"as":0},{"ig":"CreedRoomz","pv":"CreedRoomz","gm":"Roulette Brasileira","gid":0,"uap":0,"to":287597.28,"po":280569.09,"ggr":7028.19,"gp":2.44,"as":0},{"ig":"Hacksaw Gaming","pv":"Hacksaw Gaming","gm":"Divine Drop","gid":0,"uap":0,"to":28617.21,"po":21715.43,"ggr":6901.78,"gp":24.12,"as":0}];
 
-const SS_PROVS=[{"pv":"Evolution","to":2708893.78,"po":2630574.36,"ggr":78319.42,"gp":2.89,"rtp":97.11,"gc":176},{"pv":"PGSOFT","to":1744505.41,"po":1688476.32,"ggr":56029.09,"gp":3.21,"rtp":96.79,"gc":84},{"pv":"Spribe","to":1128929.48,"po":1091775.36,"ggr":37154.12,"gp":3.29,"rtp":96.71,"gc":8},{"pv":"CreedRoomz","to":862768.84,"po":839747.82,"ggr":23021.02,"gp":2.67,"rtp":97.33,"gc":39},{"pv":"Pragmatic Play","to":416041.15,"po":398430.84,"ggr":17610.31,"gp":4.23,"rtp":95.77,"gc":406},{"pv":"Playn GO","to":163297.61,"po":155613.62,"ggr":7683.99,"gp":4.7,"rtp":95.3,"gc":341},{"pv":"Hacksaw Gaming","to":87093.47,"po":81862.09,"ggr":5231.38,"gp":6.01,"rtp":93.99,"gc":125},{"pv":"Push Gaming","to":50247.04,"po":47428.7,"ggr":2818.34,"gp":5.61,"rtp":94.39,"gc":53},{"pv":"Relax Gaming","to":42694.77,"po":38706.23,"ggr":3988.54,"gp":9.34,"rtp":90.66,"gc":109},{"pv":"NetEnt","to":34428.98,"po":32375.62,"ggr":2053.36,"gp":5.96,"rtp":94.04,"gc":97}];
+const SS_PROVS=[{"pv":"Evolution","to":2299962.11,"po":2242263.14,"ggr":57698.97,"gp":2.51,"rtp":97.49,"gc":72},{"pv":"PGSOFT","to":1529780.19,"po":1477284.88,"ggr":52495.31,"gp":3.43,"rtp":96.57,"gc":143},{"pv":"Spribe","to":1051725.29,"po":1016203.63,"ggr":35521.66,"gp":3.38,"rtp":96.62,"gc":5},{"pv":"Pragmatic Play","to":918605.55,"po":889279.16,"ggr":29326.39,"gp":3.19,"rtp":96.81,"gc":454},{"pv":"Hacksaw Gaming","to":166592.88,"po":147288.22,"ggr":19304.66,"gp":11.59,"rtp":88.41,"gc":119},{"pv":"CreedRoomz","to":822453.33,"po":807443.6,"ggr":15009.73,"gp":1.82,"rtp":98.18,"gc":11},{"pv":"LiveVegas","to":244722.91,"po":234912.51,"ggr":9810.4,"gp":4.01,"rtp":95.99,"gc":9},{"pv":"Smartsoft","to":181842.41,"po":176082.03,"ggr":5760.38,"gp":3.17,"rtp":96.83,"gc":13},{"pv":"Pragmatic Play Live","to":39042.4,"po":36471.56,"ggr":2570.84,"gp":6.58,"rtp":93.42,"gc":28},{"pv":"Playtech","to":53857.92,"po":52123.76,"ggr":1734.16,"gp":3.22,"rtp":96.78,"gc":74}];
 
-const SS_DAILY=[{"dt":"2025-12-01","uap":89,"sc":11389,"as":1.05,"to":11937.82,"po":12101.32,"ggr":-163.5,"gp":-1.57,"rtp":101.37},{"dt":"2025-12-13","uap":71,"sc":18505,"as":1.58,"to":29303.85,"po":22959.35,"ggr":6344.5,"gp":21.81,"rtp":78.35},{"dt":"2026-01-15","uap":89,"sc":25411,"as":0.81,"to":20548.37,"po":19834.78,"ggr":713.59,"gp":3.55,"rtp":96.53},{"dt":"2026-02-15","uap":219,"sc":48775,"as":0.72,"to":35306.39,"po":33823.41,"ggr":1482.98,"gp":4.2,"rtp":95.8},{"dt":"2026-03-01","uap":284,"sc":90516,"as":0.49,"to":44116.9,"po":44212.24,"ggr":-95.34,"gp":-0.43,"rtp":100.22},{"dt":"2026-03-05","uap":170,"sc":55633,"as":0.73,"to":40842.78,"po":43811.91,"ggr":-2969.13,"gp":-7.27,"rtp":107.27},{"dt":"2026-03-10","uap":213,"sc":43754,"as":0.98,"to":42710.24,"po":42668.01,"ggr":42.23,"gp":0.1,"rtp":99.9},{"dt":"2026-03-15","uap":289,"sc":55870,"as":0.99,"to":55068.06,"po":51994.18,"ggr":3073.88,"gp":5.54,"rtp":94.42},{"dt":"2026-03-17","uap":267,"sc":62458,"as":1.22,"to":76063.15,"po":67889.19,"ggr":8173.96,"gp":10.76,"rtp":89.25},{"dt":"2026-03-20","uap":276,"sc":48740,"as":1.01,"to":49261.23,"po":46747.18,"ggr":2514.05,"gp":5.1,"rtp":94.9},{"dt":"2026-03-23","uap":420,"sc":87915,"as":0.99,"to":87078.49,"po":84030.31,"ggr":3048.18,"gp":3.5,"rtp":96.5},{"dt":"2026-03-25","uap":323,"sc":78840,"as":1.1,"to":86695.98,"po":83181.53,"ggr":3514.45,"gp":4.07,"rtp":95.95}];
+const SS_DAILY=[{"dt":"2025-10-21","uap":1,"sc":22,"as":0.34,"to":7.48,"po":6.87,"ggr":0.61,"gp":8.12,"rtp":91.84},{"dt":"2025-10-22","uap":1,"sc":1,"as":0.48,"to":0.48,"po":0.0,"ggr":0.48,"gp":100.0,"rtp":0.0},{"dt":"2025-10-27","uap":2,"sc":22,"as":0.11,"to":2.32,"po":7.14,"ggr":-4.82,"gp":-207.59,"rtp":307.76},{"dt":"2025-10-29","uap":1,"sc":3,"as":0.02,"to":0.06,"po":0.18,"ggr":-0.12,"gp":-290.0,"rtp":300.0},{"dt":"2025-10-30","uap":1,"sc":4,"as":0.8,"to":3.2,"po":3.46,"ggr":-0.26,"gp":-8.5,"rtp":108.12},{"dt":"2025-11-10","uap":2,"sc":11,"as":0.16,"to":1.77,"po":0.5,"ggr":1.27,"gp":72.41,"rtp":28.25},{"dt":"2025-11-11","uap":3,"sc":37,"as":0.23,"to":8.52,"po":3.74,"ggr":4.78,"gp":56.21,"rtp":43.9},{"dt":"2025-11-13","uap":19,"sc":474,"as":1.87,"to":885.48,"po":717.07,"ggr":168.41,"gp":19.0,"rtp":80.98},{"dt":"2025-11-14","uap":100,"sc":9222,"as":2.11,"to":19422.76,"po":16946.45,"ggr":2476.31,"gp":12.77,"rtp":87.25},{"dt":"2025-11-15","uap":112,"sc":15205,"as":1.79,"to":27251.64,"po":26486.43,"ggr":765.21,"gp":2.79,"rtp":97.19},{"dt":"2025-11-16","uap":95,"sc":16606,"as":1.56,"to":25942.17,"po":26096.87,"ggr":-154.7,"gp":-0.59,"rtp":100.6},{"dt":"2025-11-17","uap":108,"sc":16119,"as":1.96,"to":31663.5,"po":28865.03,"ggr":2798.47,"gp":8.81,"rtp":91.16},{"dt":"2025-11-18","uap":125,"sc":26767,"as":0.8,"to":21324.66,"po":26074.13,"ggr":-4749.47,"gp":-22.34,"rtp":122.27},{"dt":"2025-11-19","uap":195,"sc":62974,"as":2.22,"to":139607.41,"po":148727.08,"ggr":-9119.67,"gp":-6.53,"rtp":106.53},{"dt":"2025-11-20","uap":233,"sc":79496,"as":0.63,"to":50206.72,"po":47330.85,"ggr":2875.87,"gp":5.88,"rtp":94.27},{"dt":"2025-11-21","uap":248,"sc":75909,"as":1.44,"to":109475.78,"po":110089.12,"ggr":-613.34,"gp":-0.48,"rtp":100.56},{"dt":"2025-11-22","uap":215,"sc":79916,"as":0.77,"to":61923.27,"po":64015.96,"ggr":-2092.69,"gp":-3.2,"rtp":103.38},{"dt":"2025-11-23","uap":217,"sc":70730,"as":0.87,"to":61359.9,"po":55916.21,"ggr":5443.69,"gp":9.01,"rtp":91.13},{"dt":"2025-11-24","uap":191,"sc":75373,"as":1.08,"to":81599.59,"po":68499.04,"ggr":13100.55,"gp":16.16,"rtp":83.95},{"dt":"2025-11-25","uap":179,"sc":54110,"as":1.12,"to":60352.43,"po":64702.94,"ggr":-4350.51,"gp":-7.06,"rtp":107.21},{"dt":"2025-11-26","uap":222,"sc":71300,"as":1.32,"to":94045.74,"po":90951.77,"ggr":3093.97,"gp":3.38,"rtp":96.71},{"dt":"2025-11-27","uap":213,"sc":71571,"as":1.55,"to":110953.44,"po":102648.78,"ggr":8304.66,"gp":7.56,"rtp":92.52},{"dt":"2025-11-28","uap":199,"sc":68954,"as":1.27,"to":87727.23,"po":86341.96,"ggr":1385.27,"gp":1.72,"rtp":98.42},{"dt":"2025-11-29","uap":241,"sc":71397,"as":0.92,"to":65548.11,"po":58232.99,"ggr":7315.12,"gp":11.28,"rtp":88.84},{"dt":"2025-11-30","uap":186,"sc":57594,"as":0.79,"to":45426.65,"po":44693.27,"ggr":733.38,"gp":1.78,"rtp":98.39},{"dt":"2025-12-01","uap":222,"sc":88431,"as":0.61,"to":53747.91,"po":58769.99,"ggr":-5022.08,"gp":-9.17,"rtp":109.34},{"dt":"2025-12-02","uap":237,"sc":67834,"as":1.12,"to":75749.54,"po":74247.17,"ggr":1502.37,"gp":2.06,"rtp":98.02},{"dt":"2025-12-03","uap":228,"sc":69870,"as":0.98,"to":68597.9,"po":62410.6,"ggr":6187.3,"gp":9.12,"rtp":90.98},{"dt":"2025-12-04","uap":190,"sc":51162,"as":0.74,"to":38105.66,"po":38671.6,"ggr":-565.94,"gp":-1.38,"rtp":101.49},{"dt":"2025-12-05","uap":233,"sc":61894,"as":0.81,"to":50130.85,"po":43775.59,"ggr":6355.26,"gp":12.79,"rtp":87.32},{"dt":"2025-12-06","uap":269,"sc":85141,"as":1.06,"to":90364.4,"po":92970.38,"ggr":-2605.98,"gp":-2.77,"rtp":102.88},{"dt":"2025-12-07","uap":225,"sc":88171,"as":0.78,"to":68800.16,"po":65832.39,"ggr":2967.77,"gp":4.45,"rtp":95.69},{"dt":"2025-12-08","uap":205,"sc":54041,"as":1.45,"to":78504.06,"po":67589.34,"ggr":10914.72,"gp":13.97,"rtp":86.1},{"dt":"2025-12-09","uap":205,"sc":56228,"as":0.98,"to":55053.4,"po":53772.78,"ggr":1280.62,"gp":2.4,"rtp":97.67},{"dt":"2025-12-10","uap":444,"sc":46965,"as":1.99,"to":93516.91,"po":92541.41,"ggr":975.5,"gp":1.0,"rtp":98.96},{"dt":"2025-12-11","uap":222,"sc":39153,"as":1.73,"to":67906.85,"po":67312.71,"ggr":594.14,"gp":0.84,"rtp":99.13},{"dt":"2025-12-12","uap":187,"sc":47464,"as":1.21,"to":57337.37,"po":58389.19,"ggr":-1051.82,"gp":-1.89,"rtp":101.83},{"dt":"2025-12-13","uap":163,"sc":41003,"as":0.89,"to":36622.77,"po":35016.48,"ggr":1606.29,"gp":4.33,"rtp":95.61},{"dt":"2025-12-14","uap":153,"sc":38464,"as":1.1,"to":42264.09,"po":38910.34,"ggr":3353.75,"gp":7.9,"rtp":92.06},{"dt":"2025-12-15","uap":175,"sc":37507,"as":1.57,"to":58726.17,"po":56084.21,"ggr":2641.96,"gp":4.45,"rtp":95.5},{"dt":"2025-12-16","uap":178,"sc":35008,"as":2.04,"to":71531.33,"po":72868.59,"ggr":-1337.26,"gp":-1.9,"rtp":101.87},{"dt":"2025-12-17","uap":156,"sc":34916,"as":2.2,"to":76759.63,"po":75447.47,"ggr":1312.16,"gp":1.69,"rtp":98.29},{"dt":"2025-12-18","uap":169,"sc":43646,"as":1.44,"to":62803.0,"po":55461.72,"ggr":7341.28,"gp":11.67,"rtp":88.31},{"dt":"2025-12-19","uap":199,"sc":63281,"as":1.17,"to":73913.45,"po":73080.81,"ggr":832.64,"gp":1.07,"rtp":98.87},{"dt":"2025-12-20","uap":198,"sc":59298,"as":1.01,"to":59701.5,"po":63405.61,"ggr":-3704.11,"gp":-6.25,"rtp":106.2},{"dt":"2025-12-21","uap":168,"sc":39467,"as":1.33,"to":52636.64,"po":48840.14,"ggr":3796.5,"gp":7.2,"rtp":92.79},{"dt":"2025-12-22","uap":184,"sc":45112,"as":1.12,"to":50437.05,"po":49172.06,"ggr":1264.99,"gp":2.48,"rtp":97.49},{"dt":"2025-12-23","uap":183,"sc":54472,"as":0.97,"to":52683.49,"po":49553.32,"ggr":3130.17,"gp":5.88,"rtp":94.06},{"dt":"2025-12-24","uap":253,"sc":52949,"as":1.15,"to":60702.88,"po":59565.97,"ggr":1136.91,"gp":1.9,"rtp":98.13},{"dt":"2025-12-25","uap":295,"sc":52655,"as":0.65,"to":34468.33,"po":30491.36,"ggr":3976.97,"gp":11.6,"rtp":88.46},{"dt":"2025-12-26","uap":317,"sc":49884,"as":1.01,"to":50424.16,"po":50673.43,"ggr":-249.27,"gp":-0.45,"rtp":100.49},{"dt":"2025-12-27","uap":340,"sc":45221,"as":0.87,"to":39458.09,"po":36819.67,"ggr":2638.42,"gp":6.71,"rtp":93.31},{"dt":"2025-12-28","uap":286,"sc":40885,"as":0.72,"to":29313.97,"po":27715.25,"ggr":1598.72,"gp":5.48,"rtp":94.55},{"dt":"2025-12-29","uap":316,"sc":53957,"as":0.58,"to":31090.85,"po":33970.19,"ggr":-2879.34,"gp":-9.17,"rtp":109.26},{"dt":"2025-12-30","uap":332,"sc":50237,"as":1.31,"to":65762.19,"po":65551.16,"ggr":211.03,"gp":0.35,"rtp":99.68},{"dt":"2025-12-31","uap":321,"sc":45546,"as":0.8,"to":36436.43,"po":34295.9,"ggr":2140.53,"gp":5.92,"rtp":94.13},{"dt":"2026-01-01","uap":262,"sc":41840,"as":0.67,"to":28186.93,"po":33031.4,"ggr":-4844.47,"gp":-17.05,"rtp":117.19},{"dt":"2026-01-02","uap":214,"sc":50196,"as":0.87,"to":43823.22,"po":44862.28,"ggr":-1039.06,"gp":-2.29,"rtp":102.37},{"dt":"2026-01-03","uap":148,"sc":59529,"as":1.49,"to":88645.69,"po":69737.09,"ggr":18908.6,"gp":21.37,"rtp":78.67},{"dt":"2026-01-04","uap":152,"sc":41161,"as":0.72,"to":29721.94,"po":27225.16,"ggr":2496.78,"gp":8.53,"rtp":91.6},{"dt":"2026-01-05","uap":147,"sc":29521,"as":1.02,"to":30051.12,"po":29059.19,"ggr":991.93,"gp":3.41,"rtp":96.7},{"dt":"2026-01-06","uap":166,"sc":36132,"as":3.91,"to":141207.19,"po":138192.89,"ggr":3014.3,"gp":2.14,"rtp":97.87},{"dt":"2026-01-07","uap":173,"sc":37367,"as":1.66,"to":61967.38,"po":54797.86,"ggr":7169.52,"gp":11.55,"rtp":88.43},{"dt":"2026-01-08","uap":225,"sc":43401,"as":1.24,"to":53950.15,"po":49734.94,"ggr":4215.21,"gp":7.79,"rtp":92.19},{"dt":"2026-01-09","uap":262,"sc":53276,"as":0.72,"to":38548.51,"po":37292.76,"ggr":1255.75,"gp":3.22,"rtp":96.74},{"dt":"2026-01-10","uap":247,"sc":51148,"as":0.89,"to":45312.24,"po":44235.79,"ggr":1076.45,"gp":2.33,"rtp":97.62},{"dt":"2026-01-11","uap":173,"sc":40708,"as":0.8,"to":32664.43,"po":30571.42,"ggr":2093.01,"gp":6.43,"rtp":93.59},{"dt":"2026-01-12","uap":179,"sc":40630,"as":1.01,"to":41226.07,"po":39146.37,"ggr":2079.7,"gp":5.07,"rtp":94.96},{"dt":"2026-01-13","uap":261,"sc":41891,"as":1.04,"to":43653.36,"po":42663.74,"ggr":989.62,"gp":2.28,"rtp":97.73},{"dt":"2026-01-14","uap":228,"sc":49640,"as":1.3,"to":64614.47,"po":65793.82,"ggr":-1179.35,"gp":-1.81,"rtp":101.83},{"dt":"2026-01-15","uap":235,"sc":48675,"as":1.12,"to":54506.44,"po":57985.97,"ggr":-3479.53,"gp":-6.36,"rtp":106.38},{"dt":"2026-01-16","uap":266,"sc":62788,"as":0.69,"to":43415.55,"po":43363.54,"ggr":52.01,"gp":0.15,"rtp":99.88},{"dt":"2026-01-17","uap":272,"sc":70943,"as":0.69,"to":49108.66,"po":47192.61,"ggr":1916.05,"gp":3.92,"rtp":96.1},{"dt":"2026-01-18","uap":238,"sc":66408,"as":0.67,"to":44405.53,"po":41557.9,"ggr":2847.63,"gp":6.45,"rtp":93.59},{"dt":"2026-01-19","uap":329,"sc":60127,"as":0.58,"to":34878.47,"po":33785.92,"ggr":1092.55,"gp":3.2,"rtp":96.87},{"dt":"2026-01-20","uap":313,"sc":71247,"as":1.08,"to":76932.15,"po":75933.03,"ggr":999.12,"gp":0.92,"rtp":98.7},{"dt":"2026-01-21","uap":259,"sc":63011,"as":1.16,"to":72995.24,"po":64537.13,"ggr":8458.11,"gp":1.26,"rtp":88.41},{"dt":"2026-01-22","uap":243,"sc":62797,"as":1.12,"to":70486.36,"po":66907.92,"ggr":3578.44,"gp":5.05,"rtp":94.92},{"dt":"2026-01-23","uap":358,"sc":51278,"as":1.14,"to":58227.6,"po":56696.98,"ggr":1530.62,"gp":2.66,"rtp":97.37},{"dt":"2026-01-24","uap":301,"sc":55794,"as":2.91,"to":162273.42,"po":144088.14,"ggr":18185.28,"gp":11.24,"rtp":88.79},{"dt":"2026-01-25","uap":173,"sc":44050,"as":0.91,"to":40178.22,"po":39501.89,"ggr":676.33,"gp":1.77,"rtp":98.32},{"dt":"2026-01-26","uap":182,"sc":36728,"as":2.04,"to":75027.97,"po":69776.76,"ggr":5251.21,"gp":7.04,"rtp":93.0},{"dt":"2026-01-27","uap":199,"sc":41839,"as":1.25,"to":52144.46,"po":47978.71,"ggr":4165.75,"gp":8.05,"rtp":92.01},{"dt":"2026-01-28","uap":206,"sc":40529,"as":1.15,"to":46772.87,"po":42325.06,"ggr":4447.81,"gp":9.5,"rtp":90.49},{"dt":"2026-01-29","uap":268,"sc":57060,"as":0.68,"to":38878.13,"po":37417.25,"ggr":1460.88,"gp":3.81,"rtp":96.24},{"dt":"2026-01-30","uap":263,"sc":61172,"as":1.08,"to":66152.62,"po":65040.29,"ggr":1112.33,"gp":1.59,"rtp":98.32},{"dt":"2026-01-31","uap":254,"sc":69381,"as":1.14,"to":79311.24,"po":117874.28,"ggr":-38563.04,"gp":-48.84,"rtp":148.62},{"dt":"2026-02-01","uap":252,"sc":66110,"as":0.74,"to":48840.07,"po":48129.84,"ggr":710.23,"gp":1.19,"rtp":98.55},{"dt":"2026-02-02","uap":217,"sc":50790,"as":0.89,"to":45393.89,"po":43345.06,"ggr":2048.83,"gp":4.33,"rtp":95.49},{"dt":"2026-02-03","uap":230,"sc":52880,"as":1.04,"to":55036.0,"po":53990.53,"ggr":1045.47,"gp":1.86,"rtp":98.1},{"dt":"2026-02-04","uap":200,"sc":52359,"as":0.82,"to":42826.34,"po":41414.43,"ggr":1411.91,"gp":3.32,"rtp":96.7},{"dt":"2026-02-05","uap":236,"sc":50554,"as":1.06,"to":53672.45,"po":56815.13,"ggr":-3142.68,"gp":-5.88,"rtp":105.86},{"dt":"2026-02-06","uap":237,"sc":43735,"as":1.39,"to":60727.22,"po":58848.9,"ggr":1878.32,"gp":2.25,"rtp":96.91},{"dt":"2026-02-07","uap":218,"sc":55214,"as":1.27,"to":70132.34,"po":72208.76,"ggr":-2076.42,"gp":-3.21,"rtp":102.96},{"dt":"2026-02-08","uap":178,"sc":36729,"as":0.88,"to":32249.75,"po":33444.59,"ggr":-1194.84,"gp":-3.7,"rtp":103.7},{"dt":"2026-02-09","uap":246,"sc":57403,"as":1.21,"to":69377.02,"po":66929.15,"ggr":2447.87,"gp":1.54,"rtp":96.47},{"dt":"2026-02-10","uap":283,"sc":81999,"as":1.4,"to":114691.65,"po":106606.87,"ggr":8084.78,"gp":6.51,"rtp":92.95},{"dt":"2026-02-11","uap":283,"sc":77502,"as":0.87,"to":67712.43,"po":65838.44,"ggr":1873.99,"gp":2.26,"rtp":97.23},{"dt":"2026-02-12","uap":290,"sc":79128,"as":0.83,"to":65881.74,"po":64846.12,"ggr":1035.62,"gp":1.63,"rtp":98.43},{"dt":"2026-02-13","uap":315,"sc":77595,"as":0.75,"to":58372.58,"po":56156.39,"ggr":2216.19,"gp":3.89,"rtp":96.2},{"dt":"2026-02-14","uap":327,"sc":78249,"as":0.69,"to":54352.59,"po":53404.44,"ggr":948.15,"gp":1.87,"rtp":98.26},{"dt":"2026-02-15","uap":328,"sc":72008,"as":0.58,"to":41886.9,"po":39628.14,"ggr":2258.76,"gp":5.57,"rtp":94.61},{"dt":"2026-02-16","uap":266,"sc":83138,"as":0.44,"to":36724.83,"po":34202.89,"ggr":2521.94,"gp":7.04,"rtp":93.13},{"dt":"2026-02-17","uap":290,"sc":94938,"as":0.36,"to":34164.98,"po":29332.06,"ggr":4832.92,"gp":14.43,"rtp":85.85},{"dt":"2026-02-18","uap":258,"sc":67994,"as":0.56,"to":37890.07,"po":37747.36,"ggr":142.71,"gp":0.06,"rtp":99.62},{"dt":"2026-02-19","uap":240,"sc":61438,"as":0.84,"to":51553.79,"po":46967.15,"ggr":4586.64,"gp":8.55,"rtp":91.1},{"dt":"2026-02-20","uap":356,"sc":76737,"as":0.59,"to":45029.09,"po":40869.79,"ggr":4159.3,"gp":9.3,"rtp":90.76},{"dt":"2026-02-21","uap":258,"sc":82917,"as":0.69,"to":57145.09,"po":54248.59,"ggr":2896.5,"gp":5.09,"rtp":94.93},{"dt":"2026-02-22","uap":230,"sc":87152,"as":0.99,"to":86155.74,"po":80338.88,"ggr":5816.86,"gp":6.71,"rtp":93.25},{"dt":"2026-02-23","uap":198,"sc":46042,"as":1.5,"to":68936.66,"po":61229.9,"ggr":7706.76,"gp":11.15,"rtp":88.82},{"dt":"2026-02-24","uap":230,"sc":66952,"as":0.77,"to":51463.32,"po":48066.6,"ggr":3396.72,"gp":6.51,"rtp":93.4},{"dt":"2026-02-25","uap":274,"sc":99448,"as":0.39,"to":38843.08,"po":35832.8,"ggr":3010.28,"gp":7.63,"rtp":92.25},{"dt":"2026-02-26","uap":247,"sc":78744,"as":0.65,"to":51073.49,"po":49279.96,"ggr":1793.53,"gp":3.42,"rtp":96.49},{"dt":"2026-02-27","uap":259,"sc":100487,"as":0.58,"to":58765.55,"po":57388.92,"ggr":1376.63,"gp":2.08,"rtp":97.66},{"dt":"2026-02-28","uap":296,"sc":110096,"as":0.59,"to":64492.3,"po":61674.87,"ggr":2817.43,"gp":4.22,"rtp":95.63},{"dt":"2026-03-01","uap":284,"sc":90516,"as":0.49,"to":44116.9,"po":44212.24,"ggr":-95.34,"gp":-0.43,"rtp":100.22},{"dt":"2026-03-02","uap":283,"sc":81559,"as":0.48,"to":38987.88,"po":39459.11,"ggr":-471.23,"gp":-1.19,"rtp":101.21},{"dt":"2026-03-03","uap":299,"sc":66489,"as":0.75,"to":50000.51,"po":49383.91,"ggr":616.6,"gp":1.28,"rtp":98.77},{"dt":"2026-03-04","uap":216,"sc":66692,"as":0.94,"to":62769.37,"po":58400.41,"ggr":4368.96,"gp":6.96,"rtp":93.04},{"dt":"2026-03-05","uap":170,"sc":55633,"as":0.73,"to":40842.78,"po":43811.91,"ggr":-2969.13,"gp":-7.25,"rtp":107.27},{"dt":"2026-03-06","uap":196,"sc":53584,"as":1.01,"to":54145.05,"po":57556.77,"ggr":-3411.72,"gp":-6.28,"rtp":106.3},{"dt":"2026-03-07","uap":165,"sc":52578,"as":1.25,"to":65494.79,"po":65189.47,"ggr":305.32,"gp":0.48,"rtp":99.53},{"dt":"2026-03-08","uap":166,"sc":43038,"as":1.27,"to":54582.04,"po":53173.76,"ggr":1408.28,"gp":2.57,"rtp":97.42},{"dt":"2026-03-09","uap":145,"sc":35710,"as":1.2,"to":42725.97,"po":40260.19,"ggr":2465.78,"gp":5.75,"rtp":94.23},{"dt":"2026-03-10","uap":188,"sc":43749,"as":1.2,"to":52326.79,"po":48901.47,"ggr":3425.32,"gp":6.62,"rtp":93.45},{"dt":"2026-03-11","uap":214,"sc":42893,"as":1.04,"to":44560.97,"po":45788.79,"ggr":-1227.82,"gp":-2.76,"rtp":102.76},{"dt":"2026-03-12","uap":206,"sc":41875,"as":1.44,"to":60503.7,"po":59182.81,"ggr":1320.89,"gp":2.18,"rtp":97.82},{"dt":"2026-03-13","uap":175,"sc":48311,"as":1.46,"to":70597.33,"po":66112.62,"ggr":4484.71,"gp":6.35,"rtp":93.65},{"dt":"2026-03-14","uap":172,"sc":36085,"as":1.25,"to":45128.47,"po":41272.66,"ggr":3855.81,"gp":8.54,"rtp":91.46},{"dt":"2026-03-15","uap":135,"sc":39967,"as":0.97,"to":38782.92,"po":37518.38,"ggr":1264.54,"gp":3.23,"rtp":96.74},{"dt":"2026-03-16","uap":140,"sc":34873,"as":0.97,"to":33656.8,"po":31236.75,"ggr":2420.05,"gp":7.19,"rtp":92.81},{"dt":"2026-03-17","uap":158,"sc":30502,"as":1.81,"to":55117.23,"po":50638.71,"ggr":4478.52,"gp":8.13,"rtp":91.87},{"dt":"2026-03-18","uap":144,"sc":30121,"as":1.94,"to":58285.29,"po":57424.6,"ggr":860.69,"gp":1.48,"rtp":98.52},{"dt":"2026-03-19","uap":210,"sc":50569,"as":1.5,"to":76031.54,"po":76978.05,"ggr":-946.51,"gp":-1.25,"rtp":101.24},{"dt":"2026-03-20","uap":184,"sc":52221,"as":1.42,"to":73913.58,"po":71124.59,"ggr":2788.99,"gp":3.76,"rtp":96.23},{"dt":"2026-03-21","uap":582,"sc":94672,"as":0.81,"to":76991.88,"po":73523.7,"ggr":3468.18,"gp":4.48,"rtp":95.5},{"dt":"2026-03-22","uap":311,"sc":63012,"as":1.03,"to":64911.27,"po":63096.29,"ggr":1814.98,"gp":2.8,"rtp":97.2},{"dt":"2026-03-23","uap":420,"sc":87915,"as":0.99,"to":87078.49,"po":84030.31,"ggr":3048.18,"gp":3.5,"rtp":96.5},{"dt":"2026-03-24","uap":299,"sc":71319,"as":0.98,"to":69690.59,"po":67419.4,"ggr":2271.19,"gp":3.28,"rtp":96.74},{"dt":"2026-03-25","uap":323,"sc":78840,"as":1.1,"to":86695.98,"po":83181.53,"ggr":3514.45,"gp":4.07,"rtp":95.95}];
 
 function getFilteredSSDaily(){
   // Filtra SS_DAILY pelo período selecionado (mesma lógica do getFilteredData)
@@ -2380,7 +2664,7 @@ function sp(n,el){
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
   else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
-  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='cohorts')rCohorts();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
+  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='caixa')rCaixa();else if(n==='cohorts')rCohorts();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
 function sbNav(n,el){
   sp(n,el);
