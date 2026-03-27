@@ -8,7 +8,7 @@ const INITIAL_USERS = [
     email: 'harrisonwash@gmail.com',
     name: 'Harrison',
     role: 'admin',
-    hash: 'b3afe5cde3c9f37be2fdae37f8ddcf11cd7464bda3cdd73d0d2c7645fd3b4551'
+    hash: '496eb9af1521421ae86a33f6d53347b4e0fdc267957a54be460256c92a0645b6'
   }
 ];
 
@@ -30,15 +30,24 @@ function getRedis() {
 }
 
 async function getUsers() {
-  if (!process.env.REDIS_URL) return INITIAL_USERS;
+  let users = [...INITIAL_USERS];
+  if (!process.env.REDIS_URL) return users;
   try {
     const redis = getRedis();
     const data = await redis.get(REDIS_KEY);
-    if (data) return JSON.parse(data);
+    if (data) {
+      const redisUsers = JSON.parse(data);
+      // Merge: Redis users + INITIAL_USERS (initial takes priority for admin)
+      const initialEmails = new Set(INITIAL_USERS.map(u => u.email.toLowerCase()));
+      const extra = redisUsers.filter(u => !initialEmails.has(u.email.toLowerCase()));
+      users = [...INITIAL_USERS, ...extra];
+    }
+    // Sync back to Redis
+    await redis.set(REDIS_KEY, JSON.stringify(users));
   } catch (e) {
     console.error('getUsers error:', e.message);
   }
-  return INITIAL_USERS;
+  return users;
 }
 
 module.exports = async function handler(req, res) {
