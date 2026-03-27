@@ -895,18 +895,21 @@ function mc(id,cfg){const x=document.getElementById(id);if(!x)return null;if(cha
 // ═══ TIME FILTER LOGIC ═══
 let currentPeriod='yesterday';
 
+function localDateStr(dt){
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+}
 function getFilteredData(period){
   const lastDay=D[D.length-1];
   const lastDate=lastDay.date;
   switch(period){
     case 'today': {
-      const today=new Date().toISOString().slice(0,10);
+      const today=localDateStr(new Date());
       const todayData=D.filter(d=>d.date===today);
       return todayData.length?todayData:D.filter(d=>d.date===lastDate);
     }
     case 'yesterday': {
       const yd=new Date();yd.setDate(yd.getDate()-1);
-      const yds=yd.toISOString().slice(0,10);
+      const yds=localDateStr(yd);
       const ydData=D.filter(d=>d.date===yds);
       return ydData.length?ydData:D.filter(d=>d.date===lastDate);
     }
@@ -973,14 +976,14 @@ function getPeriodLabel(period){
   const months={'2025-11':'Nov/25','2025-12':'Dez/25','2026-01':'Jan/26','2026-02':'Fev/26','2026-03':'Mar/26'};
   switch(period){
     case 'today': {
-      const today=new Date().toISOString().slice(0,10);
+      const today=localDateStr(new Date());
       const hasToday=D.some(d=>d.date===today);
       const dd=today.substring(8,10)+'/'+today.substring(5,7);
       return hasToday?'Hoje ('+dd+')':'Hoje ('+dd+') — dados até '+last.df;
     }
     case 'yesterday': {
       const yd2=new Date();yd2.setDate(yd2.getDate()-1);
-      const yds2=yd2.toISOString().slice(0,10);
+      const yds2=localDateStr(yd2);
       const dd2=yds2.substring(8,10)+'/'+yds2.substring(5,7);
       const hasYd=D.some(d=>d.date===yds2);
       return hasYd?'Ontem ('+dd2+')':'Ontem ('+dd2+') — dados até '+last.df;
@@ -1406,7 +1409,7 @@ function getAffDateRange(){
     return{from:window._affFrom,to:window._affTo};
   }
   if(currentPeriod==='lifetime')return{from:allDates[0],to:lastDate};
-  if(currentPeriod==='today'){var today=new Date().toISOString().slice(0,10);var hasToday=allDates.indexOf(today)>=0;return{from:hasToday?today:lastDate,to:hasToday?today:lastDate};}
+  if(currentPeriod==='today'){var today=localDateStr(new Date());var hasToday=allDates.indexOf(today)>=0;return{from:hasToday?today:lastDate,to:hasToday?today:lastDate};}
   if(currentPeriod==='yesterday')return{from:lastDate,to:lastDate};
   if(currentPeriod==='week'){
     var ld=new Date(lastDate+'T12:00:00');var dow=ld.getDay();var diff=dow===0?6:dow-1;
@@ -1985,7 +1988,7 @@ async function fetchTronBalance(){
 function getWeekKey(date){
   const d=new Date(date+'T00:00:00');
   const day=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));
-  return mon.toISOString().slice(0,10);
+  return localDateStr(mon);
 }
 function getWeekLabel(wkStart){
   const s=new Date(wkStart+'T00:00:00');
@@ -2671,23 +2674,23 @@ function getFilteredSSDaily(){
   if(!all.length) return all;
   switch(currentPeriod){
     case 'today': {
-      const today=new Date().toISOString().slice(0,10);
+      const today=localDateStr(new Date());
       const f=all.filter(d=>d.dt===today);
       return f.length?f:[all[all.length-1]];
     }
     case 'yesterday': {
-      const yd=new Date();yd.setDate(yd.getDate()-1);const yds=yd.toISOString().slice(0,10);
+      const yd=new Date();yd.setDate(yd.getDate()-1);const yds=localDateStr(yd);
       const f=all.filter(d=>d.dt===yds);
       return f.length?f:[all[all.length-1]];
     }
     case 'week': {
       const now=new Date();const dow=now.getDay();const mon=new Date(now);mon.setDate(now.getDate()-(dow===0?6:dow-1));
-      const ws=mon.toISOString().slice(0,10);
+      const ws=localDateStr(mon);
       const f=all.filter(d=>d.dt>=ws);
       return f.length?f:all.slice(-3);
     }
     case 'month': {
-      const ms=new Date().toISOString().slice(0,8)+'01';
+      const ms=localDateStr(new Date()).slice(0,8)+'01';
       const f=all.filter(d=>d.dt>=ms);
       return f.length?f:all.slice(-5);
     }
@@ -2817,7 +2820,7 @@ function buildTicker(){
   items.push({l:'EUR/BRL',v:'R$ '+liveRates.eur.toFixed(4),c:'up'});
   items.push({l:'USDT/BRL',v:'R$ '+liveRates.usdt.toFixed(2),c:'up'});
   // TODAY
-  const today=new Date().toISOString().slice(0,10);
+  const today=localDateStr(new Date());
   const td=D.filter(d=>d.date===today);
   if(td.length){
     const t=td[0];
@@ -2828,7 +2831,7 @@ function buildTicker(){
     items.push({l:'HOJE \u00b7 FTD',v:t.ftd.toString(),c:'up'});
   }
   // YESTERDAY
-  const yd=new Date();yd.setDate(yd.getDate()-1);const yds=yd.toISOString().slice(0,10);
+  const yd=new Date();yd.setDate(yd.getDate()-1);const yds=localDateStr(yd);
   const ydd=D.filter(d=>d.date===yds);
   if(ydd.length){
     const y=ydd[0];
@@ -2838,7 +2841,7 @@ function buildTicker(){
   }
   // THIS WEEK
   const now=new Date();const dow=now.getDay();const monday=new Date(now);monday.setDate(now.getDate()-(dow===0?6:dow-1));
-  const weekStart=monday.toISOString().slice(0,10);
+  const weekStart=localDateStr(monday);
   const wk=D.filter(d=>d.date>=weekStart);
   if(wk.length){
     const wNgr=wk.reduce((a,d)=>a+d.ngr,0);
