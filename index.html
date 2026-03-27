@@ -92,7 +92,7 @@ body.sb-open .hdr{margin-left:0}
 .time-btn.active{background:var(--greenA);border-color:var(--green);color:var(--green)}
 /* KPIs */
 .kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;transition:.2s}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;transition:.2s;text-align:center}
 .kpi:hover{border-color:rgba(14,165,90,.25);transform:translateY(-1px)}
 .kpi::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green)}
 .kpi.gold::before{background:var(--gold)}.kpi.red::before{background:var(--red)}
@@ -482,31 +482,32 @@ body.light select,body.light input[type="date"]{background:var(--bg3);color:var(
 body.light .kpi-online{border-color:rgba(59,130,246,.25)}
 body.light .kpi-online .kpi-l{color:#2563EB}
 /* Funnel card */
-.kpi-funnel{min-width:200px;grid-column:span 1}
-.kpi-funnel-bar{height:8px;border-radius:4px;background:var(--bg3);margin:8px 0 6px;overflow:hidden;position:relative}
-.kpi-funnel-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#3B82F6,#0EA55A);transition:width .5s}
-.kpi-funnel-nums{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.kpi-funnel{min-width:200px;grid-column:span 1;text-align:center}
+.kpi-funnel .kpi-l{text-align:center}
+.kpi-funnel-bar{display:none}
+.kpi-funnel-fill{display:none}
+.kpi-funnel-nums{display:flex;justify-content:center;align-items:center;gap:16px}
 .kpi-funnel-nums .fn-item{text-align:center}
-.kpi-funnel-nums .fn-val{font-size:18px;font-weight:900;line-height:1.1}
-.kpi-funnel-nums .fn-lbl{font-size:9px;color:#BBB;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
-.kpi-funnel-nums .fn-arrow{color:var(--text3);font-size:14px}
-.kpi-funnel-conv{display:inline-block;background:var(--greenA);color:var(--green);font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;margin-top:4px}
+.kpi-funnel-nums .fn-val{font-size:26px;font-weight:900;line-height:1.1}
+.kpi-funnel-nums .fn-lbl{font-size:10px;color:#BBB;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-top:2px}
+.kpi-funnel-nums .fn-arrow{color:var(--text3);font-size:18px}
+.kpi-funnel-conv{display:inline-block;background:var(--greenA);color:var(--green);font-size:11px;font-weight:800;padding:3px 10px;border-radius:10px;margin-top:6px}
 /* Split card */
-.kpi-split{display:flex;gap:0;min-width:200px;grid-column:span 1}
-.kpi-split-left,.kpi-split-right{flex:1;padding:0 8px}
+.kpi-split{display:flex;gap:0;min-width:200px;grid-column:span 1;justify-content:center}
+.kpi-split-left,.kpi-split-right{flex:1;padding:0 8px;text-align:center}
 .kpi-split-left{border-right:1px solid var(--border)}
 .kpi-split-right{padding-left:12px}
 .kpi-split .sp-val{font-size:18px;font-weight:900;line-height:1.1;margin-bottom:2px}
 .kpi-split .sp-lbl{font-size:9px;color:#BBB;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
 .kpi-split .sp-sub{font-size:10px;color:#999;margin-top:3px}
 /* Churn gauges */
-.kpi-churn{min-width:220px;grid-column:span 1}
-.kpi-churn-gauges{display:flex;justify-content:space-around;align-items:flex-end;margin:6px 0 2px}
-.kpi-gauge{text-align:center}
-.kpi-gauge svg{width:64px;height:36px}
-.kpi-gauge-val{font-size:13px;font-weight:800;margin-top:2px;line-height:1}
-.kpi-gauge-lbl{font-size:9px;color:#BBB;font-weight:700;margin-top:1px}
-.kpi-gauge-ct{font-size:9px;color:#888;margin-top:0}
+.kpi-churn{min-width:320px;grid-column:span 2;text-align:center}
+.kpi-churn-gauges{display:flex;justify-content:space-around;align-items:flex-end;margin:10px 0 4px;gap:12px}
+.kpi-gauge{text-align:center;flex:1}
+.kpi-gauge svg{width:90px;height:50px}
+.kpi-gauge-val{font-size:16px;font-weight:900;margin-top:4px;line-height:1}
+.kpi-gauge-lbl{font-size:10px;color:#BBB;font-weight:700;margin-top:2px}
+.kpi-gauge-ct{font-size:9px;color:#888;margin-top:1px}
 /* Ticket card with trend */
 .kpi-trend{display:flex;align-items:center;gap:4px;margin-top:3px;font-size:10px;font-weight:700}
 .kpi-trend.up{color:var(--green)}.kpi-trend.down{color:var(--red)}.kpi-trend.neutral{color:#888}
@@ -1560,14 +1561,18 @@ function renderOverview(){
   const funnelPct=k.nr>0?k.ftd/k.nr*100:0;
   // FTD ticket
   const tkFtd=k.ftd>0?k.fda/k.ftd:0;
-  // Churn gauge SVG helper
+  // Churn gauge SVG helper — semicircular arc
   function gaugeArc(pct,color){
-    const r=26,cx=32,cy=32;
-    const startAngle=Math.PI, endAngle=Math.PI+Math.PI*(Math.min(pct,100)/100);
-    const x1=cx+r*Math.cos(startAngle),y1=cy+r*Math.sin(startAngle);
-    const x2=cx+r*Math.cos(endAngle),y2=cy+r*Math.sin(endAngle);
-    const large=pct>50?1:0;
-    return `<svg viewBox="0 0 64 36" fill="none"><path d="M${6} ${32} A${r} ${r} 0 0 1 ${58} ${32}" stroke="rgba(255,255,255,.08)" stroke-width="5" stroke-linecap="round"/><path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" stroke="${color}" stroke-width="5" stroke-linecap="round"/></svg>`;
+    const r=30,cx=40,cy=38,sw=6;
+    const p=Math.min(Math.max(pct,0),100)/100;
+    // Background arc (full semicircle, left to right)
+    const bgD=`M${cx-r} ${cy} A${r} ${r} 0 0 1 ${cx+r} ${cy}`;
+    // Foreground arc
+    const angle=Math.PI*(1-p);
+    const fx=cx+r*Math.cos(angle), fy=cy-r*Math.sin(angle);
+    const large=p>0.5?1:0;
+    const fgD=`M${cx-r} ${cy} A${r} ${r} 0 ${large} 1 ${fx.toFixed(1)} ${fy.toFixed(1)}`;
+    return `<svg viewBox="0 0 80 44" fill="none"><path d="${bgD}" stroke="rgba(255,255,255,.1)" stroke-width="${sw}" stroke-linecap="round" fill="none"/><path d="${fgD}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" fill="none"/></svg>`;
   }
   const totalVol=k.c_to+k.sb_to;
   const allKpis=[
@@ -1761,11 +1766,37 @@ function getFilteredMonthLabels(){return [...new Set(filteredData.map(d=>d.ml))]
 
 // ═══ FINANCEIRO ═══
 function rFin(){
+  // Auto-generate current month entry in O[] if missing, using D[] data
+  const curML=D.length>0?D[D.length-1].ml:'';
+  if(curML && !O.find(o=>o.mes===curML)){
+    const mData=D.filter(d=>d.ml===curML);
+    const mGGR=mData.reduce((a,d)=>a+(d.cg||0)+(d.sg||0),0);
+    const mDS=mData.reduce((a,d)=>a+d.ds,0);
+    const mWS=mData.reduce((a,d)=>a+d.ws,0);
+    const mNCL=mDS-mWS;
+    const prev=O[O.length-1]||{};
+    O.push({mes:curML,traf:prev.traf||0,mkt_inf:0,mkt_promo:0,crm:prev.crm||0,tec:prev.tec||0,
+      afiliados:0,inv_acoes:0,eq_com:0,serv:prev.serv||0,folha:prev.folha||0,
+      plat_fee:prev.plat_fee||0,gw_fee:prev.gw_fee||0,variaveis:0,
+      inv_op:0,inv_total:0,ncl:mNCL,ggr:mGGR,lucro:0,_auto:true});
+    const o=O[O.length-1];
+    o.inv_op=o.folha+o.plat_fee+o.gw_fee+o.crm+o.tec+o.serv;
+    o.inv_acoes=o.traf+o.mkt_inf+o.mkt_promo+o.crm+o.tec+o.afiliados;
+    o.inv_total=o.inv_acoes+o.inv_op;
+    o.lucro=o.ncl-o.inv_total;
+  }
   const fml=getFilteredMonthLabels();
-  const fO=O.filter(o=>fml.includes(o.mes));
+  // Fallback: se filtro sub-mensal (hoje/ontem/semana) não encontra O[], usar mês corrente
+  var fO=O.filter(o=>fml.includes(o.mes));
+  if(fO.length===0 && fml.length>0){
+    const curMonth=fml[fml.length-1];
+    const parent=O.find(o=>o.mes===curMonth);
+    if(parent) fO=[parent];
+  }
   const el=document.getElementById('ovc');
   const tggr=fO.reduce((a,o)=>a+o.ggr,0),tluc=fO.reduce((a,o)=>a+o.lucro,0),tinv=fO.reduce((a,o)=>a+o.inv_total,0);
-  el.innerHTML=fO.filter(o=>o.ggr>0).map(o=>{
+  const hasAuto=fO.some(o=>o._auto);
+  el.innerHTML=(hasAuto?'<div style="grid-column:1/-1;background:rgba(255,215,64,.1);border:1px solid rgba(255,215,64,.3);border-radius:10px;padding:10px 16px;margin-bottom:4px;font-size:12px;color:var(--gold)">⚡ Mês em andamento — GGR e NetCash calculados a partir dos dados diários. Custos estimados com base no mês anterior.</div>':'')+fO.filter(o=>o.ggr>0||o._auto).map(o=>{
     const mg=o.ggr>0?(o.lucro/o.ggr*100):0;
     const roi=o.inv_total>0?(o.lucro/o.inv_total*100):0;
     return `<div class="pc"><div class="pc-t">📅 ${o.mes}</div>
@@ -1786,7 +1817,7 @@ function rFin(){
     {label:'NetCash Líq.',data:od.map(o=>o.ncl),backgroundColor:C.bA,borderColor:C.b,borderWidth:2,borderRadius:5},
     {label:'Lucro Líq.',data:od.map(o=>o.lucro),type:'line',borderColor:C.g,backgroundColor:C.gA,borderWidth:2.5,fill:false,tension:.3,pointRadius:5}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v)}}}}});
-  const cm=od[od.length-1];
+  const cm=od[od.length-1]||{traf:0,folha:0,plat_fee:0,gw_fee:0,crm:0,tec:0,serv:0};
   mc('c-cost',{type:'doughnut',data:{
     labels:['Tráfego/Ads','Folha Equipe','Plataforma Fee','Gateway Fee','CRM','Tecnologia','Serviços'],
     datasets:[{data:[cm.traf,cm.folha,cm.plat_fee,cm.gw_fee,cm.crm,cm.tec,cm.serv],
