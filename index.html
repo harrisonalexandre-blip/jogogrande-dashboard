@@ -482,7 +482,7 @@ body.light select,body.light input[type="date"]{background:var(--bg3);color:var(
 body.light .kpi-online{border-color:rgba(59,130,246,.25)}
 body.light .kpi-online .kpi-l{color:#2563EB}
 /* Funnel card */
-.kpi-funnel{min-width:220px}
+.kpi-funnel{min-width:200px;grid-column:span 1}
 .kpi-funnel-bar{height:8px;border-radius:4px;background:var(--bg3);margin:8px 0 6px;overflow:hidden;position:relative}
 .kpi-funnel-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#3B82F6,#0EA55A);transition:width .5s}
 .kpi-funnel-nums{display:flex;justify-content:space-between;align-items:center;gap:6px}
@@ -492,7 +492,7 @@ body.light .kpi-online .kpi-l{color:#2563EB}
 .kpi-funnel-nums .fn-arrow{color:var(--text3);font-size:14px}
 .kpi-funnel-conv{display:inline-block;background:var(--greenA);color:var(--green);font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;margin-top:4px}
 /* Split card */
-.kpi-split{display:flex;gap:0;min-width:200px}
+.kpi-split{display:flex;gap:0;min-width:200px;grid-column:span 1}
 .kpi-split-left,.kpi-split-right{flex:1;padding:0 8px}
 .kpi-split-left{border-right:1px solid var(--border)}
 .kpi-split-right{padding-left:12px}
@@ -500,7 +500,7 @@ body.light .kpi-online .kpi-l{color:#2563EB}
 .kpi-split .sp-lbl{font-size:9px;color:#BBB;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
 .kpi-split .sp-sub{font-size:10px;color:#999;margin-top:3px}
 /* Churn gauges */
-.kpi-churn{min-width:240px}
+.kpi-churn{min-width:220px;grid-column:span 1}
 .kpi-churn-gauges{display:flex;justify-content:space-around;align-items:flex-end;margin:6px 0 2px}
 .kpi-gauge{text-align:center}
 .kpi-gauge svg{width:64px;height:36px}
@@ -1517,7 +1517,9 @@ function calcKPIs(data,period){
   const uap=data.length>0?data.reduce((a,d)=>a+d.uap,0)/data.length:0;
   const mi=data.reduce((a,d)=>a+(d.mi||0),0);
   const fda=data.reduce((a,d)=>a+(d.fda||0),0);
-  return {nr,ftd,ds,ws,nc:ds-ws,ngr,cg,sg,nd,nw,mi,fda,uap:Math.round(uap),
+  const c_to=data.reduce((a,d)=>a+(d.c_to||0),0);
+  const sb_to=data.reduce((a,d)=>a+(d.sb_to||0),0);
+  return {nr,ftd,ds,ws,nc:ds-ws,ngr,cg,sg,nd,nw,mi,fda,c_to,sb_to,uap:Math.round(uap),
     conv:nr>0?ftd/nr*100:0,days:data.length};
 }
 
@@ -1567,22 +1569,22 @@ function renderOverview(){
     const large=pct>50?1:0;
     return `<svg viewBox="0 0 64 36" fill="none"><path d="M${6} ${32} A${r} ${r} 0 0 1 ${58} ${32}" stroke="rgba(255,255,255,.08)" stroke-width="5" stroke-linecap="round"/><path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" stroke="${color}" stroke-width="5" stroke-linecap="round"/></svg>`;
   }
+  const totalVol=k.c_to+k.sb_to;
   const allKpis=[
-    {type:'online',l:'Online Agora',v:gaRtVal,raw:1,always:true},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',l:'NGR',v:fR(k.ngr),s:pLabel,c:'',raw:k.ngr},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold',raw:k.ds},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="8" y1="5" x2="8" y2="19"/></svg>',l:'Ticket Médio Dep.',v:fR(tkDep),s:'valor médio por depósito',c:'gold',raw:tkDep},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`${fN(k.nw||0)} transações`,c:'red',raw:k.ws-k.mi},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>',l:'Ticket Médio Saq.',v:fR(tkSaq),s:'valor médio por saque',c:'red',raw:tkSaq},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red',raw:k.ds},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/></svg>',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red',raw:k.nc},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>',l:'Mov. Interna',v:fR(k.mi),s:'Saques cripto → Wallet',c:k.mi>0?'purple':'',raw:k.mi},
-    {type:'funnel',l:'Cadastros → FTD',nr:k.nr,ftd:k.ftd,conv:funnelPct,raw:k.nr,always:true},
-    {type:'split',l:'FTD + Ticket',fda:k.fda,ftd:k.ftd,tk:tkFtd,raw:k.fda},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',l:'UAP Médio/Dia',v:fN(k.uap),s:`${k.days} dias`,c:'purple',raw:k.uap},
-    {type:'churn',l:'Churn',r7:CHURN.r7,c7:CHURN.c7,r30:CHURN.r30,c30:CHURN.c30,r90:CHURN.r90,c90:CHURN.c90,total:CHURN.total,gaugeArc:gaugeArc,raw:CHURN.r7,always:true},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>',l:'Casino GGR',v:fR(k.cg),s:'Gross Gaming Revenue',c:'gold',raw:k.cg},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>',l:'Sportsbook GGR',v:fR(k.sg),s:'Esportes',c:'blue',raw:k.sg},
+    /* 1 */ {type:'online',l:'Online Agora',v:gaRtVal,raw:1,always:true},
+    /* 2 */ {type:'funnel',l:'Cadastros → FTD',nr:k.nr,ftd:k.ftd,conv:funnelPct,raw:k.nr,always:true},
+    /* 3 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold',raw:k.ds},
+    /* 4 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="8" y1="5" x2="8" y2="19"/></svg>',l:'Ticket Médio Dep.',v:fR(tkDep),s:'valor médio por depósito',c:'gold',raw:tkDep},
+    /* 5 */ {type:'split',l:'FTD + Ticket',fda:k.fda,ftd:k.ftd,tk:tkFtd,raw:k.fda},
+    /* 6 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`${fN(k.nw||0)} transações`,c:'red',raw:k.ws-k.mi},
+    /* 7 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>',l:'Ticket Médio Saq.',v:fR(tkSaq),s:'valor médio por saque',c:'red',raw:tkSaq},
+    /* 8 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red',raw:k.ds},
+    /* 9 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',l:'NGR',v:fR(k.ngr),s:pLabel,c:'',raw:k.ngr},
+    /* 10 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/></svg>',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red',raw:k.nc},
+    /* 11 */ {type:'churn',l:'Churn',r7:CHURN.r7,c7:CHURN.c7,r30:CHURN.r30,c30:CHURN.c30,r90:CHURN.r90,c90:CHURN.c90,total:CHURN.total,gaugeArc:gaugeArc,raw:CHURN.r7,always:true},
+    /* 12 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>',l:'Volume (Wagering)',v:fR(totalVol),s:`Casino ${fR(k.c_to)} · SB ${fR(k.sb_to)}`,c:'purple',raw:totalVol},
+    /* 13 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>',l:'Sportsbook GGR',v:fR(k.sg),s:'Esportes',c:'blue',raw:k.sg},
+    /* 14 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>',l:'Casino GGR',v:fR(k.cg),s:'Gross Gaming Revenue',c:'gold',raw:k.cg},
   ];
   const visKpis=isToday?allKpis.filter(x=>x.raw!==0||x.always):allKpis;
   document.getElementById('kov').innerHTML=visKpis.map(x=>{
@@ -1688,21 +1690,29 @@ function sdt(col){if(dsc===col)dsd*=-1;else{dsc=col;dsd=-1}
 
 // ═══ PERFORMANCE ═══
 function rPerf(){
-  const allD=filteredData;
-  const fM=aggregateMonthly(allD);
-  const pLabel=getPeriodLabel(currentPeriod);
+  const isToday=(currentPeriod==='today');
+  // Para "Hoje": usar dados de ontem como consolidado (dados detalhados de performance são D+1)
+  const perfData=isToday?D.filter(d=>{const yd=new Date();yd.setDate(yd.getDate()-1);return d.date===localDateStr(yd);}):filteredData;
+  const allD=perfData;
+  const perfLabel=isToday?'Ontem (consolidado)':getPeriodLabel(currentPeriod);
+  const fM=aggregateMonthly(isToday?D.filter(d=>d.date<=localDateStr(new Date())):filteredData);
+  const pLabel=perfLabel;
   const tcg=allD.reduce((a,d)=>a+d.cg,0),tsg=allD.reduce((a,d)=>a+d.sg,0);
   const tct=allD.reduce((a,d)=>a+d.c_to,0),tst=allD.reduce((a,d)=>a+d.sb_to,0);
   const acu=allD.length>0?allD.reduce((a,d)=>a+d.c_uap,0)/allD.length:0;
   const cmg=tct>0?tcg/tct*100:0;
-  document.getElementById('kp').innerHTML=[
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',l:'Casino GGR Total',v:fR(tcg),s:pLabel,c:''},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v6M16 12h-8"></path></svg>',l:'SB GGR Total',v:fR(tsg),s:'Esportes',c:'gold'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',l:'Casino Turnover',v:fR(tct),s:'Vol. apostado',c:'blue'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',l:'SB Turnover',v:fR(tst),s:'Vol. apostado',c:'cyan'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 5 12 19M5 12h14"></polyline></svg>',l:'Margem Casino',v:fP(cmg),s:'GGR/Turnover',c:cmg>0?'':'red'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',l:'UAP Casino Méd',v:fN(Math.round(acu)),s:'Por dia',c:'purple'},
-  ].map(k=>`<div class="kpi ${k.c}"><div class="kpi-i">${k.i}</div><div class="kpi-l">${k.l}</div><div class="kpi-v">${k.v}</div><div class="kpi-s">${k.s}</div></div>`).join('');
+  const allKpis=[
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',l:'Casino GGR Total',v:fR(tcg),s:pLabel,c:'',raw:tcg},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v6M16 12h-8"></path></svg>',l:'SB GGR Total',v:fR(tsg),s:'Esportes',c:'gold',raw:tsg},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',l:'Casino Turnover',v:fR(tct),s:'Vol. apostado',c:'blue',raw:tct},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',l:'SB Turnover',v:fR(tst),s:'Vol. apostado',c:'cyan',raw:tst},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 5 12 19M5 12h14"></polyline></svg>',l:'Margem Casino',v:fP(cmg),s:'GGR/Turnover',c:cmg>0?'':'red',raw:cmg},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',l:'UAP Casino Méd',v:fN(Math.round(acu)),s:'Por dia',c:'purple',raw:acu},
+  ];
+  const visKpis=isToday?allKpis.filter(x=>x.raw!==0):allKpis;
+  const kpHtml=(isToday?'<div style="grid-column:1/-1;background:rgba(14,165,90,.1);border:1px solid rgba(14,165,90,.3);border-radius:10px;padding:10px 16px;margin-bottom:4px;font-size:12px;color:var(--green)">📊 Performance detalhada — exibindo dados consolidados de <strong>ontem</strong> (dados D+1)</div>':'')+
+    visKpis.map(k=>`<div class="kpi ${k.c}"><div class="kpi-i">${k.i}</div><div class="kpi-l">${k.l}</div><div class="kpi-v">${k.v}</div><div class="kpi-s">${k.s}</div></div>`).join('');
+  document.getElementById('kp').innerHTML=kpHtml;
   const lb=fM.map(m=>m.ml);
   mc('c-gs',{type:'bar',data:{labels:lb,datasets:[
     {label:'Casino GGR',data:fM.map(m=>m.cg),backgroundColor:C.gA,borderColor:C.g,borderWidth:1.5,borderRadius:5},
