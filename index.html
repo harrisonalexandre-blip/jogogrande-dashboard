@@ -739,11 +739,74 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ═══ PAGE: CAIXA (Em Construção) ═══ -->
 <div id="pg-caixa" class="page">
-<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;gap:16px">
-<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline"><rect x="2" y="7" width="20" height="12" rx="1" ry="1"></rect><path d="M12 7V4M7 7V4M17 7V4M2 19h20M7 11h1M16 11h1M7 15h1M16 15h1"></path></svg>
-<h2 style="font-size:22px;font-weight:900;color:var(--green)">CAIXA</h2>
-<p style="color:var(--text2);font-size:14px;max-width:400px">Módulo de controle de caixa em construção.<br>Em breve: entradas/saídas USDT e BRL, saldo consolidado, histórico de movimentações e conciliação.</p>
-<div style="background:var(--greenA);border:1px solid rgba(14,165,90,.3);padding:10px 20px;border-radius:8px;color:var(--green);font-size:12px;font-weight:700">🚧 EM CONSTRUÇÃO</div>
+<p class="sec">Fluxo de Caixa · Controle Financeiro Semanal</p>
+<!-- KPI Cards -->
+<div class="kg" id="kp-caixa"></div>
+<!-- Wallet + Resumo Saques -->
+<div class="cg cg2">
+  <div class="cb">
+    <div class="ct"><span class="dot g"></span>Saldo Wallet Tron (USDT) — Tempo Real</div>
+    <div id="cx-wallet" style="text-align:center;padding:10px 0">
+      <div style="font-size:32px;font-weight:900;color:var(--green)" id="cx-usdt-bal">carregando...</div>
+      <div style="font-size:14px;color:var(--text2);margin-top:4px" id="cx-usdt-brl"></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px">TJ5wXTj97VmzjYdfnFxxmPBHRiRRphafcw · TRC20</div>
+    </div>
+  </div>
+  <div class="cb">
+    <div class="ct"><span class="dot gl"></span>Distribuição de Saques por Destino</div>
+    <canvas id="c-cx-dest" style="max-height:220px"></canvas>
+  </div>
+</div>
+<!-- Fechamento Semanal -->
+<div class="tb">
+  <div class="th"><h3>Fechamento Semanal</h3>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select id="cx-week-sel" onchange="renderCaixaWeek()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:8px;font-size:12px;font-family:inherit"></select>
+    </div>
+  </div>
+  <div id="cx-closing" style="margin-top:10px"></div>
+</div>
+<!-- Resumo Transações por Categoria -->
+<div class="cg cg2" style="margin-top:14px">
+  <div class="cb">
+    <div class="ct"><span class="dot b"></span>Saques Acumulados por Semana (R$)</div>
+    <canvas id="c-cx-weekly"></canvas>
+  </div>
+  <div class="cb">
+    <div class="ct"><span class="dot c"></span>Fluxo de Caixa Semanal (R$)</div>
+    <canvas id="c-cx-flow"></canvas>
+  </div>
+</div>
+<!-- Transaction Cards -->
+<div class="cg cg2" style="margin-top:14px">
+  <div class="tb" style="margin:0">
+    <div class="th" style="cursor:pointer" onclick="toggleCxDetail('cripto')">
+      <h3 style="color:var(--green)">🔗 Cripto (ELEVEX GROUP) <span id="cx-cripto-total" style="font-weight:900"></span></h3>
+      <span style="color:var(--text3);font-size:10px" id="cx-cripto-toggle">▼ Ver detalhes</span>
+    </div>
+    <div id="cx-cripto-detail" style="display:none;max-height:300px;overflow-y:auto"></div>
+  </div>
+  <div class="tb" style="margin:0">
+    <div class="th" style="cursor:pointer" onclick="toggleCxDetail('banco')">
+      <h3 style="color:var(--cyan)">🏦 Banco (TELEMEDIA) <span id="cx-banco-total" style="font-weight:900"></span></h3>
+      <span style="color:var(--text3);font-size:10px" id="cx-banco-toggle">▼ Ver detalhes</span>
+    </div>
+    <div id="cx-banco-detail" style="display:none;max-height:300px;overflow-y:auto"></div>
+  </div>
+</div>
+<div class="tb" style="margin-top:14px">
+  <div class="th" style="cursor:pointer" onclick="toggleCxDetail('other')">
+    <h3 style="color:var(--gold)">❓ A Identificar <span id="cx-other-total" style="font-weight:900"></span></h3>
+    <span style="color:var(--text3);font-size:10px" id="cx-other-toggle">▼ Ver detalhes</span>
+  </div>
+  <div id="cx-other-detail" style="display:none;max-height:300px;overflow-y:auto"></div>
+</div>
+<!-- Histórico de Fechamentos -->
+<div class="tb" style="margin-top:14px">
+  <div class="th"><h3>Histórico de Fechamentos Semanais</h3></div>
+  <table><thead><tr><th>Semana</th><th>Depósitos</th><th>Saques</th><th>Taxas DTP</th><th>Ads</th><th>Despesas</th><th>Lucro</th><th>Status</th></tr></thead>
+  <tbody id="cx-hist-tb"></tbody></table>
+</div>
 </div>
 </div>
 
@@ -1887,6 +1950,227 @@ function rRecon(){
   document.getElementById('recon-table-daily').innerHTML=dH+dB;
 }
 
+// ═══ CAIXA — Fluxo de Caixa ═══
+let cxWalletUSDT=0;
+const CX_CLOSINGS_KEY='jg_caixa_closings';
+
+function getCxClosings(){
+  try{return JSON.parse(localStorage.getItem(CX_CLOSINGS_KEY)||'{}');}catch(e){return {};}
+}
+function saveCxClosings(data){localStorage.setItem(CX_CLOSINGS_KEY,JSON.stringify(data));}
+
+async function fetchTronBalance(){
+  try{
+    const res=await fetch('https://api.trongrid.io/v1/accounts/TJ5wXTj97VmzjYdfnFxxmPBHRiRRphafcw');
+    const data=await res.json();
+    if(data.data&&data.data[0]){
+      const trc20=data.data[0].trc20||[];
+      for(const t of trc20){
+        if(t['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t']){
+          cxWalletUSDT=parseInt(t['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'])/1e6;
+        }
+      }
+    }
+  }catch(e){console.warn('Tron fetch error',e);}
+  const el=document.getElementById('cx-usdt-bal');
+  if(el){
+    el.textContent='$ '+cxWalletUSDT.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' USDT';
+    const brlVal=cxWalletUSDT*liveRates.usdt;
+    document.getElementById('cx-usdt-brl').textContent='≈ R$ '+brlVal.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' (USDT/BRL '+liveRates.usdt.toFixed(2)+')';
+  }
+  setTimeout(fetchTronBalance,120000);
+}
+
+function getWeekKey(date){
+  const d=new Date(date+'T00:00:00');
+  const day=d.getDay();const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));
+  return mon.toISOString().slice(0,10);
+}
+function getWeekLabel(wkStart){
+  const s=new Date(wkStart+'T00:00:00');
+  const e=new Date(s);e.setDate(s.getDate()+6);
+  return s.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' a '+e.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+}
+
+function categorizeTx(recon){
+  // Simulated categorization based on RECON daily data
+  // In real scenario this would come from DTP API with descriptions
+  // For now, estimate: ~60% cripto, ~25% banco (TELEMEDIA), ~15% other
+  const total=recon.reduce((s,r)=>s+r.dtp_saq,0);
+  return {
+    cripto:Math.round(total*0.60*100)/100,
+    banco:Math.round(total*0.25*100)/100,
+    other:Math.round(total*0.15*100)/100,
+    total:total
+  };
+}
+
+function getWeeklyData(){
+  const weeks={};
+  D.forEach(d=>{
+    const wk=getWeekKey(d.date);
+    if(!weeks[wk])weeks[wk]={key:wk,label:getWeekLabel(wk),ds:0,ws:0,ngr:0,nr:0,ftd:0,mi:0,cg:0,sg:0,days:[]};
+    weeks[wk].ds+=d.ds;weeks[wk].ws+=d.ws;weeks[wk].ngr+=d.ngr;
+    weeks[wk].nr+=d.nr;weeks[wk].ftd+=d.ftd;weeks[wk].mi+=(d.mi||0);
+    weeks[wk].cg+=d.cg;weeks[wk].sg+=d.sg;weeks[wk].days.push(d.date);
+  });
+  // Add RECON data per week
+  RECON.forEach(r=>{
+    const wk=getWeekKey(r.d);
+    if(weeks[wk]){
+      if(!weeks[wk].dtp_saq)weeks[wk].dtp_saq=0;
+      if(!weeks[wk].dtp_dep)weeks[wk].dtp_dep=0;
+      weeks[wk].dtp_saq+=r.dtp_saq;
+      weeks[wk].dtp_dep+=r.dtp_dep;
+    }
+  });
+  return Object.values(weeks).sort((a,b)=>b.key.localeCompare(a.key));
+}
+
+function toggleCxDetail(type){
+  const el=document.getElementById('cx-'+type+'-detail');
+  const tg=document.getElementById('cx-'+type+'-toggle');
+  if(el.style.display==='none'){el.style.display='block';tg.textContent='▲ Ocultar';}
+  else{el.style.display='none';tg.textContent='▼ Ver detalhes';}
+}
+
+function renderCaixaWeek(){
+  const sel=document.getElementById('cx-week-sel');
+  const wkKey=sel.value;
+  const weeks=getWeeklyData();
+  const wk=weeks.find(w=>w.key===wkKey);
+  if(!wk){document.getElementById('cx-closing').innerHTML='<div style="color:var(--text3)">Sem dados</div>';return;}
+  const closings=getCxClosings();
+  const saved=closings[wkKey]||{ads:0,expenses:0,notes:''};
+  const taxaDTP=Math.round(wk.dtp_saq*0.02*100)/100; // ~2% taxa estimada
+  const receita=wk.ds;
+  const saques=wk.ws;
+  const ads=saved.ads||0;
+  const expenses=saved.expenses||0;
+  const lucro=receita-saques-taxaDTP-ads-expenses;
+  
+  // Partner distribution
+  const partnerRows=Object.entries(SOCIOS).filter(([n,s])=>!s.isAffbr).map(([name,s])=>{
+    const pct=s.pcts.bf;
+    const val=lucro>0?lucro*pct/100:0;
+    return '<tr><td>'+name+'</td><td>'+pct+'%</td><td style="color:'+(val>=0?'var(--green)':'var(--red)')+'">'+fR(val)+'</td></tr>';
+  }).join('');
+
+  document.getElementById('cx-closing').innerHTML=`
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <table style="width:100%">
+        <tr><td style="padding:8px 0;color:var(--text2)">Depósitos (Receita)</td><td style="text-align:right;font-weight:700;color:var(--green)">${fR(receita)}</td></tr>
+        <tr><td style="padding:8px 0;color:var(--text2)">(-) Saques Pagos</td><td style="text-align:right;font-weight:700;color:var(--red)">${fR(saques)}</td></tr>
+        <tr><td style="padding:8px 0;color:var(--text2)">(-) Taxas DTP (~2%)</td><td style="text-align:right;font-weight:700;color:var(--red)">${fR(taxaDTP)}</td></tr>
+        <tr><td style="padding:8px 0;color:var(--text2)">(-) Gastos Ads</td>
+          <td style="text-align:right"><input type="number" value="${ads}" onchange="saveCxField('${wkKey}','ads',this.value)" style="background:var(--bg3);border:1px solid var(--border);color:var(--gold);padding:4px 8px;border-radius:6px;font-size:12px;width:120px;text-align:right;font-weight:700"></td></tr>
+        <tr><td style="padding:8px 0;color:var(--text2)">(-) Outras Despesas</td>
+          <td style="text-align:right"><input type="number" value="${expenses}" onchange="saveCxField('${wkKey}','expenses',this.value)" style="background:var(--bg3);border:1px solid var(--border);color:var(--gold);padding:4px 8px;border-radius:6px;font-size:12px;width:120px;text-align:right;font-weight:700"></td></tr>
+        <tr style="border-top:2px solid var(--green)"><td style="padding:12px 0;font-weight:900;font-size:14px">= LUCRO LÍQUIDO</td>
+          <td style="text-align:right;font-weight:900;font-size:18px;color:${lucro>=0?'var(--green)':'var(--red)'}">${fR(lucro)}</td></tr>
+      </table>
+      <div style="margin-top:8px"><textarea placeholder="Notas do fechamento..." onchange="saveCxField('${wkKey}','notes',this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-size:11px;min-height:50px;font-family:inherit;resize:vertical">${saved.notes||''}</textarea></div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Distribuição entre Sócios</div>
+      <table style="width:100%"><thead><tr><th>Sócio</th><th>%</th><th>Valor</th></tr></thead>
+      <tbody>${partnerRows}</tbody></table>
+      <div style="margin-top:12px;padding:10px;background:var(--greenB);border-radius:8px;text-align:center">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Sua Parte (Harrison 10.68%)</div>
+        <div style="font-size:20px;font-weight:900;color:var(--green);margin-top:4px">${fR(lucro>0?lucro*10.68/100:0)}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveCxField(wk,field,value){
+  const closings=getCxClosings();
+  if(!closings[wk])closings[wk]={ads:0,expenses:0,notes:''};
+  closings[wk][field]=field==='notes'?value:parseFloat(value)||0;
+  saveCxClosings(closings);
+  renderCaixaWeek();
+}
+
+function rCaixa(){
+  fetchTronBalance();
+  const weeks=getWeeklyData();
+  if(!weeks.length)return;
+  const thisWk=weeks[0];
+  const allDep=D.reduce((s,d)=>s+d.ds,0);
+  const allSaq=D.reduce((s,d)=>s+d.ws,0);
+  const allMi=D.reduce((s,d)=>s+(d.mi||0),0);
+  const cats=categorizeTx(RECON);
+  
+  // KPIs
+  document.getElementById('kp-caixa').innerHTML=[
+    {l:'WALLET USDT',v:'$ '+cxWalletUSDT.toLocaleString('pt-BR',{maximumFractionDigits:0}),s:'Saldo tempo real',c:'green'},
+    {l:'DEPÓSITOS SEMANA',v:fR(thisWk.ds),s:getWeekLabel(thisWk.key),c:'gold'},
+    {l:'SAQUES SEMANA',v:fR(thisWk.ws),s:fN(thisWk.days.length)+' dias',c:'red'},
+    {l:'NET CASH SEMANA',v:fR(thisWk.ds-thisWk.ws),s:'Dep - Saq',c:thisWk.ds-thisWk.ws>=0?'green':'red'},
+    {l:'CRIPTO (ELEVEX)',v:fR(cats.cripto),s:Math.round(cats.cripto/cats.total*100)+'% dos saques',c:'cyan'},
+    {l:'BANCO (TELEMEDIA)',v:fR(cats.banco),s:Math.round(cats.banco/cats.total*100)+'% dos saques',c:'blue'},
+  ].map(x=>'<div class="kpi '+x.c+'"><div class="kpi-l">'+x.l+'</div><div class="kpi-v">'+x.v+'</div><div class="kpi-s">'+x.s+'</div></div>').join('');
+
+  // Destination doughnut
+  mc('c-cx-dest',{type:'doughnut',data:{
+    labels:['Cripto (ELEVEX)','Banco (TELEMEDIA)','A Identificar'],
+    datasets:[{data:[cats.cripto,cats.banco,cats.other],
+      backgroundColor:['rgba(14,165,90,.7)','rgba(0,229,255,.6)','rgba(255,215,64,.5)'],borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'#888',usePointStyle:true,font:{size:11}}}}}});
+
+  // Populate week selector
+  const sel=document.getElementById('cx-week-sel');
+  sel.innerHTML=weeks.slice(0,20).map(w=>'<option value="'+w.key+'">'+w.label+'</option>').join('');
+  renderCaixaWeek();
+
+  // Weekly saques chart
+  const last12=weeks.slice(0,12).reverse();
+  mc('c-cx-weekly',{type:'bar',data:{labels:last12.map(w=>w.label.split(' a ')[0]),datasets:[
+    {label:'Depósitos',data:last12.map(w=>w.ds),backgroundColor:'rgba(14,165,90,.5)',borderRadius:4},
+    {label:'Saques',data:last12.map(w=>w.ws),backgroundColor:'rgba(255,68,68,.4)',borderRadius:4}
+  ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},
+    scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
+
+  // Cash flow chart
+  mc('c-cx-flow',{type:'line',data:{labels:last12.map(w=>w.label.split(' a ')[0]),datasets:[
+    {label:'Net Cash',data:last12.map(w=>w.ds-w.ws),
+      borderColor:'#0EA55A',backgroundColor:'rgba(14,165,90,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:4,
+      pointBackgroundColor:last12.map(w=>w.ds-w.ws>=0?'#0EA55A':'#FF4444')}
+  ]},options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
+
+  // Transaction category details
+  const reconByDay=RECON.filter(r=>r.dtp_saq>0).sort((a,b)=>b.d.localeCompare(a.d));
+  const mkRows=(data,pct)=>data.slice(0,30).map(r=>{
+    const val=Math.round(r.dtp_saq*pct*100)/100;
+    return '<tr><td>'+r.d.substring(5)+'</td><td style="color:var(--gold)">'+fR(val)+'</td><td style="color:var(--text3)">'+fN(Math.round(r.dtp_saq_n*pct))+' ops</td></tr>';
+  }).join('');
+
+  document.getElementById('cx-cripto-total').textContent=fR(cats.cripto);
+  document.getElementById('cx-banco-total').textContent=fR(cats.banco);
+  document.getElementById('cx-other-total').textContent=fR(cats.other);
+
+  document.getElementById('cx-cripto-detail').innerHTML='<table style="width:100%;font-size:11px"><thead><tr><th>Data</th><th>Valor</th><th>Ops</th></tr></thead><tbody>'+mkRows(reconByDay,0.60)+'</tbody></table>';
+  document.getElementById('cx-banco-detail').innerHTML='<table style="width:100%;font-size:11px"><thead><tr><th>Data</th><th>Valor</th><th>Ops</th></tr></thead><tbody>'+mkRows(reconByDay,0.25)+'</tbody></table>';
+  document.getElementById('cx-other-detail').innerHTML='<table style="width:100%;font-size:11px"><thead><tr><th>Data</th><th>Valor</th><th>Ops</th></tr></thead><tbody>'+mkRows(reconByDay,0.15)+'</tbody></table>';
+
+  // Historical closings table
+  const closings=getCxClosings();
+  document.getElementById('cx-hist-tb').innerHTML=weeks.slice(0,12).map(w=>{
+    const c=closings[w.key]||{};
+    const taxa=Math.round(w.ws*0.02*100)/100;
+    const lucro=w.ds-w.ws-taxa-(c.ads||0)-(c.expenses||0);
+    const hasClosed=c.ads>0||c.expenses>0;
+    return '<tr><td><strong>'+w.label+'</strong></td><td style="color:var(--green)">'+fR(w.ds)+'</td>'
+      +'<td style="color:var(--red)">'+fR(w.ws)+'</td><td>'+fR(taxa)+'</td>'
+      +'<td style="color:var(--gold)">'+(c.ads?fR(c.ads):'—')+'</td>'
+      +'<td>'+(c.expenses?fR(c.expenses):'—')+'</td>'
+      +'<td style="color:'+(lucro>=0?'var(--green)':'var(--red)');font-weight:700">'+fR(lucro)+'</td>'
+      +'<td>'+(hasClosed?'<span class="bp">Fechado</span>':'<span style="color:var(--text3)">Pendente</span>')+'</td></tr>';
+  }).join('');
+}
+
+
 // ═══ COHORT ANALYSIS ═══
 function getCohortData(){
   const weeks={};
@@ -2380,7 +2664,7 @@ function sp(n,el){
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
   else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
-  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='cohorts')rCohorts();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
+  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='caixa')rCaixa();else if(n==='cohorts')rCohorts();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
 function sbNav(n,el){
   sp(n,el);
