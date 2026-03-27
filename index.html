@@ -2428,24 +2428,28 @@ function getCohortData(){
 function buildNetPLMatrix(cohorts){
   if(cohorts.length<1)return{rows:[],maxWeeks:0};
   const totalFTD=cohorts.reduce((s,x)=>s+x.ftd,0)||1;
+  const totalComm=typeof AFF!=='undefined'&&AFF.affs?AFF.affs.reduce((s,a)=>s+a.cm,0):0;
   const maxWeeks=cohorts.length;
   const rows=[];
   for(let i=0;i<cohorts.length;i++){
     const c=cohorts[i];
     const share=c.ftd/totalFTD;
-    const commission=typeof AFF!=='undefined'&&AFF.affs?AFF.affs.reduce((s,a)=>s+a.cm,0)*share:0;
-    const weeks=[];let totalNPL=0;let paybackWeek=null;let cumForPayback=0;
+    const commission=Math.round(totalComm*share);
+    // Use the cohort's OWN Net PL (ds-ws) and distribute across weeks with retention decay
+    // Week 0 gets the most (fresh FTDs), each subsequent week decays ~38%
+    const cohortNetPL=c.ds-c.ws; // Real Net PL for this cohort
+    const availWeeks=maxWeeks-i; // How many weeks this cohort has been active
+    const wts=[];let wSum=0;
+    for(let w=0;w<availWeeks;w++){const wt=Math.pow(0.62,w);wts.push(wt);wSum+=wt;}
+    const weeks=[];let totalNPL=0;let paybackWeek=null;let cum=0;
     for(let w=0;w<maxWeeks;w++){
-      const j=i+w;
-      if(j>=cohorts.length){weeks.push(null);continue;}
-      const wk=cohorts[j];
-      const npl=Math.round(wk.ngr*share);
-      weeks.push(npl);totalNPL+=npl;
-      cumForPayback+=npl;
-      if(paybackWeek===null&&commission>0&&cumForPayback>=commission)paybackWeek=w;
+      if(w>=availWeeks){weeks.push(null);continue;}
+      const npl=wSum>0?Math.round(cohortNetPL*(wts[w]/wSum)):0;
+      weeks.push(npl);totalNPL+=npl;cum+=npl;
+      if(paybackWeek===null&&commission>0&&cum>=commission)paybackWeek=w;
     }
     const roi=commission>0?Math.round(totalNPL/commission*100)/100:0;
-    rows.push({ml:c.ml,ftd:c.ftd,commission:Math.round(commission),roi,totalNPL,paybackWeek,weeks});
+    rows.push({ml:c.ml,ftd:c.ftd,commission,roi,totalNPL,paybackWeek,weeks});
   }
   return{rows,maxWeeks};
 }
@@ -2825,17 +2829,23 @@ function rBtag(){
   const wkArr=wkKeys.map(k=>weeks[k]);
   const totalFTDAll=wkArr.reduce((s,w)=>s+w.ftd,0)||1;
 
-  // For each BTAG with commission, simulate weekly Net PL using their FTD share
+  // For each BTAG with commission, distribute REAL Net PL across weeks using retention decay
+  // Logic: Week 0 gets most value (FTDs are fresh), each subsequent week decays ~38%
+  // Total across all weeks = BTAG's actual Net P&L from Smartico (not simulated)
   const btagWithComm=data.filter(a=>a.cm>100&&a.ftd>0).sort((a,b)=>b.ftd-a.ftd);
   const btagPayback=btagWithComm.map(a=>{
-    const share=a.ftd/totalFTDAll;
+    const nW=wkArr.length;
+    // Decay weights: W0=1.0, W1=0.62, W2=0.38, W3=0.24... sums to ~2.6 for 13 weeks
+    const wts=[];let wSum=0;
+    for(let w=0;w<nW;w++){const wt=Math.pow(0.62,w);wts.push(wt);wSum+=wt;}
+    // Distribute BTAG's real Net PL proportionally
     const weekVals=[];let cum=0;let pbWeek=null;
-    for(let w=0;w<wkArr.length;w++){
-      const npl=Math.round(wkArr[w].ngr*share);
+    for(let w=0;w<nW;w++){
+      const npl=Math.round(a.np*(wts[w]/wSum));
       weekVals.push(npl);cum+=npl;
-      if(pbWeek===null&&cum>=a.cm)pbWeek=w;
+      if(pbWeek===null&&a.cm>0&&cum>=a.cm)pbWeek=w;
     }
-    return{n:a.n,ftd:a.ftd,cm:a.cm,np:a.np,roi:a.roi,totalNPL:cum,paybackWeek:pbWeek,weeks:weekVals};
+    return{n:a.n,ftd:a.ftd,cm:a.cm,np:a.np,roi:a.roi,totalNPL:a.np,paybackWeek:pbWeek,weeks:weekVals};
   });
 
   // Chart: Payback por BTAG (top 15)
