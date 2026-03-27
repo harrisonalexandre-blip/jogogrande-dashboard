@@ -488,10 +488,10 @@ body.light .kpi-online .kpi-l{color:#2563EB}
 .kpi-funnel-fill{display:none}
 .kpi-funnel-nums{display:flex;justify-content:center;align-items:center;gap:16px}
 .kpi-funnel-nums .fn-item{text-align:center}
-.kpi-funnel-nums .fn-val{font-size:26px;font-weight:900;line-height:1.1}
-.kpi-funnel-nums .fn-lbl{font-size:10px;color:#BBB;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-top:2px}
-.kpi-funnel-nums .fn-arrow{color:var(--text3);font-size:18px}
-.kpi-funnel-conv{display:inline-block;background:var(--greenA);color:var(--green);font-size:11px;font-weight:800;padding:3px 10px;border-radius:10px;margin-top:6px}
+.kpi-funnel-nums .fn-val{font-size:32px;font-weight:900;line-height:1.1}
+.kpi-funnel-nums .fn-lbl{font-size:10px;color:#BBB;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-top:3px}
+.kpi-funnel-nums .fn-arrow{color:var(--text3);font-size:20px}
+.kpi-funnel-conv{display:inline-block;background:var(--greenA);color:var(--green);font-size:11px;font-weight:800;padding:3px 10px;border-radius:10px;margin-top:12px}
 /* Split card */
 .kpi-split{display:flex;gap:0;min-width:200px;grid-column:span 1;justify-content:center}
 .kpi-split-left,.kpi-split-right{flex:1;padding:0 8px;text-align:center}
@@ -764,7 +764,7 @@ body.light .kpi-online .kpi-l{color:#2563EB}
 </div>
 <div class="cg cg2">
   <div class="cb"><div class="ct"><span class="dot b"></span>Margem de Lucro % (Lucro/GGR)</div><canvas id="c-marg"></canvas></div>
-  <div class="cb"><div class="ct"><span class="dot r"></span>Retiradas / Saques USDT por Período</div><canvas id="c-saq"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot r"></span>Retiradas Crypto por Período (R$)</div><canvas id="c-saq"></canvas></div>
 </div>
 </div>
 
@@ -1561,18 +1561,15 @@ function renderOverview(){
   const funnelPct=k.nr>0?k.ftd/k.nr*100:0;
   // FTD ticket
   const tkFtd=k.ftd>0?k.fda/k.ftd:0;
-  // Churn gauge SVG helper — semicircular arc
+  // Churn gauge SVG — uses stroke-dasharray on a semicircle path
   function gaugeArc(pct,color){
-    const r=30,cx=40,cy=38,sw=6;
-    const p=Math.min(Math.max(pct,0),100)/100;
-    // Background arc (full semicircle, left to right)
-    const bgD=`M${cx-r} ${cy} A${r} ${r} 0 0 1 ${cx+r} ${cy}`;
-    // Foreground arc
-    const angle=Math.PI*(1-p);
-    const fx=cx+r*Math.cos(angle), fy=cy-r*Math.sin(angle);
-    const large=p>0.5?1:0;
-    const fgD=`M${cx-r} ${cy} A${r} ${r} 0 ${large} 1 ${fx.toFixed(1)} ${fy.toFixed(1)}`;
-    return `<svg viewBox="0 0 80 44" fill="none"><path d="${bgD}" stroke="rgba(255,255,255,.1)" stroke-width="${sw}" stroke-linecap="round" fill="none"/><path d="${fgD}" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" fill="none"/></svg>`;
+    // Semicircle: center(50,44), radius 34, from left(16,44) to right(84,44)
+    // Total arc length of semicircle = PI * r = ~106.8
+    const r=34, arcLen=Math.PI*r;
+    const filled=arcLen*(Math.min(Math.max(pct,0),100)/100);
+    const bg=`<path d="M 16 44 A 34 34 0 0 1 84 44" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="7" stroke-linecap="round"/>`;
+    const fg=filled>0?`<path d="M 16 44 A 34 34 0 0 1 84 44" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${filled.toFixed(1)} ${(arcLen-filled).toFixed(1)}"/>`:'';
+    return `<svg viewBox="0 0 100 50" fill="none">${bg}${fg}</svg>`;
   }
   const totalVol=k.c_to+k.sb_to;
   const allKpis=[
@@ -1827,11 +1824,15 @@ function rFin(){
     data:od.map(o=>o.ggr>0?o.lucro/o.ggr*100:0),borderColor:C.gl,backgroundColor:C.glA,borderWidth:2.5,fill:true,tension:.3,pointRadius:6}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v.toFixed(1)+'%'}}}}});
   const fMonths=new Set(filteredData.map(d=>d.month));
-  const fS=S.filter(s=>fMonths.has(s.dt.substring(0,7)));
-  const saqM={};fS.forEach(s=>{const m=s.dt.substring(0,7);saqM[m]=(saqM[m]||0)+s.usdt});
-  const sm=Object.keys(saqM).sort();
-  mc('c-saq',{type:'bar',data:{labels:sm,datasets:[{label:'Saques USDT',data:sm.map(k=>saqM[k]),
-    backgroundColor:C.rA,borderColor:C.r,borderWidth:2,borderRadius:5}]},options:CD});
+  // Retiradas Crypto (CRYPTO[] tem dados reais; S[] estava zerado)
+  const fCr=CRYPTO.filter(c=>fMonths.has(c.d.substring(0,7)));
+  const crM={};fCr.forEach(c=>{const m=c.d.substring(0,7);if(!crM[m])crM[m]={bruto:0,taxa:0,liq:0};crM[m].bruto+=c.v;crM[m].taxa+=c.t;crM[m].liq+=c.v-c.t});
+  const sm=Object.keys(crM).sort();
+  mc('c-saq',{type:'bar',data:{labels:sm,datasets:[
+    {label:'Bruto R$',data:sm.map(k=>crM[k].bruto),backgroundColor:C.rA,borderColor:C.r,borderWidth:2,borderRadius:5},
+    {label:'Taxas R$',data:sm.map(k=>crM[k].taxa),backgroundColor:'rgba(255,215,64,.3)',borderColor:C.gl,borderWidth:2,borderRadius:5},
+    {label:'Líquido R$',data:sm.map(k=>crM[k].liq),type:'line',borderColor:C.g,backgroundColor:C.gA,borderWidth:2.5,fill:false,tension:.3,pointRadius:5}]},
+    options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v)}}}}});
   // Movimentações Internas (Crypto)
   const fCrypto=CRYPTO.filter(c=>{const cm=c.d.substring(0,7);return fMonths.has(cm)});
   const miTb=document.getElementById('mi-tbody');
