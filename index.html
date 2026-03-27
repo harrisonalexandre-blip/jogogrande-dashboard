@@ -502,7 +502,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ═══ PAGE: CRM ═══ -->
 <div id="pg-crm" class="page">
-<p class="sec">CRM · Inteligência de Jogadores</p>
+<p class="sec">CRM · Inteligência de Jogadores <span id="crm-period-label" style="font-size:11px;color:var(--gold);margin-left:8px"></span></p>
 <div id="crm-kpis" class="crm-stats"></div>
 
 <!-- ROW 1: Funil de Depositos + Segmentação -->
@@ -1721,19 +1721,34 @@ function renderCrmGameRankings(){
   document.getElementById('crm-gt-worst').innerHTML=mkTable(rk.worst||[]);
 }
 
+var _cliFiltered=null;
 function rCRM(){
   const rate=liveRates.eur||6.14;
-  // Stats from CLI
-  var vips=CLI.filter(c=>c.tr==='VIP');
-  var highs=CLI.filter(c=>c.tr==='High');
-  var hots=CLI.filter(c=>c.st2==='hot'||c.st2==='active');
-  var warms=CLI.filter(c=>c.st2==='warm');
-  var colds=CLI.filter(c=>c.st2==='cold'||c.st2==='lost');
-  var totalNGR=CLI.reduce((a,c)=>a+c.ngr,0);
-  var oneDep=CLI.filter(c=>c.dc===1);
-  var twoDep=CLI.filter(c=>c.dc===2);
-  var threePlus=CLI.filter(c=>c.dc>=3&&c.dc<=5);
-  var sixPlus=CLI.filter(c=>c.dc>=6);
+  // --- FILTRO DE PERÍODO para CLI ---
+  var cliData=CLI;
+  if(filteredData&&filteredData.length&&currentPeriod!=='lifetime'){
+    var dates=filteredData.map(function(d){return d.date}).sort();
+    var pStart=dates[0];
+    var pEnd=dates[dates.length-1];
+    cliData=CLI.filter(function(c){return c.ld>=pStart&&c.fd<=pEnd});
+    if(cliData.length<5)cliData=CLI.filter(function(c){return c.ld>=pStart});
+    if(cliData.length===0)cliData=CLI;
+  }
+  var cliLabel=currentPeriod==='lifetime'?'Top '+CLI.length+' clientes':'Top '+CLI.length+' · '+cliData.length+' ativos no período';
+  _cliFiltered=cliData;
+  var pel=document.getElementById("crm-period-label");
+  if(pel)pel.textContent=currentPeriod==="lifetime"?"(Lifetime · todos os dados)":"("+getPeriodLabel(currentPeriod)+" · "+cliData.length+"/"+CLI.length+" clientes ativos)";
+  // Stats from filtered CLI
+  var vips=cliData.filter(c=>c.tr==='VIP');
+  var highs=cliData.filter(c=>c.tr==='High');
+  var hots=cliData.filter(c=>c.st2==='hot'||c.st2==='active');
+  var warms=cliData.filter(c=>c.st2==='warm');
+  var colds=cliData.filter(c=>c.st2==='cold'||c.st2==='lost');
+  var totalNGR=cliData.reduce((a,c)=>a+c.ngr,0);
+  var oneDep=cliData.filter(c=>c.dc===1);
+  var twoDep=cliData.filter(c=>c.dc===2);
+  var threePlus=cliData.filter(c=>c.dc>=3&&c.dc<=5);
+  var sixPlus=cliData.filter(c=>c.dc>=6);
 
   // Funnel from CRM_X
   var fn=CRM_X.funnel||[];
@@ -1747,8 +1762,8 @@ function rCRM(){
     {v:fN(fn2?fn2.p:0),l:'2º Depósito',s:convRate+'% redeposit rate',cl:'var(--gold)'},
     {v:fN(oneDep.length),l:'Apenas 1 Dep (CLI)',s:fP(oneDep.length/CLI.length*100)+' da base monitorada',cl:'var(--red)'},
     {v:fN(hots.length),l:'Ativos (≤7d)',s:fP(hots.length/CLI.length*100)+' engajados',cl:'var(--green)'},
-    {v:fR(totalNGR),l:'NGR Total (Top '+CLI.length+')',s:'Ticket médio: '+fR(CLI.reduce((a,c)=>a+c.dt,0)/CLI.reduce((a,c)=>a+c.dc,0)),cl:'var(--cyan)'},
-    {v:fN(vips.length)+' VIP · '+fN(highs.length)+' High',l:'Tiers Premium',s:fR(vips.reduce((a,c)=>a+c.dt,0))+' em dep VIP',cl:'var(--purple)'},
+    {v:fR(totalNGR),l:'NGR Total ('+cliLabel+')',s:'Ticket médio: '+fR(cliData.reduce((a,c)=>a+c.dt,0)/cliData.reduce((a,c)=>a+c.dc,0)),cl:'var(--cyan)'},
+    {v:fN(vips.length)+' VIP · '+fN(highs.length)+' High',l:'Tiers Premium · '+cliData.length+' clientes',s:fR(vips.reduce((a,c)=>a+c.dt,0))+' em dep VIP',cl:'var(--purple)'},
   ].map(k=>'<div class="crm-stat"><div class="lbl">'+k.l+'</div><div class="val" style="color:'+k.cl+'">'+k.v+'</div><div class="sub">'+k.s+'</div></div>').join('');
 
   // 1. Deposit Funnel Bar Chart
@@ -1776,7 +1791,7 @@ function rCRM(){
   ]},options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
 
   // 4. Redeposit Opportunities (1 deposit, recent, sorted by deposit amount)
-  var redepOpps=CLI.filter(c=>c.dc===1&&c.di<=30).sort((a,b)=>b.dt-a.dt);
+  var redepOpps=cliData.filter(c=>c.dc===1&&c.di<=30).sort((a,b)=>b.dt-a.dt);
   document.getElementById('crm-redep-count').textContent=redepOpps.length;
   document.getElementById('crm-redep-list').innerHTML=redepOpps.length?
     '<table style="width:100%"><thead><tr><th style="text-align:left">Jogador</th><th>Depósito</th><th>Inativo</th><th>Status</th></tr></thead><tbody>'
@@ -1800,11 +1815,11 @@ function rCRM(){
   ]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}},y:{...CD.scales.x,ticks:{font:{size:10}}}}}});
 
   // 7. Status distribution doughnut
-  var hotC=CLI.filter(c=>c.st2==='hot').length;
-  var actC=CLI.filter(c=>c.st2==='active').length;
-  var warmC=CLI.filter(c=>c.st2==='warm').length;
-  var coldC=CLI.filter(c=>c.st2==='cold').length;
-  var lostC=CLI.filter(c=>c.st2==='lost').length;
+  var hotC=cliData.filter(c=>c.st2==='hot').length;
+  var actC=cliData.filter(c=>c.st2==='active').length;
+  var warmC=cliData.filter(c=>c.st2==='warm').length;
+  var coldC=cliData.filter(c=>c.st2==='cold').length;
+  var lostC=cliData.filter(c=>c.st2==='lost').length;
   mc('c-dist',{type:'doughnut',data:{
     labels:['Hot ≤3d ('+hotC+')','Ativo 4-7d ('+actC+')','Morno 8-30d ('+warmC+')','Frio 31-90d ('+coldC+')','Perdido >90d ('+lostC+')'],
     datasets:[{data:[hotC,actC,warmC,coldC,lostC],
@@ -1818,19 +1833,19 @@ function rCRM(){
   ]},options:{...CD,scales:{...CD.scales,x:{...CD.scales.x,stacked:false},y:{...CD.scales.y,stacked:false}}}});
 
   // 9. Top losers / winners
-  var topLosers=CLI.slice().sort((a,b)=>b.ngr-a.ngr).slice(0,10);
+  var topLosers=cliData.slice().sort((a,b)=>b.ngr-a.ngr).slice(0,10);
   mc('c-topwin',{type:'bar',data:{labels:topLosers.map(c=>c.n.length>18?c.n.substring(0,18)+'…':c.n),datasets:[
     {label:'NGR R$',data:topLosers.map(c=>c.ngr),backgroundColor:topLosers.map(c=>c.ngr>=0?C.gA:C.rA),borderColor:topLosers.map(c=>c.ngr>=0?C.g:C.r),borderWidth:2,borderRadius:5}
   ]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v)}},y:{...CD.scales.x,ticks:{font:{size:10}}}}}});
 
-  var topWinners=CLI.slice().sort((a,b)=>a.ngr-b.ngr).slice(0,10);
+  var topWinners=cliData.slice().sort((a,b)=>a.ngr-b.ngr).slice(0,10);
   mc('c-toplose',{type:'bar',data:{labels:topWinners.map(c=>c.n.length>18?c.n.substring(0,18)+'…':c.n),datasets:[
     {label:'NGR R$',data:topWinners.map(c=>c.ngr),backgroundColor:topWinners.map(c=>c.ngr>=0?C.gA:C.rA),borderColor:topWinners.map(c=>c.ngr>=0?C.g:C.r),borderWidth:2,borderRadius:5}
   ]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v)}},y:{...CD.scales.x,ticks:{font:{size:10}}}}}});
 
   // 10. Tiers
   var tierData={VIP:0,High:0,Mid:0,Low:0};
-  CLI.forEach(c=>tierData[c.tr]++);
+  cliData.forEach(c=>tierData[c.tr]++);
   mc('c-tiers',{type:'doughnut',data:{
     labels:['VIP >50k ('+tierData.VIP+')','High 10-50k ('+tierData.High+')','Mid 1-10k ('+tierData.Mid+')','Low <1k ('+tierData.Low+')'],
     datasets:[{data:[tierData.VIP,tierData.High,tierData.Mid,tierData.Low],
@@ -1849,7 +1864,7 @@ function rCRM(){
   var statuses=['hot','active','warm','cold','lost'];
   var stNames={'hot':'Hot','active':'Ativo','warm':'Morno','cold':'Frio','lost':'Perdido'};
   tiers.forEach(t=>{ matrix[t]={}; statuses.forEach(s=>{ matrix[t][s]={count:0,ngr:0,dep:0}; }); });
-  CLI.forEach(c=>{
+  cliData.forEach(c=>{
     if(matrix[c.tr]&&matrix[c.tr][c.st2]){
       matrix[c.tr][c.st2].count++;
       matrix[c.tr][c.st2].ngr+=c.ngr;
@@ -1879,12 +1894,12 @@ function rCRM(){
   // 14. Auto Insights
   var insights=[];
   // Redeposit opportunity
-  var redep1=CLI.filter(c=>c.dc===1&&c.di<=7);
+  var redep1=cliData.filter(c=>c.dc===1&&c.di<=7);
   if(redep1.length>0) insights.push('🔥 <b>'+redep1.length+' jogadores fizeram apenas 1 depósito nos últimos 7 dias</b> — oportunidade imediata de redepósito. Valor total depositado: '+fR(redep1.reduce((a,c)=>a+c.dt,0)));
   // Conversion rate
   if(fn1&&fn2) insights.push('📊 Taxa de redepósito geral: <b style="color:var(--gold)">'+convRate+'%</b> — de '+fN(fn1.p)+' FTDs, apenas '+fN(fn2.p)+' voltaram para o 2º depósito');
   // VIP at risk
-  var vipRisk=CLI.filter(c=>c.tr==='VIP'&&(c.st2==='warm'||c.st2==='cold'));
+  var vipRisk=cliData.filter(c=>c.tr==='VIP'&&(c.st2==='warm'||c.st2==='cold'));
   if(vipRisk.length>0) insights.push('⚠️ <b>'+vipRisk.length+' VIPs em risco</b> (mornos/frios) com '+fR(vipRisk.reduce((a,c)=>a+c.dt,0))+' em depósitos — ação urgente');
   // Live casino losing
   var liveGt=CRM_X.gt.find(g=>g.t==='live');
@@ -1893,10 +1908,10 @@ function rCRM(){
   var bestGt=CRM_X.gt[0];
   if(bestGt) insights.push('🎰 Tipo mais lucrativo: <b>'+bestGt.t.charAt(0).toUpperCase()+bestGt.t.slice(1)+'</b> com GGR '+fR(bestGt.ggr*rate)+' ('+bestGt.gc+' jogos, '+fN(bestGt.uap)+' jogadores)');
   // High deposit single players
-  var bigOneDep=CLI.filter(c=>c.dc===1&&c.dt>=1000).sort((a,b)=>b.dt-a.dt);
+  var bigOneDep=cliData.filter(c=>c.dc===1&&c.dt>=1000).sort((a,b)=>b.dt-a.dt);
   if(bigOneDep.length>0) insights.push('💎 <b>'+bigOneDep.length+' jogadores com depósito >R$1k</b> que nunca voltaram — maior oportunidade: '+bigOneDep[0].n.substring(0,20)+' ('+fR(bigOneDep[0].dt)+')');
   // Winning players
-  var winners=CLI.filter(c=>c.ngr<-1000);
+  var winners=cliData.filter(c=>c.ngr<-1000);
   if(winners.length>0) insights.push('🏆 <b>'+winners.length+' jogadores com ganho >R$1k</b> — total pago: '+fR(Math.abs(winners.reduce((a,c)=>a+c.ngr,0)))+'. Monitorar limites');
 
   document.getElementById('crm-insights').innerHTML=insights.map(i=>'<div style="padding:6px 0;border-bottom:1px solid var(--border)">'+i+'</div>').join('');
@@ -1908,7 +1923,7 @@ function rCRM(){
 function renderCRMList(){
   var list=document.getElementById('cli-list');
   if(!list)return;
-  var data=CLI.slice();
+  var data=(_cliFiltered||CLI).slice();
 
   // Filter by status/tier
   if(crmFilter==='hot')data=data.filter(function(c){return c.st2==='hot'});
