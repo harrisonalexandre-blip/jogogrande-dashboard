@@ -185,6 +185,41 @@ try:
 except Exception as e:
     print(f"   DTP skip: {e}")
 
+# === 6. UPDATE D[] TODAY with Smartico data (NR, FTD, Volume) ===
+# Smartico provides real-time NR/FTD/Volume for today before Phoenix (D+1)
+print("6. D[] today (Smartico → NR, FTD, Volume)...")
+try:
+    sm_today = api({'aggregation_period':'DAY','date_from':TODAY,'date_to':TMR})
+    sm_totals = defaultdict(float)
+    for r in sm_today:
+        for f in FS: sm_totals[f] += r.get(f,0) or 0
+
+    sm_nr = int(sm_totals['registration_count'])
+    sm_ftd = int(sm_totals['ftd_count'])
+    sm_vol = round(sm_totals['volume'], 2)
+
+    # Find today's entry in D[] and update nr, ftd, c_to (volume as proxy)
+    # Only update if Phoenix hasn't already provided data (cg=0 means no Phoenix yet)
+    d_match = re.search(r'\{[^}]*"date":\s*"' + re.escape(TODAY) + r'"[^}]*\}', html)
+    if d_match:
+        d_str = d_match.group()
+        d_obj = json.loads(d_str)
+
+        # Only fill if Phoenix hasn't arrived (cg=0 means no consolidated data yet)
+        if abs(d_obj.get('cg', 0)) < 1:
+            d_obj['nr'] = sm_nr
+            d_obj['ftd'] = sm_ftd
+            d_obj['c_to'] = sm_vol  # Smartico volume as casino turnover proxy
+            new_d = json.dumps(d_obj, separators=(',',': '))
+            html = html.replace(d_str, new_d, 1)
+            print(f"   → D[{TODAY}]: nr={sm_nr}, ftd={sm_ftd}, vol=R${sm_vol:,.2f}")
+        else:
+            print(f"   → D[{TODAY}]: Phoenix data present (cg={d_obj.get('cg',0)}), skipping Smartico fill")
+    else:
+        print(f"   → D[{TODAY}]: entry not found in D[]")
+except Exception as e:
+    print(f"   D[] today skip: {e}")
+
 # === SAVE ===
 AFF['syncAt'] = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -200,4 +235,4 @@ with open('/tmp/jogogrande-dashboard/index.html','w') as f:
 td = AFF['days'][-1] if AFF.get('days') else {}
 print(f"\n✅ QUICK SYNC DONE")
 print(f"   Hoje ({td.get('d','?')}): rg={td.get('rg',0)}, ftd={td.get('ftd',0)}, dep=R${td.get('da',0):,.2f}")
-print(f"   API calls: 4 (vs 6 full) | Period: {YESTERDAY}→{TODAY}")
+print(f"   API calls: 5 (vs 6 full) | Period: {YESTERDAY}→{TODAY}")
