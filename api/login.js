@@ -30,15 +30,24 @@ function getRedis() {
 }
 
 async function getUsers() {
-  if (!process.env.REDIS_URL) return INITIAL_USERS;
+  let users = [...INITIAL_USERS];
+  if (!process.env.REDIS_URL) return users;
   try {
     const redis = getRedis();
     const data = await redis.get(REDIS_KEY);
-    if (data) return JSON.parse(data);
+    if (data) {
+      const redisUsers = JSON.parse(data);
+      // Merge: Redis users + INITIAL_USERS (initial takes priority for admin)
+      const initialEmails = new Set(INITIAL_USERS.map(u => u.email.toLowerCase()));
+      const extra = redisUsers.filter(u => !initialEmails.has(u.email.toLowerCase()));
+      users = [...INITIAL_USERS, ...extra];
+    }
+    // Sync back to Redis
+    await redis.set(REDIS_KEY, JSON.stringify(users));
   } catch (e) {
     console.error('getUsers error:', e.message);
   }
-  return INITIAL_USERS;
+  return users;
 }
 
 module.exports = async function handler(req, res) {
