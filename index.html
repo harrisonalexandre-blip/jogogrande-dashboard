@@ -1466,50 +1466,84 @@ var affView='ranking';
 // Filtra dados de afiliados baseado no período global
 function getAffDateRange(){
   // Determina range de datas baseado no período selecionado
-  if(!AFF.days||!AFF.days.length)return{from:'',to:''};
-  var allDates=AFF.days.map(function(d){return d.d}).sort();
-  var lastDate=allDates[allDates.length-1];
-  if(currentPeriod==='custom'&&window._affFrom&&window._affTo){
-    return{from:window._affFrom,to:window._affTo};
+  var hasDays=AFF.days&&AFF.days.length>0;
+  if(hasDays){
+    var allDates=AFF.days.map(function(d){return d.d}).sort();
+    var lastDate=allDates[allDates.length-1];
+    if(currentPeriod==='custom'&&window._affFrom&&window._affTo){
+      return{from:window._affFrom,to:window._affTo};
+    }
+    if(currentPeriod==='lifetime')return{from:allDates[0],to:lastDate};
+    if(currentPeriod==='today'){var today=localDateStr(new Date());var hasToday=allDates.indexOf(today)>=0;return{from:hasToday?today:lastDate,to:hasToday?today:lastDate};}
+    if(currentPeriod==='yesterday')return{from:lastDate,to:lastDate};
+    if(currentPeriod==='week'){
+      var ld=new Date(lastDate+'T12:00:00');var dow=ld.getDay();var diff=dow===0?6:dow-1;
+      var wStart=new Date(ld);wStart.setDate(ld.getDate()-diff);
+      var ws=localDateStr(wStart);
+      return{from:ws,to:lastDate};
+    }
+    if(currentPeriod==='month')return{from:lastDate.substring(0,8)+'01',to:lastDate};
+    if(currentPeriod==='year')return{from:'2026-01-01',to:lastDate};
+    return{from:lastDate,to:lastDate};
   }
-  if(currentPeriod==='lifetime')return{from:allDates[0],to:lastDate};
-  if(currentPeriod==='today'){var today=localDateStr(new Date());var hasToday=allDates.indexOf(today)>=0;return{from:hasToday?today:lastDate,to:hasToday?today:lastDate};}
-  if(currentPeriod==='yesterday')return{from:lastDate,to:lastDate};
-  if(currentPeriod==='week'){
-    var ld=new Date(lastDate+'T12:00:00');var dow=ld.getDay();var diff=dow===0?6:dow-1;
-    var wStart=new Date(ld);wStart.setDate(ld.getDate()-diff);
-    var ws=wStart.toISOString().substring(0,10);
-    return{from:ws,to:lastDate};
-  }
-  if(currentPeriod==='month')return{from:lastDate.substring(0,8)+'01',to:lastDate};
-  if(currentPeriod==='year')return{from:'2026-01-01',to:lastDate};
-  return{from:lastDate,to:lastDate};
+  // Fallback: sem days, retorna range genérico para que filtering use affs/affMonths
+  return{from:'',to:'',noDays:true};
 }
 function getFilteredAffData(){
   var range=getAffDateRange();
   var isLifetime=(currentPeriod==='lifetime');
-  // Filter months
   var fml=getFilteredMonthLabels();
   var fMonths=isLifetime?AFF.months:AFF.months.filter(function(m){return fml.indexOf(m.ml)>=0});
-  var fWeeks=AFF.weeks;
-  // Filter days
-  var fDays=AFF.days.filter(function(d){return d.d>=range.from&&d.d<=range.to});
+  var fWeeks=AFF.weeks||[];
+  var fDays=[];
   var fAffs=[];
-  // Sempre agregar a partir dos dados diários (affDays) para consistência
-  for(var i=0;i<AFF.affs.length;i++){
-    var a=AFF.affs[i];
-    var ad=AFF.affDays[a.n];
-    if(ad){
-      var fa={n:a.n,rg:0,ftd:0,fr:0,dc:0,da:0,wa:0,nd:0,np:0,npc:0,nps:0,cpa:0,rs:0,cm:0,bn:0,vol:0,ops:0,cb:0,fda:0,bal:a.bal||0,vc:0};
-      for(var j=0;j<ad.length;j++){
-        if(ad[j].d>=range.from&&ad[j].d<=range.to){
-          fa.rg+=ad[j].rg||0;fa.ftd+=ad[j].ftd||0;fa.dc+=ad[j].dc||0;fa.da+=ad[j].da||0;fa.wa+=ad[j].wa||0;
-          fa.np+=ad[j].np||0;fa.cm+=ad[j].cm||0;fa.vol+=ad[j].vol||0;fa.ops+=ad[j].ops||0;fa.vc+=ad[j].vc||0;
+
+  // MODO COMPLETO: se temos days + affDays, filtrar por data
+  if(AFF.days&&AFF.days.length&&AFF.affDays&&!range.noDays){
+    fDays=AFF.days.filter(function(d){return d.d>=range.from&&d.d<=range.to});
+    for(var i=0;i<AFF.affs.length;i++){
+      var a=AFF.affs[i];
+      var ad=AFF.affDays[a.n];
+      if(ad){
+        var fa={n:a.n,rg:0,ftd:0,fr:0,dc:0,da:0,wa:0,nd:0,np:0,npc:0,nps:0,cpa:0,rs:0,cm:0,bn:0,vol:0,ops:0,cb:0,fda:0,bal:a.bal||0,vc:0};
+        for(var j=0;j<ad.length;j++){
+          if(ad[j].d>=range.from&&ad[j].d<=range.to){
+            fa.rg+=ad[j].rg||0;fa.ftd+=ad[j].ftd||0;fa.dc+=ad[j].dc||0;fa.da+=ad[j].da||0;fa.wa+=ad[j].wa||0;
+            fa.np+=ad[j].np||0;fa.cm+=ad[j].cm||0;fa.vol+=ad[j].vol||0;fa.ops+=ad[j].ops||0;fa.vc+=ad[j].vc||0;
+          }
         }
+        fa.nd=fa.da-fa.wa;
+        fa.fr=fa.rg>0?Math.round(fa.ftd/fa.rg*1000)/10:0;
+        if(fa.rg>0||fa.da>0||fa.np!==0)fAffs.push(fa);
       }
-      fa.nd=fa.da-fa.wa;
-      fa.fr=fa.rg>0?Math.round(fa.ftd/fa.rg*1000)/10:0;
-      if(fa.rg>0||fa.da>0||fa.np!==0)fAffs.push(fa);
+    }
+  }
+  // MODO FALLBACK: sem days/affDays — usar affMonths para filtro por mês, ou affs direto para lifetime
+  else if(AFF.affMonths&&!isLifetime&&fml.length>0){
+    for(var i=0;i<AFF.affs.length;i++){
+      var a=AFF.affs[i];
+      var am=AFF.affMonths[a.n];
+      if(am){
+        var fa={n:a.n,rg:0,ftd:0,fr:0,dc:0,da:0,wa:0,nd:0,np:0,npc:0,nps:0,cpa:0,rs:0,cm:0,bn:0,vol:0,ops:0,cb:0,fda:0,bal:a.bal||0,vc:0};
+        for(var j=0;j<am.length;j++){
+          if(fml.indexOf(am[j].ml)>=0){
+            fa.rg+=am[j].rg||0;fa.ftd+=am[j].ftd||0;fa.dc+=am[j].dc||0;fa.da+=am[j].da||0;fa.wa+=am[j].wa||0;
+            fa.np+=am[j].np||0;fa.cm+=am[j].cm||0;fa.vol+=am[j].vol||0;fa.ops+=am[j].ops||0;fa.vc+=am[j].vc||0;
+          }
+        }
+        fa.nd=fa.da-fa.wa;
+        fa.fr=fa.rg>0?Math.round(fa.ftd/fa.rg*1000)/10:0;
+        if(fa.rg>0||fa.da>0||fa.np!==0)fAffs.push(fa);
+      }
+    }
+  }
+  // MODO LIFETIME/SEM DADOS GRANULARES: usar affs direto
+  else{
+    for(var i=0;i<AFF.affs.length;i++){
+      var a=AFF.affs[i];
+      if(a.rg>0||a.da>0||a.np!==0){
+        fAffs.push({n:a.n,rg:a.rg||0,ftd:a.ftd||0,fr:a.fr||0,dc:a.dc||0,da:a.da||0,wa:a.wa||0,nd:(a.da||0)-(a.wa||0),np:a.np||0,npc:a.npc||0,nps:a.nps||0,cpa:a.cpa||0,rs:a.rs||0,cm:a.cm||0,bn:a.bn||0,vol:a.vol||0,ops:a.ops||0,cb:a.cb||0,fda:a.fda||0,bal:a.bal||0,vc:a.vc||0});
+      }
     }
   }
   fAffs.sort(function(a,b){return b.np-a.np});
