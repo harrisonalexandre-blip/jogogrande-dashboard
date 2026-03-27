@@ -10,11 +10,11 @@
 :root {
   --bg:#080808; --bg2:#0d0d0d; --bg3:#131313; --card:#111111; --border:#1a1a1a;
   --green:#0EA55A; --green2:#0b8a4a; --greenA:rgba(14,165,90,.15); --greenB:rgba(14,165,90,.08);
-  --gold:#FFD740; --goldA:rgba(255,215,64,.15);
+  --gold:#0EA55A; --goldA:rgba(14,165,90,.12);
   --red:#FF4444; --redA:rgba(255,68,68,.15);
-  --blue:#4488FF; --blueA:rgba(68,136,255,.15);
-  --cyan:#00E5FF; --cyanA:rgba(0,229,255,.15);
-  --purple:#BB86FC; --purpleA:rgba(187,134,252,.15);
+  --blue:#0EA55A; --blueA:rgba(14,165,90,.12);
+  --cyan:#0EA55A; --cyanA:rgba(14,165,90,.12);
+  --purple:#0EA55A; --purpleA:rgba(14,165,90,.12);
   --text:#F5F5F5; --text2:#888; --text3:#555;
   --radius:10px; --shadow:0 2px 16px rgba(0,0,0,.6);
 }
@@ -252,6 +252,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .ac-msg{font-size:12px;padding:10px;border-radius:8px;margin-top:10px;display:none;line-height:1.5}
 .ac-msg.ok{background:var(--greenA);color:var(--green);border:1px solid rgba(14,165,90,.3)}
 .ac-msg.err{background:var(--redA);color:var(--red);border:1px solid rgba(255,68,68,.3)}
+
+@keyframes rtPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
 </style>
 </head>
 <body>
@@ -429,6 +431,42 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <div class="cg cg2">
   <div class="cb"><div class="ct"><span class="dot c"></span>UAP · Jogadores Ativos</div><canvas id="c-uap"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot p"></span>Ticket Médio Depósito (R$)</div><canvas id="c-tk"></canvas></div>
+</div>
+
+
+<!-- GA Real-Time Widget -->
+<div id="ga-rt-widget" class="card" style="margin:16px 0;padding:0;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--card-bg)">
+<div style="display:grid;grid-template-columns:280px 1fr;min-height:200px">
+  <!-- Left: Big number + pulse -->
+  <div style="background:linear-gradient(135deg,rgba(14,165,90,.08),rgba(14,165,90,.02));padding:24px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <span id="ga-rt-pulse" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);animation:rtPulse 1.5s ease-in-out infinite"></span>
+      <span style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);font-weight:700">Usuários Ativos Agora</span>
+    </div>
+    <div id="ga-rt-count" style="font-size:56px;font-weight:900;color:var(--green);line-height:1;margin:8px 0">--</div>
+    <div style="font-size:11px;color:var(--text3)">Últimos 30 minutos</div>
+    <div id="ga-rt-updated" style="font-size:9px;color:var(--text3);margin-top:8px;opacity:.6">Carregando...</div>
+  </div>
+  <!-- Right: Countries + Cities table -->
+  <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:4px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        País
+        <span style="margin-left:auto;font-weight:400">Usuários</span>
+      </div>
+      <div id="ga-rt-countries" style="font-size:12px"></div>
+    </div>
+    <div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:4px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Cidade
+        <span style="margin-left:auto;font-weight:400">Usuários</span>
+      </div>
+      <div id="ga-rt-cities" style="font-size:12px"></div>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- GA Analytics Mini Dashboard -->
@@ -1055,9 +1093,9 @@ const MRECON=[{"m":"OUT/25","dtp_dep":40.0,"dtp_saq":0,"dtp_taxa":0.83,"phx_dep"
 const PS={"bf": {"AFFBR": 47.5, "Cadão": 12.5, "Ravani": 20, "Pedro": 20}, "ff": {"AFFBR": 47.5, "Cadão": 23.18, "Ravani": 10, "Pedro": 20}, "fm": {"AFFBR": 47.5, "Cadão": 23.18, "Ravani": 10, "Pedro": 20, "Mauricio_Robô": 10}};
 const AM={"bf": {"Bruno": 4.75, "Harrison": 10.68, "Neja": 10.68, "Gregório": 10.68, "AFFBR_op": 10.71}, "ff": {"Bruno": 4.75, "Harrison": 10.68, "Neja": 10.68, "AFFBR_op": 21.39}, "fm": {"Bruno": 4.75, "Harrison": 10.68, "Neja": 10.68, "AFFBR_op": 21.39}};
 
-const C={g:'#0EA55A',gl:'#FFD740',r:'#FF4444',b:'#4488FF',c:'#00E5FF',p:'#BB86FC',
-  gA:'rgba(14,165,90,.2)',glA:'rgba(255,215,64,.2)',rA:'rgba(255,68,68,.2)',
-  bA:'rgba(68,136,255,.2)',cA:'rgba(0,229,255,.2)',pA:'rgba(187,134,252,.2)'};
+const C={g:'#0EA55A',gl:'#1ABF6A',r:'#FF4444',b:'#0b8a4a',c:'#15C463',p:'#088040',
+  gA:'rgba(14,165,90,.2)',glA:'rgba(26,191,106,.2)',rA:'rgba(255,68,68,.2)',
+  bA:'rgba(11,138,74,.2)',cA:'rgba(21,196,99,.2)',pA:'rgba(8,128,64,.2)'};
 const CD={responsive:true,maintainAspectRatio:false,
   plugins:{legend:{labels:{color:'#888',font:{size:11,family:'Inter'},usePointStyle:true}},
     tooltip:{backgroundColor:'#111',borderColor:'#1a1a1a',borderWidth:1,titleColor:'#f5f5f5',bodyColor:'#888',padding:10}},
@@ -3453,6 +3491,78 @@ function toggleSidebarVisibility(){
 // ═══ TICKER — CNN-style insights ═══
 // ═══ CÂMBIO AO VIVO ═══
 let liveRates={eur:6.14,usdt:5.25};
+
+// === GA REAL-TIME POLLING ===
+var _gaRtInterval=null;
+function fetchGaRealtime(){
+  fetch('/api/ga-realtime').then(function(r){return r.json()}).then(function(j){
+    var d=j.data||{};
+    var el=document.getElementById('ga-rt-count');
+    if(el){
+      var newVal=d.activeUsers||0;
+      el.textContent=newVal>0?newVal.toLocaleString('pt-BR'):'--';
+      el.style.color=newVal>0?'var(--green)':'var(--text3)';
+    }
+    // Countries
+    var cEl=document.getElementById('ga-rt-countries');
+    if(cEl&&d.countries&&d.countries.length>0){
+      cEl.innerHTML=d.countries.slice(0,6).map(function(c,i){
+        var bar=d.activeUsers>0?Math.round(c.v/d.activeUsers*100):0;
+        var flag=c.n==='Brazil'?'\ud83c\udde7\ud83c\uddf7':c.n==='Argentina'?'\ud83c\udde6\ud83c\uddf7':c.n==='Mexico'?'\ud83c\uddf2\ud83c\uddfd':c.n==='United States'?'\ud83c\uddfa\ud83c\uddf8':c.n==='Colombia'?'\ud83c\udde8\ud83c\uddf4':c.n==='Netherlands'?'\ud83c\uddf3\ud83c\uddf1':'\ud83c\udf0d';
+        return '<div style="display:flex;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="width:18px">'+flag+'</span><span style="flex:1;color:var(--text)">'+c.n+'</span><span style="font-weight:700;color:var(--green);min-width:30px;text-align:right">'+c.v+'</span></div>';
+      }).join('');
+    } else if(cEl&&(!d.countries||d.countries.length===0)){
+      // Use static GA data as fallback
+      if(typeof GA!=='undefined'&&GA.rt&&GA.rt.countries){
+        cEl.innerHTML=GA.rt.countries.slice(0,6).map(function(c){
+          return '<div style="display:flex;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="flex:1;color:var(--text)">'+c.n+'</span><span style="font-weight:700;color:var(--green);min-width:30px;text-align:right">'+c.v+'</span></div>';
+        }).join('');
+      }
+    }
+    // Cities
+    var ciEl=document.getElementById('ga-rt-cities');
+    if(ciEl&&d.cities&&d.cities.length>0){
+      ciEl.innerHTML=d.cities.slice(0,6).map(function(c){
+        return '<div style="display:flex;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="flex:1;color:var(--text)">'+c.n+'</span><span style="font-weight:700;color:var(--cyan);min-width:30px;text-align:right">'+c.v+'</span></div>';
+      }).join('');
+    }
+    // Updated timestamp
+    var upEl=document.getElementById('ga-rt-updated');
+    if(upEl){
+      if(j.ok){
+        upEl.textContent='Atualizado: '+new Date(d.updated).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' (live)';
+        upEl.style.color='var(--green)';
+      } else if(j.fallback){
+        // Use static data
+        el.textContent=GA.rt.usersNow;
+        el.style.color='var(--green)';
+        upEl.textContent='Dados est\u00e1ticos (API n\u00e3o configurada)';
+        upEl.style.color='var(--gold)';
+        // Render static countries
+        if(cEl&&GA.rt.countries){
+          cEl.innerHTML=GA.rt.countries.slice(0,6).map(function(c){
+            var flag=c.n==='Brazil'?'\ud83c\udde7\ud83c\uddf7':c.n==='Argentina'?'\ud83c\udde6\ud83c\uddf7':c.n==='Mexico'?'\ud83c\uddf2\ud83c\uddfd':'\ud83c\udf0d';
+            return '<div style="display:flex;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)"><span style="width:18px">'+flag+'</span><span style="flex:1;color:var(--text)">'+c.n+'</span><span style="font-weight:700;color:var(--green);min-width:30px;text-align:right">'+c.v+'</span></div>';
+          }).join('');
+        }
+      }
+    }
+  }).catch(function(e){
+    console.warn('GA RT fetch error',e);
+    // Use static fallback
+    var el=document.getElementById('ga-rt-count');
+    if(el&&typeof GA!=='undefined'){el.textContent=GA.rt.usersNow;el.style.color='var(--green)';}
+    var upEl=document.getElementById('ga-rt-updated');
+    if(upEl){upEl.textContent='Offline (dados est\u00e1ticos)';upEl.style.color='var(--red)';}
+  });
+}
+// Start polling on page load
+function startGaRtPolling(){
+  fetchGaRealtime();
+  if(_gaRtInterval)clearInterval(_gaRtInterval);
+  _gaRtInterval=setInterval(fetchGaRealtime,30000); // Every 30 seconds
+}
+
 async function fetchRates(){
   try{
     const [eurRes,usdtRes]=await Promise.allSettled([
@@ -3525,7 +3635,8 @@ function buildTicker(){
   document.getElementById('ticker-track').innerHTML=html+html;
 }
 
-document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); fetchRates(); });
+document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); fetchRates();
+startGaRtPolling(); });
 
 // ═══════════════════════════════════════════════════════════
 // AUTH SYSTEM — Jogo Grande BI (API-based)
