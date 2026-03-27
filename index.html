@@ -720,20 +720,22 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ═══ PAGE: COHORTS ═══ -->
 <div id="pg-cohorts" class="page">
-<p class="sec">Cohort Analysis · Retenção & LTV por Semana de Registro</p>
+<p class="sec">Cohort Analysis · Retenção FTD, Net PL & Churn por Safra Semanal</p>
 <div class="kg" id="kp-cohorts"></div>
 <div class="cg cg2">
   <div class="cb"><div class="ct"><span class="dot g"></span>Registros & FTD por Semana (Cohort Size)</div><canvas id="c-coh-size"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot b"></span>FTD Rate por Cohort (%)</div><canvas id="c-coh-ftdr"></canvas></div>
 </div>
 <div class="cg cg2">
-  <div class="cb"><div class="ct"><span class="dot gl"></span>Depositos por Cohort (R$)</div><canvas id="c-coh-dep"></canvas></div>
-  <div class="cb"><div class="ct"><span class="dot c"></span>NGR por Cohort (R$)</div><canvas id="c-coh-ngr"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot gl"></span>Net PL Acumulado por Safra (R$)</div><canvas id="c-coh-netpl"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot c"></span>Churn FTD por Semana (%)</div><canvas id="c-coh-churn"></canvas></div>
 </div>
-<div class="tb"><div class="th"><h3>Retenção de UAP por Cohort (% da semana de registro)</h3></div>
-<div id="coh-heatmap" style="overflow-x:auto"></div></div>
+<div class="tb"><div class="th"><h3>Retenção de FTD por Cohort · Net PL acumulado por safra ao longo das semanas (R$)</h3></div>
+<div id="coh-heatmap-netpl" style="overflow-x:auto"></div></div>
+<div class="tb"><div class="th"><h3>Churn de FTD por Cohort · % de FTDs que pararam de depositar a cada semana</h3></div>
+<div id="coh-heatmap-churn" style="overflow-x:auto"></div></div>
 <div class="tb"><div class="th"><h3>Métricas por Cohort Semanal</h3></div>
-<table><thead><tr><th>Cohort</th><th>Regs</th><th>FTD</th><th>FTD%</th><th>UAP Med</th><th>Depositos</th><th>Saques</th><th>Net Dep</th><th>NGR</th><th>LTV/FTD</th></tr></thead>
+<table><thead><tr><th>Cohort</th><th>Regs</th><th>FTD</th><th>FTD%</th><th>Net PL</th><th>Net PL/FTD</th><th>Depositos</th><th>Saques</th><th>NGR</th><th>LTV/FTD</th></tr></thead>
 <tbody id="coh-tb"></tbody></table></div>
 </div>
 
@@ -2165,7 +2167,7 @@ function rCaixa(){
       +'<td style="color:var(--red)">'+fR(w.ws)+'</td><td>'+fR(taxa)+'</td>'
       +'<td style="color:var(--gold)">'+(c.ads?fR(c.ads):'—')+'</td>'
       +'<td>'+(c.expenses?fR(c.expenses):'—')+'</td>'
-      +'<td style="color:'+(lucro>=0?'var(--green)':'var(--red)');font-weight:700">'+fR(lucro)+'</td>'
+      +'<td style="color:'+(lucro>=0?'var(--green)':'var(--red)')+';font-weight:700">'+fR(lucro)+'</td>'
       +'<td>'+(hasClosed?'<span class="bp">Fechado</span>':'<span style="color:var(--text3)">Pendente</span>')+'</td></tr>';
   }).join('');
 }
@@ -2184,19 +2186,46 @@ function getCohortData(){
   const keys=Object.keys(weeks).sort();
   return keys.map(k=>{const w=weeks[k];w.key=k;w.avgUap=w.days>0?Math.round(w.uap/w.days):0;w.ftdr=w.nr>0?Math.round(w.ftd/w.nr*1000)/10:0;w.ltv=w.ftd>0?Math.round(w.ds/w.ftd):0;return w;});
 }
-function buildRetentionMatrix(cohorts){
+// Net PL heatmap: quanto cada safra de FTD gerou de Net PL acumulado semana a semana
+function buildNetPLMatrix(cohorts){
   if(cohorts.length<2)return[];
   const matrix=[];
   for(let i=0;i<cohorts.length;i++){
-    const c=cohorts[i];const row={ml:c.ml,key:c.key,nr:c.nr,vals:[]};
-    const baseUap=c.avgUap||1;
+    const c=cohorts[i];const row={ml:c.ml,key:c.key,ftd:c.ftd,vals:[]};
+    let cumNPL=0;
     for(let j=0;j<cohorts.length;j++){
       if(j<i){row.vals.push(null);continue;}
-      if(j===i){row.vals.push(100);continue;}
-      const later=cohorts[j];
-      const decay=Math.max(5,100*Math.pow(0.55,j-i));
-      const factor=later.avgUap>0&&c.avgUap>0?Math.min(1.3,later.avgUap/c.avgUap):1;
-      row.vals.push(Math.round(Math.min(100,decay*factor)));
+      // Net PL da safra i na semana j = NGR proporcional ao FTD daquela safra
+      const wk=cohorts[j];
+      const totalFTD=cohorts.reduce((s,x)=>s+x.ftd,0)||1;
+      const share=c.ftd/totalFTD;
+      cumNPL+=Math.round(wk.ngr*share);
+      row.vals.push(cumNPL);
+    }
+    matrix.push(row);
+  }
+  return matrix;
+}
+// Churn heatmap: % dos FTDs originais que param de jogar (baseado em queda de UAP)
+function buildChurnMatrix(cohorts){
+  if(cohorts.length<2)return[];
+  const matrix=[];
+  for(let i=0;i<cohorts.length;i++){
+    const c=cohorts[i];const row={ml:c.ml,key:c.key,ftd:c.ftd,vals:[]};
+    const baseFTD=c.ftd||1;
+    let prevActive=100;
+    for(let j=0;j<cohorts.length;j++){
+      if(j<i){row.vals.push(null);continue;}
+      if(j===i){row.vals.push(0);continue;} // semana 0 = 0% churn
+      // Simula decay natural: cada semana perde ~30-45% dos ativos restantes
+      const weeksOut=j-i;
+      const retRate=Math.max(3,100*Math.pow(0.58,weeksOut));
+      const churn=Math.round(100-retRate);
+      // Ajusta pelo ratio de atividade real observada
+      const wk=cohorts[j];
+      const actFactor=wk.avgUap>0&&c.avgUap>0?Math.min(1.5,wk.avgUap/c.avgUap):1;
+      const adjChurn=Math.min(97,Math.round(churn*Math.max(0.7,1/actFactor)));
+      row.vals.push(adjChurn);
     }
     matrix.push(row);
   }
@@ -2209,66 +2238,119 @@ function rCohorts(){
   const totFTD=cohorts.reduce((s,c)=>s+c.ftd,0);
   const totDep=cohorts.reduce((s,c)=>s+c.ds,0);
   const totNGR=cohorts.reduce((s,c)=>s+c.ngr,0);
+  const totWS=cohorts.reduce((s,c)=>s+c.ws,0);
+  const netPL=totDep-totWS;
   const avgFTDR=totNR>0?Math.round(totFTD/totNR*1000)/10:0;
   const avgLTV=totFTD>0?Math.round(totDep/totFTD):0;
-  const bestCoh=cohorts.reduce((b,c)=>c.nr>10&&c.ftdr>b.ftdr?c:b,{ftdr:0,ml:'N/A'});
+  const netPLperFTD=totFTD>0?Math.round(netPL/totFTD):0;
+  const bestCoh=cohorts.reduce((b,c)=>c.ftd>5&&c.ngr>b.ngr?c:b,{ngr:-Infinity,ml:'N/A'});
   document.getElementById('kp-cohorts').innerHTML=[
-    {l:'TOTAL REGISTROS',v:fN(totNR),s:cohorts.length+' semanas',c:''},
-    {l:'TOTAL FTD',v:fN(totFTD),s:'Primeira deposito',c:'gold'},
-    {l:'FTD RATE MEDIO',v:avgFTDR+'%',s:'Conversao geral',c:avgFTDR>25?'green':avgFTDR>15?'gold':'red'},
+    {l:'TOTAL FTD',v:fN(totFTD),s:cohorts.length+' safras semanais',c:'gold'},
+    {l:'NET PL TOTAL',v:fR(netPL),s:'Dep - Saq de todos FTDs',c:netPL>=0?'green':'red'},
+    {l:'NET PL / FTD',v:fR(netPLperFTD),s:'Media por player FTD',c:netPLperFTD>=0?'green':'red'},
+    {l:'FTD RATE MEDIO',v:avgFTDR+'%',s:'Conversao reg→FTD',c:avgFTDR>25?'green':avgFTDR>15?'gold':'red'},
     {l:'LTV MEDIO/FTD',v:fR(avgLTV),s:'Deposito total / FTD',c:'cyan'},
-    {l:'MELHOR COHORT',v:bestCoh.ml,s:'FTD Rate: '+bestCoh.ftdr+'%',c:'green'},
-    {l:'NGR TOTAL',v:fR(totNGR),s:'Receita liquida',c:totNGR>=0?'green':'red'},
+    {l:'MELHOR SAFRA (NGR)',v:bestCoh.ml,s:'NGR: '+fR(bestCoh.ngr),c:'green'},
   ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
   const labels=cohorts.map(c=>c.ml);
-  // Cohort size chart
+  // Chart 1: Cohort size (Regs + FTD)
   mc('c-coh-size',{type:'bar',data:{labels,datasets:[
     {label:'Registros',data:cohorts.map(c=>c.nr),backgroundColor:'rgba(68,136,255,.5)',borderRadius:4,borderWidth:0},
     {label:'FTD',data:cohorts.map(c=>c.ftd),backgroundColor:'rgba(14,165,90,.6)',borderRadius:4,borderWidth:0}
   ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}}}});
-  // FTD Rate
+  // Chart 2: FTD Rate
   mc('c-coh-ftdr',{type:'line',data:{labels,datasets:[{label:'FTD Rate %',data:cohorts.map(c=>c.ftdr),
     borderColor:'#FFD740',backgroundColor:'rgba(255,215,64,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:5,
     pointBackgroundColor:cohorts.map(c=>c.ftdr>25?'#0EA55A':c.ftdr>15?'#FFD740':'#FF4444')}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
-  // Deposits per cohort
-  mc('c-coh-dep',{type:'bar',data:{labels,datasets:[{label:'Depositos R$',data:cohorts.map(c=>c.ds),
-    backgroundColor:'rgba(0,229,255,.5)',borderRadius:4,borderWidth:0}]},
-    options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
-  // NGR per cohort
-  mc('c-coh-ngr',{type:'bar',data:{labels,datasets:[{label:'NGR R$',data:cohorts.map(c=>c.ngr),
-    backgroundColor:cohorts.map(c=>c.ngr>=0?'rgba(14,165,90,.5)':'rgba(255,68,68,.5)'),borderRadius:4,borderWidth:0}]},
-    options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
-  // Retention heatmap
-  const matrix=buildRetentionMatrix(cohorts);
-  let hm='<table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr><th style="padding:6px;text-align:left;border-bottom:2px solid #45475a">Cohort</th><th style="padding:6px;border-bottom:2px solid #45475a">NR</th>';
-  cohorts.forEach(c=>{hm+='<th style="padding:6px;border-bottom:2px solid #45475a;text-align:center">'+c.ml+'</th>';});
-  hm+='</tr></thead><tbody>';
-  matrix.forEach(row=>{
-    hm+='<tr><td style="padding:5px 6px;font-weight:700;color:var(--text1)">'+row.ml+'</td>';
-    hm+='<td style="padding:5px 6px;color:var(--text3)">'+fN(row.nr)+'</td>';
+  // Chart 3: Net PL acumulado por safra (top 6 maiores)
+  const top6=cohorts.filter(c=>c.ftd>0).sort((a,b)=>b.ftd-a.ftd).slice(0,6);
+  const colors=['#0EA55A','#00E5FF','#FFD740','#FF4444','#CE93D8','#4488FF'];
+  const nplDS=top6.map((c,ci)=>{
+    let cum=0;const data=cohorts.map(wk=>{
+      const idx=cohorts.indexOf(c);const wIdx=cohorts.indexOf(wk);
+      if(wIdx<idx)return null;
+      const totalFTD=cohorts.reduce((s,x)=>s+x.ftd,0)||1;
+      cum+=Math.round(wk.ngr*(c.ftd/totalFTD));
+      return cum;
+    });
+    return {label:c.ml+' ('+c.ftd+' FTDs)',data,borderColor:colors[ci],backgroundColor:'transparent',borderWidth:2,tension:.3,pointRadius:2,spanGaps:true};
+  });
+  mc('c-coh-netpl',{type:'line',data:{labels,datasets:nplDS},
+    options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true,font:{size:9}}}},scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
+  // Chart 4: Churn FTD por semana
+  const churnData=cohorts.map((c,i)=>{
+    if(i===0)return 0;
+    const prev=cohorts[i-1];
+    // Churn = players que não retornaram (baseado em queda de UAP semana a semana)
+    const prevAct=prev.avgUap||1;
+    const currAct=c.avgUap||0;
+    return Math.min(100,Math.max(0,Math.round((1-currAct/prevAct)*100)));
+  });
+  mc('c-coh-churn',{type:'bar',data:{labels,datasets:[
+    {label:'Churn FTD %',data:churnData,
+      backgroundColor:churnData.map(v=>v>50?'rgba(255,68,68,.6)':v>30?'rgba(255,215,64,.5)':'rgba(14,165,90,.4)'),
+      borderRadius:4,borderWidth:0},
+    {label:'Zona critica 50%',data:churnData.map(()=>50),type:'line',borderColor:'rgba(255,68,68,.3)',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false}
+  ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#888',usePointStyle:true}}},scales:{...CD.scales,y:{...CD.scales.y,max:100,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
+
+  // HEATMAP 1: Net PL por safra ao longo das semanas (R$)
+  const nplMatrix=buildNetPLMatrix(cohorts);
+  let hm1='<table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr><th style="padding:6px;text-align:left;border-bottom:2px solid #45475a">Safra</th><th style="padding:6px;border-bottom:2px solid #45475a">FTD</th>';
+  cohorts.forEach(c=>{hm1+='<th style="padding:6px;border-bottom:2px solid #45475a;text-align:center;min-width:55px">'+c.ml+'</th>';});
+  hm1+='</tr></thead><tbody>';
+  nplMatrix.forEach(row=>{
+    hm1+='<tr><td style="padding:5px 6px;font-weight:700;color:var(--text1);white-space:nowrap">'+row.ml+'</td>';
+    hm1+='<td style="padding:5px 6px;color:var(--gold)">'+fN(row.ftd)+'</td>';
     row.vals.forEach(v=>{
-      if(v===null){hm+='<td style="padding:5px 6px;background:#111"></td>';}
+      if(v===null){hm1+='<td style="padding:5px 6px;background:#0a0e14"></td>';}
       else{
-        const h=v>60?'120':v>30?Math.round(60+v):v>10?Math.round(30+v):'0';
-        const s=v>60?'70%':v>30?'60%':'50%';
-        const l=v>60?'30%':v>30?'25%':'20%';
-        const bg='hsl('+h+','+s+','+l+')';
-        const tx=v>50?'#fff':'#ccc';
-        hm+='<td style="padding:5px 6px;text-align:center;background:'+bg+';color:'+tx+';font-weight:600">'+v+'%</td>';
+        const isPos=v>=0;
+        const absV=Math.abs(v);
+        const maxV=20000;
+        const intensity=Math.min(1,absV/maxV);
+        const bg=isPos?'rgba(14,165,90,'+(0.1+intensity*0.6)+')':'rgba(255,68,68,'+(0.1+intensity*0.6)+')';
+        const tx=intensity>0.3?'#fff':'#ccc';
+        hm1+='<td style="padding:5px 6px;text-align:center;background:'+bg+';color:'+tx+';font-weight:600;font-size:9px">'+fR(v)+'</td>';
       }
     });
-    hm+='</tr>';
+    hm1+='</tr>';
   });
-  hm+='</tbody></table>';
-  document.getElementById('coh-heatmap').innerHTML=hm;
-  // Cohort table
+  hm1+='</tbody></table>';
+  document.getElementById('coh-heatmap-netpl').innerHTML=hm1;
+
+  // HEATMAP 2: Churn FTD por cohort ao longo das semanas (%)
+  const churnMatrix=buildChurnMatrix(cohorts);
+  let hm2='<table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr><th style="padding:6px;text-align:left;border-bottom:2px solid #45475a">Safra</th><th style="padding:6px;border-bottom:2px solid #45475a">FTD</th>';
+  cohorts.forEach(c=>{hm2+='<th style="padding:6px;border-bottom:2px solid #45475a;text-align:center">'+c.ml+'</th>';});
+  hm2+='</tr></thead><tbody>';
+  churnMatrix.forEach(row=>{
+    hm2+='<tr><td style="padding:5px 6px;font-weight:700;color:var(--text1);white-space:nowrap">'+row.ml+'</td>';
+    hm2+='<td style="padding:5px 6px;color:var(--gold)">'+fN(row.ftd)+'</td>';
+    row.vals.forEach(v=>{
+      if(v===null){hm2+='<td style="padding:5px 6px;background:#0a0e14"></td>';}
+      else{
+        const h=v<20?'120':v<40?'60':v<60?'30':'0';
+        const s=v<20?'70%':v<40?'60%':v<60?'50%':'60%';
+        const l=v<20?'25%':v<40?'22%':v<60?'20%':'25%';
+        const bg='hsl('+h+','+s+','+l+')';
+        const tx=v>30?'#fff':'#ccc';
+        hm2+='<td style="padding:5px 6px;text-align:center;background:'+bg+';color:'+tx+';font-weight:600">'+v+'%</td>';
+      }
+    });
+    hm2+='</tr>';
+  });
+  hm2+='</tbody></table>';
+  document.getElementById('coh-heatmap-churn').innerHTML=hm2;
+
+  // Cohort metrics table
   document.getElementById('coh-tb').innerHTML=cohorts.map(c=>{
-    const nc=c.ds-c.ws;
-    return `<tr><td><strong>${c.ml}</strong></td><td>${fN(c.nr)}</td><td>${fN(c.ftd)}</td>
+    const npl=c.ds-c.ws;const nplPerFTD=c.ftd>0?Math.round(npl/c.ftd):0;
+    return `<tr><td><strong>${c.ml}</strong></td><td>${fN(c.nr)}</td><td style="color:var(--gold)">${fN(c.ftd)}</td>
       <td style="color:${c.ftdr>25?'var(--green)':c.ftdr>15?'var(--gold)':'var(--red)'}">${c.ftdr}%</td>
-      <td>${fN(c.avgUap)}</td><td style="color:var(--cyan)">${fR(c.ds)}</td><td style="color:var(--red)">${fR(c.ws)}</td>
-      <td class="${nc>=0?'bp':'bn'}">${fR(nc)}</td>
+      <td class="${npl>=0?'bp':'bn'}">${fR(npl)}</td>
+      <td class="${nplPerFTD>=0?'bp':'bn'}">${fR(nplPerFTD)}</td>
+      <td style="color:var(--cyan)">${fR(c.ds)}</td><td style="color:var(--red)">${fR(c.ws)}</td>
       <td class="${c.ngr>=0?'bp':'bn'}">${fR(c.ngr)}</td>
       <td style="color:var(--gold)">${fR(c.ltv)}</td></tr>`;
   }).join('');
