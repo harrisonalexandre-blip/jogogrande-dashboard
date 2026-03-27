@@ -8,7 +8,7 @@ const INITIAL_USERS = [
     email: 'harrisonwash@gmail.com',
     name: 'Harrison',
     role: 'admin',
-    hash: 'b3afe5cde3c9f37be2fdae37f8ddcf11cd7464bda3cdd73d0d2c7645fd3b4551'
+    hash: '496eb9af1521421ae86a33f6d53347b4e0fdc267957a54be460256c92a0645b6'
   }
 ];
 
@@ -47,14 +47,14 @@ async function saveUsers(users) {
   await redis.set(REDIS_KEY, JSON.stringify(users));
 }
 
-function validateAdmin(req) {
+async function validateAdmin(req) {
   const { adminEmail = '', adminPassword = '' } = req.body || {};
   const emailNorm = adminEmail.toLowerCase().trim();
+  if (!emailNorm || !adminPassword) return false;
   const h = sha256(emailNorm, adminPassword);
-  return (
-    emailNorm === 'harrisonwash@gmail.com' &&
-    h === 'b3afe5cde3c9f37be2fdae37f8ddcf11cd7464bda3cdd73d0d2c7645fd3b4551'
-  );
+  const { users } = await getUsers();
+  const user = users.find(u => u.email.toLowerCase() === emailNorm && u.hash === h);
+  return user && user.role === 'admin';
 }
 
 module.exports = async function handler(req, res) {
@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
     const { action } = body;
 
     if (action === 'list') {
-      if (!validateAdmin(req)) return res.status(403).json({ error: 'Nao autorizado' });
+      if (!(await validateAdmin(req))) return res.status(403).json({ error: 'Nao autorizado' });
       const { users } = await getUsers();
       return res.status(200).json({
         users: users.map(u => ({ email: u.email, name: u.name, role: u.role }))
@@ -78,7 +78,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === 'add') {
-      if (!validateAdmin(req)) return res.status(403).json({ error: 'Nao autorizado' });
+      if (!(await validateAdmin(req))) return res.status(403).json({ error: 'Nao autorizado' });
       const newEmail = (body.newEmail || body.email || '').toLowerCase().trim();
       const newName = body.newName || body.name || '';
       const newPassword = body.newPassword || body.password || '';
@@ -105,7 +105,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === 'remove') {
-      if (!validateAdmin(req)) return res.status(403).json({ error: 'Nao autorizado' });
+      if (!(await validateAdmin(req))) return res.status(403).json({ error: 'Nao autorizado' });
       const targetEmail = (body.targetEmail || body.email || '').toLowerCase().trim();
 
       if (targetEmail === 'harrisonwash@gmail.com') {
