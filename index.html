@@ -584,40 +584,17 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 <p class="sec">Overview de Performance</p>
 <div class="kg" id="kov"></div>
 
-<!-- GA Real-Time Widget -->
-<div id="ga-rt-widget" class="card" style="margin:16px 0;padding:0;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--card-bg)">
-<div id="ga-rt-inner" style="display:grid;grid-template-columns:280px 1fr;min-height:200px">
-  <div style="background:linear-gradient(135deg,rgba(14,165,90,.08),rgba(14,165,90,.02));padding:24px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-      <span id="ga-rt-pulse" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);animation:rtPulse 1.5s ease-in-out infinite"></span>
-      <span style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);font-weight:700">Usuários Ativos Agora</span>
-    </div>
-    <div id="ga-rt-count" style="font-size:56px;font-weight:900;color:var(--green);line-height:1;margin:8px 0">--</div>
-    <div style="font-size:11px;color:var(--text3)">Últimos 30 minutos</div>
-    <div id="ga-rt-updated" style="font-size:9px;color:var(--text3);margin-top:8px;opacity:.6">Carregando...</div>
+<!-- NGR + Volume side by side -->
+<div class="cg cg2" id="ngr-vol-row">
+  <div class="cb" id="ngr-today-card" style="position:relative">
+    <div class="ct"><span class="dot g"></span><span id="ct-ngr-title">NGR Diário (R$)</span></div>
+    <canvas id="c-ngr"></canvas>
   </div>
-  <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
-    <div>
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:4px">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        País
-        <span style="margin-left:auto;font-weight:400">Usuários</span>
-      </div>
-      <div id="ga-rt-countries" style="font-size:12px"></div>
-    </div>
-    <div>
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:4px">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        Cidade
-        <span style="margin-left:auto;font-weight:400">Usuários</span>
-      </div>
-      <div id="ga-rt-cities" style="font-size:12px"></div>
-    </div>
+  <div class="cb" id="vol-today-card" style="position:relative">
+    <div class="ct"><span class="dot gl"></span><span id="ct-vol-title">Volume / Turnover (R$)</span></div>
+    <canvas id="c-vol"></canvas>
   </div>
 </div>
-</div>
-
-<div class="cg cgf"><div class="cb"><div class="ct"><span class="dot g"></span><span id="ct-ngr-title">NGR Diário (R$)</span></div><canvas id="c-ngr"></canvas></div></div>
 <div class="cg cg2">
   <div class="cb"><div class="ct"><span class="dot b"></span>Registros & FTD</div><canvas id="c-rf"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot gl"></span>Depósitos vs Saques (R$)</div><canvas id="c-dvs"></canvas></div>
@@ -1433,37 +1410,34 @@ function renderOverview(){
   const pLabel=getPeriodLabel(currentPeriod);
   const depSaqPct=k.ds>0?((k.ws-k.mi)/k.ds*100):0;
   const volPct=k.ds>0?((k.ds/(k.ds+(k.ws-k.mi)))*100):0;
-  document.getElementById('kov').innerHTML=[
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',l:'NGR',v:fR(k.ngr),s:pLabel,c:''},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`Saques reais (sem mov. interna)`,c:'red'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/></svg>',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>',l:'Mov. Interna',v:fR(k.mi),s:'Saques cripto → Wallet',c:k.mi>0?'purple':''},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',l:'Novos Cadastros',v:fN(k.nr),s:`FTD: ${fN(k.ftd)}`,c:'blue'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',l:'Conv. Reg→FTD',v:fP(k.conv),s:'Taxa conversão',c:'cyan'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',l:'UAP Médio/Dia',v:fN(k.uap),s:`${k.days} dias`,c:'purple'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 7d',v:fP(CHURN.r7),s:`${fN(CHURN.c7)} de ${fN(CHURN.total)} players`,c:'red'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 30d',v:fP(CHURN.r30),s:`${fN(CHURN.c30)} inativos >30d`,c:CHURN.r30>50?'red':'gold'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 90d',v:fP(CHURN.r90),s:`${fN(CHURN.c90)} inativos >90d`,c:CHURN.r90>30?'red':'gold'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>',l:'Casino GGR',v:fR(k.cg),s:'Gross Gaming Revenue',c:'gold'},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>',l:'Sportsbook GGR',v:fR(k.sg),s:'Esportes',c:'blue'},
-  ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
-
-  // GA Mini Dashboard in Overview
-  var gaOvEl=document.getElementById('ga-ov-mini');
-  if(gaOvEl&&typeof GA!=='undefined'){
-    gaOvEl.innerHTML=[
-      {v:fN(GA.ov.users),l:'Usuários 28d',s:(GA.summary30d.activeUsersGrowth>0?'+':'')+GA.summary30d.activeUsersGrowth+'%',cl:GA.summary30d.activeUsersGrowth>=0?'var(--green)':'var(--red)'},
-      {v:'R$'+fN(Math.round(GA.trafficTotal.rev/1000))+'k',l:'Receita GA 90d',s:fN(GA.trafficTotal.sess)+' sessões',cl:'var(--green)'},
-      {v:GA.buyer.rate+'%',l:'Taxa Comprador',s:'FTP: '+GA.buyer.ftpRate+'%',cl:'var(--gold)'},
-      {v:fN(GA.rt.usersNow),l:'Online Agora',s:'🟢 real-time',cl:'var(--green)'},
-      {v:GA.ov.engTime,l:'Eng. Médio',s:'por sessão',cl:'var(--cyan)'},
-      {v:fN(GA.summary30d.purchases),l:'Compras 30d',s:(GA.summary30d.purchasesGrowth>0?'+':'')+GA.summary30d.purchasesGrowth+'%',cl:GA.summary30d.purchasesGrowth>=0?'var(--green)':'var(--red)'}
-    ].map(function(k){return '<div style="text-align:center;padding:8px;background:var(--card-bg);border-radius:8px;border:1px solid var(--border)"><div style="font-size:18px;font-weight:800;color:'+k.cl+'">'+k.v+'</div><div style="font-size:10px;color:var(--text3);margin-top:2px">'+k.l+'</div><div style="font-size:9px;color:var(--text3)">'+k.s+'</div></div>'}).join('');
-  }
+  // Build KPI cards — filter zeros when period is 'today' or 'yesterday'
+  const isToday=(currentPeriod==='today'||currentPeriod==='yesterday');
+  const gaRtVal=(typeof GA!=='undefined')?GA.rt.usersNow:'--';
+  const allKpis=[
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12H8"/><path d="M12 8v8"/></svg>',l:'Online Agora',v:gaRtVal,s:'real-time · 30min',c:'green',raw:1,always:true},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',l:'NGR',v:fR(k.ngr),s:pLabel,c:'',raw:k.ngr},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold',raw:k.ds},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`Saques reais (sem mov. interna)`,c:'red',raw:k.ws-k.mi},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red',raw:k.ds},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/></svg>',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red',raw:k.nc},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>',l:'Mov. Interna',v:fR(k.mi),s:'Saques cripto → Wallet',c:k.mi>0?'purple':'',raw:k.mi},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',l:'Novos Cadastros',v:fN(k.nr),s:`FTD: ${fN(k.ftd)}`,c:'blue',raw:k.nr},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',l:'Conv. Reg→FTD',v:fP(k.conv),s:'Taxa conversão',c:'cyan',raw:k.conv},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',l:'UAP Médio/Dia',v:fN(k.uap),s:`${k.days} dias`,c:'purple',raw:k.uap},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 7d',v:fP(CHURN.r7),s:`${fN(CHURN.c7)} de ${fN(CHURN.total)} players`,c:'red',raw:CHURN.r7},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 30d',v:fP(CHURN.r30),s:`${fN(CHURN.c30)} inativos >30d`,c:CHURN.r30>50?'red':'gold',raw:CHURN.r30},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 90d',v:fP(CHURN.r90),s:`${fN(CHURN.c90)} inativos >90d`,c:CHURN.r90>30?'red':'gold',raw:CHURN.r90},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>',l:'Casino GGR',v:fR(k.cg),s:'Gross Gaming Revenue',c:'gold',raw:k.cg},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>',l:'Sportsbook GGR',v:fR(k.sg),s:'Esportes',c:'blue',raw:k.sg},
+  ];
+  const visKpis=isToday?allKpis.filter(x=>x.raw!==0||x.always):allKpis;
+  document.getElementById('kov').innerHTML=visKpis.map(x=>{
+    if(x.l==='Online Agora') return `<div class="kpi green" id="ga-rt-kpi"><div class="kpi-i"><span id="ga-rt-pulse" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);animation:rtPulse 1.5s ease-in-out infinite"></span></div><div class="kpi-l">${x.l}</div><div class="kpi-v" id="ga-rt-count">${x.v}</div><div class="kpi-s" id="ga-rt-updated">${x.s}</div></div>`;
+    return `<div class="kpi ${x.c}"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`;
+  }).join('');
 
   document.getElementById('ct-ngr-title').textContent='NGR — '+pLabel+' (R$)';
+  document.getElementById('ct-vol-title').textContent='Volume / Turnover — '+pLabel+' (R$)';
   document.getElementById('tbl-title').textContent=pLabel;
 
   // Decidir se usa barras mensais ou diárias
@@ -1483,6 +1457,13 @@ function renderOverview(){
   mc('c-ngr',{type:'bar',data:{labels:lb,datasets:[{label:'NGR (R$)',data:ngr,
     backgroundColor:ngr.map(v=>v>=0?C.gA:C.rA),borderColor:ngr.map(v=>v>=0?C.g:C.r),borderWidth:2,borderRadius:useMonthly?8:4}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v)}}}}});
+  // Volume / Turnover chart (Casino + Sportsbook turnover)
+  const volC=chartData.map(d=>(d.c_to||0));
+  const volS=chartData.map(d=>(d.sb_to||0));
+  mc('c-vol',{type:'bar',data:{labels:lb,datasets:[
+    {label:'Casino Turnover',data:volC,backgroundColor:C.gA,borderColor:C.g,borderWidth:1.5,borderRadius:useMonthly?8:4},
+    {label:'SB Turnover',data:volS,backgroundColor:C.glA,borderColor:C.gl,borderWidth:1.5,borderRadius:useMonthly?8:4}
+  ]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#aaa',font:{size:10}}}},scales:{...CD.scales,x:{...CD.scales.x,stacked:true},y:{...CD.scales.y,stacked:true,ticks:{...CD.scales.y.ticks,callback:v=>fR(v)}}}}});
   mc('c-rf',{type:'bar',data:{labels:lb,datasets:[
     {label:'Registros',data:chartData.map(d=>d.nr),backgroundColor:C.bA,borderColor:C.b,borderWidth:1.5,borderRadius:useMonthly?6:3},
     {label:'FTD',data:chartData.map(d=>d.ftd),backgroundColor:C.glA,borderColor:C.gl,borderWidth:1.5,borderRadius:useMonthly?6:3}]},options:CD});
