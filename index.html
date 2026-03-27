@@ -102,7 +102,7 @@ body.sb-open .hdr{margin-left:0}
 .kpi-v{font-size:22px;font-weight:900;line-height:1;margin-bottom:3px;color:var(--green)}
 .kpi.gold .kpi-v{color:var(--gold)}.kpi.red .kpi-v{color:var(--red)}
 .kpi.blue .kpi-v{color:var(--blue)}.kpi.cyan .kpi-v{color:var(--cyan)}.kpi.purple .kpi-v{color:var(--purple)}
-.kpi-s{font-size:11px;color:var(--text3)}
+.kpi-s{font-size:11px;color:#BBB}
 .cg{display:grid;gap:14px;margin-bottom:14px}
 .cg2{grid-template-columns:1fr 1fr}.cg3{grid-template-columns:2fr 1fr}.cgf{grid-template-columns:1fr}
 .cb{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
@@ -468,6 +468,48 @@ body.light .ac-submit{color:#FFF}
 body.light .ticker-tag{color:#FFF}
 body.light .sheets-btn{color:var(--green)}
 body.light select,body.light input[type="date"]{background:var(--bg3);color:var(--text);border-color:var(--border)}
+/* ═══ SPECIAL KPI CARDS ═══ */
+/* Online Agora — blue pulse */
+.kpi-online{background:var(--card);border:1px solid rgba(59,130,246,.3);position:relative;overflow:visible}
+.kpi-online .kpi-v{color:#3B82F6 !important}
+.kpi-online .kpi-l{color:#93C5FD}
+.kpi-online::before{background:#3B82F6 !important}
+.kpi-pulse-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.kpi-pulse-ring{width:52px;height:52px;border-radius:50%;border:2px solid rgba(59,130,246,.4);display:flex;align-items:center;justify-content:center;position:relative}
+.kpi-pulse-ring::after{content:'';position:absolute;width:100%;height:100%;border-radius:50%;border:2px solid rgba(59,130,246,.5);animation:pulseRing 2s ease-out infinite}
+.kpi-pulse-num{font-size:20px;font-weight:900;color:#3B82F6}
+@keyframes pulseRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+body.light .kpi-online{border-color:rgba(59,130,246,.25)}
+body.light .kpi-online .kpi-l{color:#2563EB}
+/* Funnel card */
+.kpi-funnel{min-width:220px}
+.kpi-funnel-bar{height:8px;border-radius:4px;background:var(--bg3);margin:8px 0 6px;overflow:hidden;position:relative}
+.kpi-funnel-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#3B82F6,#0EA55A);transition:width .5s}
+.kpi-funnel-nums{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.kpi-funnel-nums .fn-item{text-align:center}
+.kpi-funnel-nums .fn-val{font-size:18px;font-weight:900;line-height:1.1}
+.kpi-funnel-nums .fn-lbl{font-size:9px;color:#BBB;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.kpi-funnel-nums .fn-arrow{color:var(--text3);font-size:14px}
+.kpi-funnel-conv{display:inline-block;background:var(--greenA);color:var(--green);font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;margin-top:4px}
+/* Split card */
+.kpi-split{display:flex;gap:0;min-width:200px}
+.kpi-split-left,.kpi-split-right{flex:1;padding:0 8px}
+.kpi-split-left{border-right:1px solid var(--border)}
+.kpi-split-right{padding-left:12px}
+.kpi-split .sp-val{font-size:18px;font-weight:900;line-height:1.1;margin-bottom:2px}
+.kpi-split .sp-lbl{font-size:9px;color:#BBB;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.kpi-split .sp-sub{font-size:10px;color:#999;margin-top:3px}
+/* Churn gauges */
+.kpi-churn{min-width:240px}
+.kpi-churn-gauges{display:flex;justify-content:space-around;align-items:flex-end;margin:6px 0 2px}
+.kpi-gauge{text-align:center}
+.kpi-gauge svg{width:64px;height:36px}
+.kpi-gauge-val{font-size:13px;font-weight:800;margin-top:2px;line-height:1}
+.kpi-gauge-lbl{font-size:9px;color:#BBB;font-weight:700;margin-top:1px}
+.kpi-gauge-ct{font-size:9px;color:#888;margin-top:0}
+/* Ticket card with trend */
+.kpi-trend{display:flex;align-items:center;gap:4px;margin-top:3px;font-size:10px;font-weight:700}
+.kpi-trend.up{color:var(--green)}.kpi-trend.down{color:var(--red)}.kpi-trend.neutral{color:#888}
 </style>
 </head>
 <body>
@@ -1509,28 +1551,50 @@ function renderOverview(){
   // Build KPI cards — filter zeros when period is 'today' or 'yesterday'
   const isToday=(currentPeriod==='today'||currentPeriod==='yesterday');
   const gaRtVal=(typeof GA!=='undefined')?GA.rt.usersNow:'--';
+  // Ticket médio dep/saq
+  const tkDep=k.nd>0?k.ds/k.nd:0;
+  const tkSaq=k.nw>0?(k.ws-k.mi)/k.nw:0;
+  // Funnel conversion
+  const funnelPct=k.nr>0?k.ftd/k.nr*100:0;
+  // FTD ticket
+  const tkFtd=k.ftd>0?k.fda/k.ftd:0;
+  // Churn gauge SVG helper
+  function gaugeArc(pct,color){
+    const r=26,cx=32,cy=32;
+    const startAngle=Math.PI, endAngle=Math.PI+Math.PI*(Math.min(pct,100)/100);
+    const x1=cx+r*Math.cos(startAngle),y1=cy+r*Math.sin(startAngle);
+    const x2=cx+r*Math.cos(endAngle),y2=cy+r*Math.sin(endAngle);
+    const large=pct>50?1:0;
+    return `<svg viewBox="0 0 64 36" fill="none"><path d="M${6} ${32} A${r} ${r} 0 0 1 ${58} ${32}" stroke="rgba(255,255,255,.08)" stroke-width="5" stroke-linecap="round"/><path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" stroke="${color}" stroke-width="5" stroke-linecap="round"/></svg>`;
+  }
   const allKpis=[
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12H8"/><path d="M12 8v8"/></svg>',l:'Online Agora',v:gaRtVal,s:'real-time · 30min',c:'green',raw:1,always:true},
+    {type:'online',l:'Online Agora',v:gaRtVal,raw:1,always:true},
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',l:'NGR',v:fR(k.ngr),s:pLabel,c:'',raw:k.ngr},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações · Ticket ${fR(k.nd>0?k.ds/k.nd:0)}`,c:'gold',raw:k.ds},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`${fN(k.nw||0)} transações · Ticket ${fR(k.nw>0?(k.ws-k.mi)/k.nw:0)}`,c:'red',raw:k.ws-k.mi},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold',raw:k.ds},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`${fN(k.nw||0)} transações`,c:'red',raw:k.ws-k.mi},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="8" y1="5" x2="8" y2="19"/></svg>',l:'Ticket Médio Dep.',v:fR(tkDep),s:'valor médio por depósito',c:'gold',raw:tkDep},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>',l:'Ticket Médio Saq.',v:fR(tkSaq),s:'valor médio por saque',c:'red',raw:tkSaq},
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red',raw:k.ds},
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/></svg>',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red',raw:k.nc},
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>',l:'Mov. Interna',v:fR(k.mi),s:'Saques cripto → Wallet',c:k.mi>0?'purple':'',raw:k.mi},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',l:'Novos Cadastros',v:fN(k.nr),s:`FTD: ${fN(k.ftd)}`,c:'blue',raw:k.nr},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',l:'Conv. Reg→FTD',v:fP(k.conv),s:'Taxa conversão',c:'cyan',raw:k.conv},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',l:'Novos Depósitos (FTD)',v:fR(k.fda),s:`${fN(k.ftd)} primeiro depósito`,c:'green',raw:k.fda},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',l:'Ticket Médio FTD',v:k.ftd>0?fR(k.fda/k.ftd):'R$ 0',s:'FTD Amount / FTD Count',c:'cyan',raw:k.ftd>0?k.fda/k.ftd:0},
+    {type:'funnel',l:'Cadastros → FTD',nr:k.nr,ftd:k.ftd,conv:funnelPct,raw:k.nr,always:true},
+    {type:'split',l:'FTD + Ticket',fda:k.fda,ftd:k.ftd,tk:tkFtd,raw:k.fda},
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',l:'UAP Médio/Dia',v:fN(k.uap),s:`${k.days} dias`,c:'purple',raw:k.uap},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 7d',v:fP(CHURN.r7),s:`${fN(CHURN.c7)} de ${fN(CHURN.total)} players`,c:'red',raw:CHURN.r7},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 30d',v:fP(CHURN.r30),s:`${fN(CHURN.c30)} inativos >30d`,c:CHURN.r30>50?'red':'gold',raw:CHURN.r30},
-    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',l:'Churn 90d',v:fP(CHURN.r90),s:`${fN(CHURN.c90)} inativos >90d`,c:CHURN.r90>30?'red':'gold',raw:CHURN.r90},
+    {type:'churn',l:'Churn',r7:CHURN.r7,c7:CHURN.c7,r30:CHURN.r30,c30:CHURN.c30,r90:CHURN.r90,c90:CHURN.c90,total:CHURN.total,gaugeArc:gaugeArc,raw:CHURN.r7,always:true},
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>',l:'Casino GGR',v:fR(k.cg),s:'Gross Gaming Revenue',c:'gold',raw:k.cg},
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>',l:'Sportsbook GGR',v:fR(k.sg),s:'Esportes',c:'blue',raw:k.sg},
   ];
   const visKpis=isToday?allKpis.filter(x=>x.raw!==0||x.always):allKpis;
   document.getElementById('kov').innerHTML=visKpis.map(x=>{
-    if(x.l==='Online Agora') return `<div class="kpi green" id="ga-rt-kpi"><div class="kpi-i"><span id="ga-rt-pulse" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);animation:rtPulse 1.5s ease-in-out infinite"></span></div><div class="kpi-l">${x.l}</div><div class="kpi-v" id="ga-rt-count">${x.v}</div><div class="kpi-s" id="ga-rt-updated">${x.s}</div></div>`;
+    // Card 1: Online Agora — Blue Pulse Circle
+    if(x.type==='online') return `<div class="kpi kpi-online" id="ga-rt-kpi"><div class="kpi-pulse-wrap"><div class="kpi-pulse-ring"><span class="kpi-pulse-num" id="ga-rt-count">${x.v}</span></div></div><div class="kpi-l">Online Agora</div><div class="kpi-s" id="ga-rt-updated">real-time · 30min</div></div>`;
+    // Card 6: Funnel Cadastros → FTD
+    if(x.type==='funnel'){const pct=x.nr>0?(x.ftd/x.nr*100):0;return `<div class="kpi blue kpi-funnel"><div class="kpi-l">Cadastros → FTD</div><div class="kpi-funnel-nums"><div class="fn-item"><div class="fn-val" style="color:#3B82F6">${fN(x.nr)}</div><div class="fn-lbl">Cadastros</div></div><div class="fn-arrow">→</div><div class="fn-item"><div class="fn-val" style="color:var(--green)">${fN(x.ftd)}</div><div class="fn-lbl">FTD</div></div></div><div class="kpi-funnel-bar"><div class="kpi-funnel-fill" style="width:${Math.min(pct,100)}%"></div></div><div class="kpi-funnel-conv">${fP(pct)} conversão</div></div>`;}
+    // Card 7: Split FTD + Ticket
+    if(x.type==='split') return `<div class="kpi green"><div class="kpi-l">Novos Depósitos (FTD)</div><div class="kpi-split"><div class="kpi-split-left"><div class="sp-val" style="color:var(--green)">${fR(x.fda)}</div><div class="sp-lbl">Volume FTD</div><div class="sp-sub">${fN(x.ftd)} FTDs</div></div><div class="kpi-split-right"><div class="sp-val" style="color:var(--cyan)">${fR(x.tk)}</div><div class="sp-lbl">Ticket Médio</div><div class="sp-sub">por primeiro dep.</div></div></div></div>`;
+    // Card 8: Churn Gauges
+    if(x.type==='churn'){const c7=x.r7>70?'#FF4444':x.r7>40?'#F59E0B':'#0EA55A';const c30=x.r30>70?'#FF4444':x.r30>40?'#F59E0B':'#0EA55A';const c90=x.r90>30?'#FF4444':x.r90>15?'#F59E0B':'#0EA55A';return `<div class="kpi red kpi-churn"><div class="kpi-l">Churn Rate</div><div class="kpi-churn-gauges"><div class="kpi-gauge">${x.gaugeArc(x.r7,c7)}<div class="kpi-gauge-val" style="color:${c7}">${fP(x.r7)}</div><div class="kpi-gauge-lbl">7 dias</div><div class="kpi-gauge-ct">${fN(x.c7)} players</div></div><div class="kpi-gauge">${x.gaugeArc(x.r30,c30)}<div class="kpi-gauge-val" style="color:${c30}">${fP(x.r30)}</div><div class="kpi-gauge-lbl">30 dias</div><div class="kpi-gauge-ct">${fN(x.c30)} inativos</div></div><div class="kpi-gauge">${x.gaugeArc(x.r90,c90)}<div class="kpi-gauge-val" style="color:${c90}">${fP(x.r90)}</div><div class="kpi-gauge-lbl">90 dias</div><div class="kpi-gauge-ct">${fN(x.c90)} inativos</div></div></div></div>`;}
+    // Default cards
     return `<div class="kpi ${x.c}"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`;
   }).join('');
 

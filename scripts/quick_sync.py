@@ -205,18 +205,30 @@ try:
         d_str = d_match.group()
         d_obj = json.loads(d_str)
 
-        # Only fill if Phoenix hasn't arrived (cg=0 means no consolidated data yet)
-        if abs(d_obj.get('cg', 0)) < 1:
+        # Only fill if Phoenix/Superset hasn't arrived (c_po=0 means no consolidated data yet)
+        if abs(d_obj.get('c_po', 0)) < 1:
             d_obj['nr'] = sm_nr
             d_obj['ftd'] = sm_ftd
             d_obj['c_to'] = sm_vol  # Smartico volume as casino turnover proxy
             d_obj['fda'] = round(sm_totals.get('ftd_total', 0), 2)  # FTD Amount
+            # Smartico net_pl = NGR total (casino+sport breakdown not available)
+            sm_ngr = round(sm_totals.get('net_pl', 0), 2)
+            d_obj['ngr'] = sm_ngr
+            # If casino/sport breakdown available use it, otherwise attribute all to casino
+            sm_cg = sm_totals.get('net_pl_casino', 0) or 0
+            sm_sg = sm_totals.get('net_pl_sport', 0) or 0
+            if abs(sm_cg) > 0 or abs(sm_sg) > 0:
+                d_obj['cg'] = round(sm_cg, 2)
+                d_obj['sg'] = round(sm_sg, 2)
+            else:
+                d_obj['cg'] = sm_ngr  # All NGR attributed to casino (main vertical)
+                d_obj['sg'] = 0
             new_d = json.dumps(d_obj, separators=(',',': '))
             html = html.replace(d_str, new_d, 1)
             sm_fda = round(sm_totals.get('ftd_total', 0), 2)
-            print(f"   → D[{TODAY}]: nr={sm_nr}, ftd={sm_ftd}, vol=R${sm_vol:,.2f}, fda=R${sm_fda:,.2f}")
+            print(f"   → D[{TODAY}]: nr={sm_nr}, ftd={sm_ftd}, vol=R${sm_vol:,.2f}, fda=R${sm_fda:,.2f}, ngr=R${sm_ngr:,.2f}")
         else:
-            print(f"   → D[{TODAY}]: Phoenix data present (cg={d_obj.get('cg',0)}), skipping Smartico fill")
+            print(f"   → D[{TODAY}]: Phoenix/Superset data present (c_po={d_obj.get('c_po',0)}), skipping Smartico fill")
     else:
         print(f"   → D[{TODAY}]: entry not found in D[]")
 except Exception as e:
