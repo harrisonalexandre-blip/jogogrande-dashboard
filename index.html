@@ -2165,7 +2165,7 @@ function rCaixa(){
       +'<td style="color:var(--red)">'+fR(w.ws)+'</td><td>'+fR(taxa)+'</td>'
       +'<td style="color:var(--gold)">'+(c.ads?fR(c.ads):'—')+'</td>'
       +'<td>'+(c.expenses?fR(c.expenses):'—')+'</td>'
-      +'<td style="color:'+(lucro>=0?'var(--green)':'var(--red)');font-weight:700">'+fR(lucro)+'</td>'
+      +'<td style="color:'+(lucro>=0?'var(--green)':'var(--red)')+';font-weight:700">'+fR(lucro)+'</td>'
       +'<td>'+(hasClosed?'<span class="bp">Fechado</span>':'<span style="color:var(--text3)">Pendente</span>')+'</td></tr>';
   }).join('');
 }
