@@ -210,9 +210,11 @@ try:
             d_obj['nr'] = sm_nr
             d_obj['ftd'] = sm_ftd
             d_obj['c_to'] = sm_vol  # Smartico volume as casino turnover proxy
+            d_obj['fda'] = round(sm_totals.get('ftd_total', 0), 2)  # FTD Amount
             new_d = json.dumps(d_obj, separators=(',',': '))
             html = html.replace(d_str, new_d, 1)
-            print(f"   → D[{TODAY}]: nr={sm_nr}, ftd={sm_ftd}, vol=R${sm_vol:,.2f}")
+            sm_fda = round(sm_totals.get('ftd_total', 0), 2)
+            print(f"   → D[{TODAY}]: nr={sm_nr}, ftd={sm_ftd}, vol=R${sm_vol:,.2f}, fda=R${sm_fda:,.2f}")
         else:
             print(f"   → D[{TODAY}]: Phoenix data present (cg={d_obj.get('cg',0)}), skipping Smartico fill")
     else:
