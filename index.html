@@ -1851,7 +1851,7 @@ function renderCrmGameRankings(){
 
 
 function rAnalytics(){
-  if(RD.analytics)return;RD.analytics=true;
+  // RD guard handled by sp()
   // Updated timestamp
   var upd=document.getElementById('ga-updated');
   if(upd)upd.textContent=new Date(GA.updated).toLocaleDateString('pt-BR')+' '+new Date(GA.updated).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -3436,7 +3436,7 @@ function sp(n,el){
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
   else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
-  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='caixa')rCaixa();else if(n==='cohorts')rCohorts();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
+  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='caixa')rCaixa();else if(n==='cohorts')rCohorts();else if(n==='analytics')rAnalytics();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
 function sbNav(n,el){
   sp(n,el);
