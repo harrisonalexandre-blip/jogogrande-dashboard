@@ -1624,6 +1624,23 @@ function renderOverview(){
   const _avgTkSaq=data.length>0?data.reduce((a,d)=>a+((d.nw||0)>0?((d.ws||0)-(d.mi||0))/(d.nw||1):0),0)/dayCount:0;
   const _maxTkSaq=data.length>0?Math.max(...data.map(d=>(d.nw||0)>0?((d.ws||0)-(d.mi||0))/(d.nw||1):0)):1;
   const _curTkSaq=tkSaq;
+  // %Dep/Saq per day
+  const _avgDepSaq=data.length>0?data.reduce((a,d)=>a+(d.ds>0?((d.ws||0)-(d.mi||0))/d.ds*100:0),0)/dayCount:0;
+  const _maxDepSaq=data.length>0?Math.max(...data.map(d=>d.ds>0?((d.ws||0)-(d.mi||0))/d.ds*100:0)):1;
+  const _curDepSaq=depSaqPct;
+  // NGR per day
+  const _avgNgrDay=data.length>0?k.ngr/dayCount:0;
+  const _maxNgrDay=data.length>0?Math.max(...data.map(d=>d.ngr)):1;
+  const _curNgrDay=dayCount===1?k.ngr:_avgNgrDay;
+  // NetCash per day
+  const _avgNcDay=data.length>0?k.nc/dayCount:0;
+  const _maxNcDay=data.length>0?Math.max(...data.map(d=>d.ds-(d.ws||0))):1;
+  const _curNcDay=dayCount===1?k.nc:_avgNcDay;
+  // Wagering (volume) per day
+  const _avgVolDay=data.length>0?totalVol/dayCount:0;
+  const _maxVolDay=data.length>0?Math.max(...data.map(d=>(d.c_to||0)+(d.sb_to||0))):1;
+  const _curVolDay=dayCount===1?totalVol:_avgVolDay;
+  // (Casino/SB GGR cards removidos — NGR já mostra o consolidado)
   function _th(cur,avg,mx,fmt){const m=mx||1;return{thCur:Math.min(100,cur/m*100),thAvg:Math.min(100,avg/m*100),thMax:mx,thCurV:fmt(cur),thAvgV:fmt(avg),thMaxV:fmt(mx)};};
   const allKpis=[
     /* 1 */ {type:'online',l:'Online Agora',v:gaRtVal,raw:1,always:true},
@@ -1633,13 +1650,11 @@ function renderOverview(){
     /* 5 */ {type:'split',l:'FTD + Ticket',fda:k.fda,ftd:k.ftd,tk:tkFtd,raw:k.fda},
     /* 6 */ Object.assign({i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',l:'Vol. Saques',v:fR(k.ws-k.mi),s:`${fN(k.nw||0)} transações`,c:'red',raw:k.ws-k.mi},_th(_curWsDay,_avgWsDay,_maxWsDay,fR)),
     /* 7 */ Object.assign({i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>',l:'Ticket Médio Saq.',v:fR(tkSaq),s:'valor médio por saque',c:'red',raw:tkSaq},_th(_curTkSaq,_avgTkSaq,_maxTkSaq,fR)),
-    /* 8 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red',raw:k.ds},
-    /* 9 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',l:'NGR',v:fR(k.ngr),s:pLabel,c:'',raw:k.ngr},
-    /* 10 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/></svg>',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red',raw:k.nc},
+    /* 8 */ Object.assign({i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red',raw:k.ds},_th(_curDepSaq,_avgDepSaq,_maxDepSaq,fP)),
+    /* 9 */ Object.assign({i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',l:'NGR',v:fR(k.ngr),s:pLabel,c:'',raw:k.ngr},_th(_curNgrDay,_avgNgrDay,_maxNgrDay,fR)),
+    /* 10 */ Object.assign({i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/></svg>',l:'NetCash',v:fR(k.nc),s:`Retenção: ${fP(100-depSaqPct)}`,c:k.nc>=0?'':'red',raw:k.nc},_th(_curNcDay,_avgNcDay,_maxNcDay,fR)),
     /* 11 */ {type:'churn',l:'Churn',r7:CHURN.r7,c7:CHURN.c7,r30:CHURN.r30,c30:CHURN.c30,r90:CHURN.r90,c90:CHURN.c90,total:CHURN.total,gaugeArc:gaugeArc,raw:CHURN.r7,always:true},
-    /* 12 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>',l:'Volume (Wagering)',v:fR(totalVol),s:isToday?`Smartico volume total`:`Casino ${fR(k.c_to)} · SB ${fR(k.sb_to)}`,c:'purple',raw:totalVol,always:true},
-    /* 13 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>',l:'Sportsbook GGR',v:fR(k.sg),s:isToday&&k.sg===0?'Smartico não separa casino/sport':'Esportes',c:'blue',raw:k.sg,always:!isToday},
-    /* 14 */ {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>',l:'Casino GGR',v:fR(k.cg),s:isToday?'Smartico net_pl (casino+sport)':'Gross Gaming Revenue',c:'gold',raw:k.cg,always:true},
+    /* 12 */ Object.assign({i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>',l:'Volume (Wagering)',v:fR(totalVol),s:isToday?`Smartico volume total`:`Casino ${fR(k.c_to)} · SB ${fR(k.sb_to)}`,c:'purple',raw:totalVol,always:true},_th(_curVolDay,_avgVolDay,_maxVolDay,fR)),
   ];
   const visKpis=allKpis;
   document.getElementById('kov').innerHTML=visKpis.map(x=>{
