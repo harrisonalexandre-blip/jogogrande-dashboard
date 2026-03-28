@@ -1603,6 +1603,10 @@ function fR(v,s=true){const a=Math.abs(v);const f=a>=1e6?(a/1e6).toFixed(2)+'M':
 function fN(v){return Number(v).toLocaleString('pt-BR')}
 function fP(v){return v.toFixed(1)+'%'}
 function mk(v,f='c'){const cl=v>0?'bp':v<0?'bn':'bp';const t=f==='c'?fR(v):fP(v);return `<span class="${cl}">${t}</span>`}
+// ═══ HOURLY DATA (24h breakdown — today only) ═══
+// Format: {date:"YYYY-MM-DD", regs:[h0..h23], ftd:[h0..h23], vol:[h0..h23]}
+const HOURLY={date:"2026-03-27",regs:[0,0,0,0,0,0,0,0,12,18,22,15,14,11,9,13,16,10,8,7,5,4,3,2],ftd:[0,0,0,0,0,0,0,0,5,8,10,7,6,5,4,6,7,5,3,3,2,1,1,1],vol:[0,0,0,0,0,0,0,0,4200,6800,8500,5400,4800,3900,3200,4600,5800,3600,2800,2400,1800,1400,1000,700]};
+
 let charts={};
 function mc(id,cfg){const x=document.getElementById(id);if(!x)return null;if(charts[id]){charts[id].destroy()}charts[id]=new Chart(x.getContext('2d'),cfg);return charts[id]}
 
@@ -1952,6 +1956,50 @@ function kpiDrop(e){
   renderOverview();
 }
 
+// ═══ HOURLY BAR CHARTS (24h breakdown) ═══
+function renderHourlyCharts(){
+  const now=new Date();
+  const curHour=now.getHours();
+  const todayStr=localDateStr(now);
+  const isCurrentDay=(HOURLY.date===todayStr);
+
+  function buildBars(containerId, labelId, arr, color, isCurrency){
+    const el=document.getElementById(containerId);
+    const lbl=document.getElementById(labelId);
+    if(!el)return;
+    const maxVal=Math.max(...arr,1);
+    const total=arr.reduce((s,v)=>s+v,0);
+    let bars='';
+    for(let h=0;h<24;h++){
+      const v=arr[h]||0;
+      const pct=maxVal>0?(v/maxVal*100):0;
+      const isFuture=isCurrentDay&&h>curHour;
+      const isEmpty=v===0&&(!isCurrentDay||h<=curHour);
+      const bg=isFuture?'rgba(255,255,255,.05)':isEmpty?'rgba(255,255,255,.08)':color;
+      const opacity=isFuture?'1':isEmpty?'1':'1';
+      const ht=pct>0?Math.max(pct,4):2;
+      const tipVal=isCurrency?fR(v):fN(v);
+      const tipLabel=isFuture?'—':tipVal;
+      bars+=`<div class="h-bar" style="height:${ht}%;background:${bg};opacity:${opacity}"><div class="h-tip">${String(h).padStart(2,'0')}h: ${tipLabel}</div></div>`;
+    }
+    el.innerHTML=bars;
+    // Labels: show every 3 hours
+    let labels='';
+    for(let h=0;h<24;h++){
+      labels+=`<span>${h%3===0?String(h).padStart(2,'0'):''}</span>`;
+    }
+    lbl.innerHTML=labels;
+    // Total below
+    let totalEl=el.parentNode.querySelector('.hourly-total');
+    if(!totalEl){totalEl=document.createElement('div');totalEl.className='hourly-total';el.parentNode.appendChild(totalEl);}
+    totalEl.textContent='Total: '+(isCurrency?fR(total):fN(total));
+  }
+
+  buildBars('hc-regs','hl-regs',HOURLY.regs,'#3B82F6',false);
+  buildBars('hc-ftd','hl-ftd',HOURLY.ftd,'#0EA55A',false);
+  buildBars('hc-vol','hl-vol',HOURLY.vol,'#8B5CF6',true);
+}
+
 function renderOverview(){
   const data=filteredData;
   const k=calcKPIs(data,currentPeriod);
@@ -2098,6 +2146,15 @@ function renderOverview(){
     const dltBadge=x.dlt||'';
     return `<div class="kpi ${x.c}" ${dAttr(x._id)} style="position:relative;${hasTh?'display:flex;flex-direction:column;padding-bottom:0;overflow:hidden':''}">${dBtns(x._id)}<div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v} ${dltBadge}</div><div class="kpi-s">${x.s}</div>${thBar}</div>`;
   }).join('');
+
+  // === Hourly 24h Charts (today only) ===
+  const hourlyEl=document.getElementById('ov-hourly');
+  if(currentPeriod==='today'){
+    hourlyEl.style.display='';
+    renderHourlyCharts();
+  } else {
+    hourlyEl.style.display='none';
+  }
 
   // === TOP Rankings + Charts visibility ===
   const topsEl=document.getElementById('ov-tops');
