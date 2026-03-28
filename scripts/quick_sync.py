@@ -234,6 +234,34 @@ try:
 except Exception as e:
     print(f"   D[] today skip: {e}")
 
+# === 7. UPDATE HOURLY ===
+print("7. HOURLY (por hora - Smartico)...")
+try:
+    raw_h = api({'aggregation_period':'HOUR','date_from':TODAY,'date_to':TMR})
+    hr_regs = [0]*24
+    hr_ftd  = [0]*24
+    hr_vol  = [0.0]*24
+    for r in raw_h:
+        dt_str = str(r.get('dt',''))
+        # dt pode vir como "2026-03-28T12:00:00" ou "2026-03-28 12:00:00"
+        if 'T' in dt_str or (' ' in dt_str and len(dt_str) >= 13):
+            sep = 'T' if 'T' in dt_str else ' '
+            hour = int(dt_str.split(sep)[1][:2])
+        else:
+            continue
+        if 0 <= hour < 24:
+            hr_regs[hour] += int(r.get('registration_count', 0) or 0)
+            hr_ftd[hour]  += int(r.get('ftd_count', 0) or 0)
+            hr_vol[hour]  += float(r.get('volume', 0) or 0)
+    hr_vol = [round(v, 2) for v in hr_vol]
+    new_hourly = {'date': TODAY, 'regs': hr_regs, 'ftd': hr_ftd, 'vol': hr_vol}
+    hj = json.dumps(new_hourly, separators=(',',':'))
+    html = re.sub(r'const HOURLY=\{.*?\};', f'const HOURLY={hj};', html, count=1)
+    filled = sum(1 for v in hr_regs if v > 0)
+    print(f"   → HOURLY: {filled} horas com dados, regs={sum(hr_regs)}, ftd={sum(hr_ftd)}, vol=R${sum(hr_vol):,.2f}")
+except Exception as e:
+    print(f"   HOURLY skip: {e}")
+
 # === SAVE ===
 AFF['syncAt'] = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 

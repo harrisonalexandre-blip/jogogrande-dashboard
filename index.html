@@ -421,6 +421,15 @@ body { overflow-x: clip; }
   }
   #ga-rt-count { font-size: 40px !important; }
 
+  /* Título de seção — legível em mobile */
+  .sec { font-size: 11px !important; letter-spacing: 1px !important; margin-bottom: 10px !important; }
+
+  /* Card KPI split — sem min-width que causa overflow */
+  .kpi-split-wrap { min-width: 0 !important; }
+
+  /* Sub-texto do KPI — sem truncar "Ab: 14:04" */
+  .kpi-s { white-space: normal !important; word-break: break-word !important; }
+
   /* CRM stats valores menores */
   .crm-stat .val { font-size: 22px !important; }
 
@@ -1618,7 +1627,7 @@ function fP(v){return v.toFixed(1)+'%'}
 function mk(v,f='c'){const cl=v>0?'bp':v<0?'bn':'bp';const t=f==='c'?fR(v):fP(v);return `<span class="${cl}">${t}</span>`}
 // ═══ HOURLY DATA (24h breakdown — today only) ═══
 // Format: {date:"YYYY-MM-DD", regs:[h0..h23], ftd:[h0..h23], vol:[h0..h23]}
-const HOURLY={date:"2026-03-28",regs:[13, 7, 14, 2, 5, 1, 8, 8, 13, 15, 15, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],ftd:[6, 4, 7, 1, 2, 0, 4, 4, 6, 7, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],vol:[23123, 13213, 24774, 3303, 8258, 1652, 14865, 14865, 23123, 26426, 29729, 3303, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]};
+const HOURLY={date:"2026-03-28",regs:[12, 6, 12, 2, 4, 1, 8, 8, 15, 15, 18, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],ftd:[6, 3, 6, 1, 2, 0, 4, 4, 7, 7, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],vol:[5452, 2726, 5452, 681, 1704, 341, 3407, 3407, 6474, 6474, 8178, 1022, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]};
 
 let charts={};
 function mc(id,cfg){const x=document.getElementById(id);if(!x)return null;if(charts[id]){charts[id].destroy()}charts[id]=new Chart(x.getContext('2d'),cfg);return charts[id]}
