@@ -268,8 +268,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
    Fixes para iPhone e telas < 768px
    ═══════════════════════════════════════════ */
 
-/* Previne scroll horizontal global */
-html, body { overflow-x: hidden; max-width: 100vw; }
+/* Previne scroll horizontal — sem quebrar position:fixed no iOS Safari */
+body { overflow-x: clip; }
 
 /* Botão hamburger — visível apenas em mobile */
 .mob-menu-btn {
