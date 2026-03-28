@@ -527,12 +527,12 @@ body.light .kpi-funnel-convbar{background:rgba(0,0,0,.06)}
 .kpi-gauge-lbl{font-size:10px;color:#BBB;font-weight:700;margin-top:2px}
 .kpi-gauge-ct{font-size:9px;color:#888;margin-top:1px}
 /* Thermometer bar */
-.kpi-thermo-wrap{width:100%;padding:0 14px 6px;margin-top:auto;position:relative}
-.kpi-thermo{width:100%;height:4px;background:rgba(255,255,255,.08);border-radius:2px;position:relative}
-.kpi-thermo-fill{height:100%;border-radius:2px 0 0 2px;position:absolute;left:0;top:0}
-.kpi-thermo-tick{position:absolute;top:-1px;width:1px;height:6px;background:rgba(255,255,255,.25)}
+.kpi-thermo-wrap{width:100%;padding:0;margin-top:auto;position:relative}
+.kpi-thermo{width:100%;height:6px;background:rgba(255,255,255,.06);border-radius:0 0 12px 12px;position:relative}
+.kpi-thermo-fill{height:100%;border-radius:0 0 0 12px;position:absolute;left:0;top:0;transition:width .4s}
+.kpi-thermo-tick{position:absolute;top:-2px;width:1px;height:10px;background:rgba(255,255,255,.25)}
 .kpi-thermo-tick.avg{background:rgba(255,255,255,.4)}
-.kpi-thermo-tick.cur{width:3px;height:10px;top:-3px;border-radius:1.5px;background:#fff;box-shadow:0 0 5px rgba(255,255,255,.5);margin-left:-1px}
+.kpi-thermo-tick.cur{width:3px;height:10px;top:-2px;border-radius:1.5px;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.5);margin-left:-1px}
 .kpi-thermo-labels{display:flex;justify-content:space-between;margin-top:3px}
 .kpi-thermo-lbl{font-size:7px;color:#666;font-weight:600}
 .kpi-thermo-lbl.avg{color:#999;position:absolute;transform:translateX(-50%)}
@@ -1658,8 +1658,8 @@ function renderOverview(){
     // Default cards
     const hasTh=x.thCur!=null;
     const thColor=x.c==='gold'?'var(--gold)':x.c==='red'?'var(--red)':x.c==='green'?'var(--green)':'var(--cyan)';
-    const thBar=hasTh?`<div class="kpi-thermo-wrap"><div class="kpi-thermo"><div class="kpi-thermo-fill" style="width:${x.thCur.toFixed(1)}%;background:${thColor};opacity:.4"></div><div class="kpi-thermo-tick avg" style="left:${x.thAvg.toFixed(1)}%" title="Média: ${x.thAvgV}"></div><div class="kpi-thermo-tick cur" style="left:${x.thCur.toFixed(1)}%" title="Atual: ${x.thCurV}"></div></div><div style="position:relative;height:12px"><span class="kpi-thermo-lbl" style="position:absolute;left:0">0</span><span class="kpi-thermo-lbl avg" style="left:${x.thAvg.toFixed(1)}%">méd ${x.thAvgV}</span><span class="kpi-thermo-lbl" style="position:absolute;right:0">${x.thMaxV}</span></div></div>`:'';
-    return `<div class="kpi ${x.c}" style="${hasTh?'display:flex;flex-direction:column;padding-bottom:0':''}"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div>${thBar}</div>`;
+    const thBar=hasTh?`<div class="kpi-thermo-wrap"><div class="kpi-thermo"><div class="kpi-thermo-fill" style="width:${x.thCur.toFixed(1)}%;background:${thColor};opacity:.4"></div><div class="kpi-thermo-tick avg" style="left:${x.thAvg.toFixed(1)}%" title="Média: ${x.thAvgV}"></div><div class="kpi-thermo-tick cur" style="left:${x.thCur.toFixed(1)}%" title="Atual: ${x.thCurV}"></div></div></div>`:'';
+    return `<div class="kpi ${x.c}" style="${hasTh?'display:flex;flex-direction:column;padding-bottom:0;overflow:hidden':''}"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div>${thBar}</div>`;
   }).join('');
 
   document.getElementById('ct-ngr-title').textContent='NGR — '+pLabel+' (R$)';
@@ -3896,6 +3896,7 @@ function fetchGaRealtime(){
     var el=document.getElementById('ga-rt-count');
     if(el){
       var newVal=d.activeUsers||0;
+      if(newVal>0)window._lastGaRtVal=newVal; // Save last known good value
       el.textContent=newVal>0?newVal.toLocaleString('pt-BR'):'--';
       el.style.color=newVal>0?'var(--green)':'var(--text3)';
     }
@@ -3928,11 +3929,19 @@ function fetchGaRealtime(){
       if(j.ok){
         upEl.textContent='Att: '+new Date(d.updated).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
         upEl.style.color='rgba(59,130,246,.7)';
+      } else if(j.cached){
+        // Stale cache from server — still show it as live-ish
+        var cachedVal=d.activeUsers||0;
+        if(cachedVal>0){el.textContent=cachedVal.toLocaleString('pt-BR');el.style.color='var(--green)';}
+        upEl.textContent='Att: '+new Date(d.updated).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' (cache)';
+        upEl.style.color='rgba(59,130,246,.5)';
       } else if(j.fallback){
-        el.textContent=GA.rt.usersNow;
-        el.style.color='var(--green)';
-        upEl.textContent='estático';
-        upEl.style.color='var(--gold)';
+        // Last resort: use static GA data
+        var lastVal=window._lastGaRtVal||GA.rt.usersNow||0;
+        el.textContent=lastVal>0?lastVal.toLocaleString('pt-BR'):'--';
+        el.style.color=lastVal>0?'var(--gold)':'var(--text3)';
+        upEl.textContent='cota GA4 esgotada (reseta ~4h)';
+        upEl.style.color='var(--red)';
         if(cEl&&GA.rt.countries){
           cEl.innerHTML=GA.rt.countries.slice(0,6).map(function(c){
             var flag=c.n==='Brazil'?'\ud83c\udde7\ud83c\uddf7':c.n==='Argentina'?'\ud83c\udde6\ud83c\uddf7':c.n==='Mexico'?'\ud83c\uddf2\ud83c\uddfd':'\ud83c\udf0d';
