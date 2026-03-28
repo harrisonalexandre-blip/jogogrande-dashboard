@@ -3972,7 +3972,7 @@ function fetchGaRealtime(){
 function startGaRtPolling(){
   fetchGaRealtime();
   if(_gaRtInterval)clearInterval(_gaRtInterval);
-  _gaRtInterval=setInterval(fetchGaRealtime,120000); // Every 2 minutes (GA4 quota: ~200 tokens/day)
+  _gaRtInterval=setInterval(fetchGaRealtime,180000); // Every 3 min (1 token/call, 20/hour, quota=50/hour)
 }
 
 async function fetchRates(){

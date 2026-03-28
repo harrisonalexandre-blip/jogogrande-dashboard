@@ -1,17 +1,17 @@
 // Vercel Serverless Function: GA4 Realtime Data
-// With in-memory cache to avoid exhausting GA4 daily quota
+// GA4 quota: 50 realtime tokens/hour → 1 call every 3 min = 20 tokens/hour
 const { google } = require('googleapis');
 
-// In-memory cache (persists across invocations on same Vercel instance)
+// In-memory cache (persists across warm invocations)
 let _cache = null;
 let _cacheTime = 0;
-const CACHE_TTL = 120000; // 2 minutes in ms
+const CACHE_TTL = 180000; // 3 minutes
 
 module.exports = async (req, res) => {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=60');
+  // CDN cache: serve stale for up to 5 min while revalidating
+  res.setHeader('Cache-Control', 's-maxage=180, stale-while-revalidate=120');
 
   // Return cache if fresh
   if (_cache && (Date.now() - _cacheTime) < CACHE_TTL) {
@@ -22,9 +22,8 @@ module.exports = async (req, res) => {
     const keyJson = process.env.GA_SERVICE_ACCOUNT_KEY;
     if (!keyJson) {
       return res.status(200).json({
-        ok: false, error: 'GA_SERVICE_ACCOUNT_KEY not configured',
-        fallback: true,
-        data: { activeUsers: 0, countries: [], cities: [], pages: [], updated: new Date().toISOString() }
+        ok: false, error: 'GA_SERVICE_ACCOUNT_KEY not configured', fallback: true,
+        data: { activeUsers: 0, countries: [], cities: [], perMinute: [], updated: new Date().toISOString() }
       });
     }
 
@@ -37,34 +36,22 @@ module.exports = async (req, res) => {
     const analyticsData = google.analyticsdata({ version: 'v1beta', auth });
     const propertyId = process.env.GA_PROPERTY_ID || '521853091';
 
-    // Single consolidated call: activeUsers with country+city dimensions
-    // Uses only 1 API token instead of 5
-    const [mainReport, minuteReport] = await Promise.all([
-      analyticsData.properties.runRealtimeReport({
-        property: `properties/${propertyId}`,
-        requestBody: {
-          dimensions: [{ name: 'country' }, { name: 'city' }],
-          metrics: [{ name: 'activeUsers' }],
-          orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
-          limit: 50
-        }
-      }),
-      analyticsData.properties.runRealtimeReport({
-        property: `properties/${propertyId}`,
-        requestBody: {
-          dimensions: [{ name: 'minutesAgo' }],
-          metrics: [{ name: 'activeUsers' }],
-          minuteRanges: [{ startMinutesAgo: 29, endMinutesAgo: 0 }]
-        }
-      })
-    ]);
+    // === SINGLE API CALL: country+city combined (1 token) ===
+    const report = await analyticsData.properties.runRealtimeReport({
+      property: `properties/${propertyId}`,
+      requestBody: {
+        dimensions: [{ name: 'country' }, { name: 'city' }],
+        metrics: [{ name: 'activeUsers' }],
+        orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
+        limit: 100
+      }
+    });
 
-    // Aggregate from combined report
     let totalUsers = 0;
     const countryMap = {};
     const cityMap = {};
 
-    (mainReport.data.rows || []).forEach(r => {
+    (report.data.rows || []).forEach(r => {
       const country = r.dimensionValues[0].value;
       const city = r.dimensionValues[1].value;
       const users = parseInt(r.metricValues[0].value);
@@ -76,55 +63,39 @@ module.exports = async (req, res) => {
     });
 
     const countries = Object.entries(countryMap)
-      .map(([n, v]) => ({ n, v }))
-      .sort((a, b) => b.v - a.v)
-      .slice(0, 10);
-
+      .map(([n, v]) => ({ n, v })).sort((a, b) => b.v - a.v).slice(0, 10);
     const cities = Object.entries(cityMap)
-      .map(([n, v]) => ({ n, v }))
-      .sort((a, b) => b.v - a.v)
-      .slice(0, 10);
+      .map(([n, v]) => ({ n, v })).sort((a, b) => b.v - a.v).slice(0, 10);
 
-    // Per-minute bars
-    const minuteMap = {};
-    (minuteReport.data.rows || []).forEach(r => {
-      minuteMap[parseInt(r.dimensionValues[0].value)] = parseInt(r.metricValues[0].value);
-    });
-    const perMinute = [];
-    for (let i = 29; i >= 0; i--) {
-      perMinute.push(minuteMap[i] || 0);
+    // Build perMinute from history (shift previous cache + add current)
+    let perMinute = [];
+    if (_cache && _cache.data && _cache.data.perMinute) {
+      perMinute = _cache.data.perMinute.slice(1); // shift left
+      perMinute.push(totalUsers); // add current
+    } else {
+      // First call: fill with current value
+      perMinute = new Array(30).fill(0);
+      perMinute[29] = totalUsers;
     }
 
     const result = {
       ok: true,
-      data: {
-        activeUsers: totalUsers,
-        countries,
-        cities,
-        pages: [],
-        perMinute,
-        updated: new Date().toISOString()
-      }
+      data: { activeUsers: totalUsers, countries, cities, pages: [], perMinute, updated: new Date().toISOString() }
     };
 
-    // Store in cache
     _cache = result;
     _cacheTime = Date.now();
-
     return res.status(200).json(result);
 
   } catch (err) {
-    console.error('GA Realtime API error:', err.message);
-
-    // If we have stale cache, return it instead of empty fallback
+    console.error('GA Realtime error:', err.message);
+    // Return stale cache if available
     if (_cache) {
-      _cache.data.updated = new Date().toISOString();
       return res.status(200).json({ ..._cache, cached: true });
     }
-
     return res.status(200).json({
       ok: false, error: err.message, fallback: true,
-      data: { activeUsers: 0, countries: [], cities: [], pages: [], updated: new Date().toISOString() }
+      data: { activeUsers: 0, countries: [], cities: [], perMinute: [], updated: new Date().toISOString() }
     });
   }
 };
