@@ -20,13 +20,26 @@ let _redis = null;
 function getRedis() {
   if (!_redis) {
     _redis = new Redis(process.env.REDIS_URL, {
-      maxRetriesPerRequest: 2,
-      connectTimeout: 5000,
-      lazyConnect: false
+      maxRetriesPerRequest: 1,
+      connectTimeout: 3000,
+      commandTimeout: 3000,
+      lazyConnect: true,
+      retryStrategy(times) {
+        if (times > 1) return null; // give up after 1 retry
+        return 500;
+      }
     });
     _redis.on('error', (e) => console.error('Redis error:', e.message));
   }
   return _redis;
+}
+
+// Timeout wrapper — returns fallback if Redis takes too long
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+  ]);
 }
 
 async function getUsers() {
@@ -34,18 +47,19 @@ async function getUsers() {
   if (!process.env.REDIS_URL) return users;
   try {
     const redis = getRedis();
-    const data = await redis.get(REDIS_KEY);
+    await withTimeout(redis.connect().catch(() => {}), 2000);
+    if (redis.status !== 'ready') return users;
+    const data = await withTimeout(redis.get(REDIS_KEY), 2000);
     if (data) {
       const redisUsers = JSON.parse(data);
-      // Merge: Redis users + INITIAL_USERS (initial takes priority for admin)
       const initialEmails = new Set(INITIAL_USERS.map(u => u.email.toLowerCase()));
       const extra = redisUsers.filter(u => !initialEmails.has(u.email.toLowerCase()));
       users = [...INITIAL_USERS, ...extra];
     }
-    // Sync back to Redis
-    await redis.set(REDIS_KEY, JSON.stringify(users));
+    // Sync back to Redis (fire and forget)
+    redis.set(REDIS_KEY, JSON.stringify(users)).catch(() => {});
   } catch (e) {
-    console.error('getUsers error:', e.message);
+    console.error('getUsers fallback to INITIAL_USERS:', e.message);
   }
   return users;
 }
