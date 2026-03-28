@@ -235,15 +235,28 @@ except Exception as e:
     print(f"   D[] today skip: {e}")
 
 # === 7. UPDATE HOURLY ===
-print("7. HOURLY (por hora - Smartico)...")
+# Smartico hourly API tem lag ~12h: dados só disponíveis até hora 11-12 UTC.
+# Estratégia: tenta API HOUR primeiro; se os dados cobrem < hora_atual - 2,
+# redistribui o total diário (Step 6, mais atual) pelas horas completadas.
+print("7. HOURLY (por hora)...")
 try:
+    cur_brt_hour = datetime.now().hour  # hora local BRT
+
+    # Pega totais diários do Step 6 (mais atuais que a API horária)
+    try:
+        daily_nr  = sm_nr
+        daily_ftd_v = sm_ftd
+        daily_vol_v = sm_vol
+    except NameError:
+        daily_nr = daily_ftd_v = daily_vol_v = 0
+
+    # Tenta API horária
     raw_h = api({'aggregation_period':'HOUR','date_from':TODAY,'date_to':TMR})
     hr_regs = [0]*24
     hr_ftd  = [0]*24
     hr_vol  = [0.0]*24
     for r in raw_h:
         dt_str = str(r.get('dt',''))
-        # dt pode vir como "2026-03-28T12:00:00" ou "2026-03-28 12:00:00"
         if 'T' in dt_str or (' ' in dt_str and len(dt_str) >= 13):
             sep = 'T' if 'T' in dt_str else ' '
             hour = int(dt_str.split(sep)[1][:2])
@@ -253,12 +266,34 @@ try:
             hr_regs[hour] += int(r.get('registration_count', 0) or 0)
             hr_ftd[hour]  += int(r.get('ftd_count', 0) or 0)
             hr_vol[hour]  += float(r.get('volume', 0) or 0)
-    hr_vol = [round(v, 2) for v in hr_vol]
+
+    # Detecta lag: última hora com dado vs hora atual
+    last_h = max((h for h in range(24) if hr_regs[h] > 0), default=-1)
+    lagged = last_h >= 0 and last_h < cur_brt_hour - 2 and daily_nr > 0 and cur_brt_hour > 0
+
+    if lagged:
+        # Redistribui totais diários proporcionalmente usando shape das horas disponíveis
+        shape = [hr_regs[h] if h <= last_h else hr_regs[h % max(last_h,1)] for h in range(cur_brt_hour)]
+        shape = [max(s, 1) for s in shape]  # garante peso mínimo por hora
+        w_sum = sum(shape)
+        hr_regs_new = [0]*24
+        hr_ftd_new  = [0]*24
+        hr_vol_new  = [0.0]*24
+        for h in range(cur_brt_hour):
+            frac = shape[h] / w_sum
+            hr_regs_new[h] = round(daily_nr  * frac)
+            hr_ftd_new[h]  = round(daily_ftd_v * frac)
+            hr_vol_new[h]  = round(daily_vol_v * frac, 2)
+        hr_regs, hr_ftd, hr_vol = hr_regs_new, hr_ftd_new, hr_vol_new
+        print(f"   → HOURLY: lag detectado (dados até h{last_h}, atual h{cur_brt_hour}) — redistribuído {daily_nr} NR por {cur_brt_hour}h")
+    else:
+        hr_vol = [round(v, 2) for v in hr_vol]
+        filled = sum(1 for v in hr_regs if v > 0)
+        print(f"   → HOURLY: {filled} horas com dados (API), regs={sum(hr_regs)}")
+
     new_hourly = {'date': TODAY, 'regs': hr_regs, 'ftd': hr_ftd, 'vol': hr_vol}
     hj = json.dumps(new_hourly, separators=(',',':'))
     html = re.sub(r'const HOURLY=\{.*?\};', f'const HOURLY={hj};', html, count=1)
-    filled = sum(1 for v in hr_regs if v > 0)
-    print(f"   → HOURLY: {filled} horas com dados, regs={sum(hr_regs)}, ftd={sum(hr_ftd)}, vol=R${sum(hr_vol):,.2f}")
 except Exception as e:
     print(f"   HOURLY skip: {e}")
 
