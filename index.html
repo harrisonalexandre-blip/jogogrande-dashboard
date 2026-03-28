@@ -340,10 +340,23 @@ body { overflow-x: clip; }
     gap: 5px !important;
   }
   .time-bar::-webkit-scrollbar { height: 0; }
-  .time-btn { flex-shrink: 0; }
+  .time-btn { flex-shrink: 0; white-space: nowrap; }
 
   /* Conteúdo com padding adequado */
   .ctn { padding: 12px !important; }
+
+  /* Cards KPI - mais respiro no mobile */
+  .kpi { padding: 14px 16px !important; }
+  .kpi-v { font-size: 20px !important; }
+  .kpi-l { font-size: 10px !important; letter-spacing: 0.5px !important; }
+  .kpi-s { font-size: 10px !important; }
+  .cg { gap: 10px !important; }
+
+  /* Cards box - padding ajustado */
+  .cb { padding: 14px 16px !important; }
+
+  /* Grids forçar 1 coluna em mobile */
+  .cg2, .cg3, .cg3h { grid-template-columns: 1fr !important; }
 
   /* Ticker esconde em mobile — economiza 32px de altura */
   .ticker-bar { display: none !important; }
@@ -1605,7 +1618,7 @@ function fP(v){return v.toFixed(1)+'%'}
 function mk(v,f='c'){const cl=v>0?'bp':v<0?'bn':'bp';const t=f==='c'?fR(v):fP(v);return `<span class="${cl}">${t}</span>`}
 // ═══ HOURLY DATA (24h breakdown — today only) ═══
 // Format: {date:"YYYY-MM-DD", regs:[h0..h23], ftd:[h0..h23], vol:[h0..h23]}
-const HOURLY={date:"2026-03-28",regs:[12, 7, 13, 2, 4, 1, 8, 8, 12, 14, 13, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],ftd:[6, 3, 6, 1, 2, 0, 4, 4, 6, 7, 8, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],vol:[5451, 3115, 5840, 779, 1947, 389, 3504, 3504, 5451, 6230, 7008, 779, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]};
+const HOURLY={date:"2026-03-28",regs:[4, 2, 2, 1, 1, 1, 4, 6, 9, 10, 13, 11, 9, 8, 6, 4, 3, 2, 0, 0, 0, 0, 0, 0],ftd:[2, 1, 1, 0, 0, 0, 2, 3, 5, 5, 7, 6, 5, 4, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0],vol:[1725, 863, 863, 431, 431, 431, 1725, 2588, 4314, 5179, 6039, 5176, 4314, 3451, 2588, 1725, 1294, 863, 0, 0, 0, 0, 0, 0]};
 
 let charts={};
 function mc(id,cfg){const x=document.getElementById(id);if(!x)return null;if(charts[id]){charts[id].destroy()}charts[id]=new Chart(x.getContext('2d'),cfg);return charts[id]}
