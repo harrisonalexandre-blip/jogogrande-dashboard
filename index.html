@@ -3517,8 +3517,7 @@ function renderCRMList(){
   }).join('');
   if(data.length===0)list.innerHTML+='<div style="text-align:center;padding:40px;color:var(--text3)">Nenhum cliente nesta categoria</div>';
 }
-// ═══ BACKLOG CRUD ═══
-const BK_KEY='jg_backlog';
+// ═══ BACKLOG CRUD (Redis-persisted) ═══
 const BK_DEFAULT=[
   {id:1,desc:'Integrar dados de afiliados (comissões, cliques, conversão)',status:'Planejado',prio:'Alta'},
   {id:2,desc:'Módulo Caixa — controle de entradas/saídas USDT e BRL',status:'Planejado',prio:'Alta'},
@@ -3529,11 +3528,24 @@ const BK_DEFAULT=[
   {id:7,desc:'Relatório PDF exportável por período',status:'Planejado',prio:'Baixa'},
   {id:8,desc:'Dark/Light mode toggle',status:'Planejado',prio:'Baixa'}
 ];
-let bkItems=[];
-try{const s=localStorage.getItem(BK_KEY);bkItems=s?JSON.parse(s):JSON.parse(JSON.stringify(BK_DEFAULT))}catch(e){bkItems=JSON.parse(JSON.stringify(BK_DEFAULT))}
-function saveBk(){try{localStorage.setItem(BK_KEY,JSON.stringify(bkItems))}catch(e){} updBkCount()}
+let bkItems=JSON.parse(JSON.stringify(BK_DEFAULT));
+let bkLoaded=false;
+async function loadBk(){
+  try{
+    const r=await fetch('/api/backlog');
+    const d=await r.json();
+    if(d.items&&Array.isArray(d.items)){bkItems=d.items;bkLoaded=true}
+    else{bkItems=JSON.parse(JSON.stringify(BK_DEFAULT));bkLoaded=true;saveBk()}
+  }catch(e){console.warn('Backlog load fallback:',e);bkLoaded=true}
+  updBkCount();
+}
+loadBk();
+function saveBk(){
+  updBkCount();
+  fetch('/api/backlog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:bkItems})}).catch(e=>console.warn('Backlog save error:',e));
+}
 function updBkCount(){const c=bkItems.filter(i=>i.status!=='Concluído').length;document.getElementById('bk-count').textContent=c}
-function toggleBacklog(){document.getElementById('bk-overlay').classList.toggle('open');renderBk()}
+function toggleBacklog(){document.getElementById('bk-overlay').classList.toggle('open');if(!bkLoaded){loadBk().then(()=>renderBk())}else{renderBk()}}
 function prioColor(p){return p==='Alta'?'var(--red)':p==='Média'?'var(--gold)':'var(--text2)'}
 function prioIcon(p){return p==='Alta'?'<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="var(--red)"/></svg>':p==='Média'?'<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="var(--gold)"/></svg>':'<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#555" stroke="#777" stroke-width=".5"/></svg>'}
 function statusStyle(s){
