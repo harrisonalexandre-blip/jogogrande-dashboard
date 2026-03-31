@@ -161,8 +161,11 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .crm-stat .lbl{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;font-weight:700}
 .crm-stat .sub{font-size:11px;color:var(--text3);margin-top:4px}
 /* CRM Drilldown Modals */
-.crm-stat.clickable{cursor:pointer;transition:.2s}
-.crm-stat.clickable:hover{border-color:rgba(14,165,90,.4);box-shadow:0 0 12px rgba(14,165,90,.25)}
+.crm-stat.clickable{cursor:pointer;transition:.3s;position:relative;overflow:hidden}
+.crm-stat.clickable::after{content:'🔍';position:absolute;top:6px;right:8px;font-size:10px;opacity:.4;transition:.3s}
+.crm-stat.clickable:hover{border-color:rgba(14,165,90,.5);box-shadow:0 0 16px rgba(14,165,90,.3);transform:translateY(-2px)}
+.crm-stat.clickable:hover::after{opacity:.8}
+.crm-stat.clickable:active{transform:translateY(0);box-shadow:0 0 8px rgba(14,165,90,.2)}
 .crm-drill-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:9998;justify-content:center;align-items:center;padding:20px}
 .crm-drill-modal.open{display:flex}
 .crm-drill-content{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:900px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.9)}
@@ -927,6 +930,10 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
       <span class="sb-label">Cohorts</span>
     </div>
     <div class="sb-group-title">Marketing</div>
+    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('traf',this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/><path d="M2 20h20"/></svg>
+      <span class="sb-label">Tráfego Interno</span>
+    </div>
     <div class="sb-item" data-roles="admin,socio" onclick="sbNav('analytics',this)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
       <span class="sb-label">Analytics</span>
@@ -1028,6 +1035,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   <div class="tab" data-roles="admin,socio" onclick="sp('alertas',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>ALERTAS <span id="alert-badge" style="background:var(--red);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;margin-left:2px;font-weight:800;display:none">0</span></div>
   <div class="tab" data-roles="admin,socio" onclick="sp('saldos',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="14" r="2"/></svg>SALDOS</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('cohorts',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>COHORTS</div>
+  <div class="tab" data-roles="admin,socio" onclick="sp('traf',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/><path d="M2 20h20"/></svg>TRÁFEGO</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('caixa',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="3" y="5" width="18" height="14" rx="1" ry="1"></rect><path d="M12 9v6"></path><path d="M9 12h6"></path></svg>CAIXA</div>
   <div class="tab" data-roles="admin" onclick="sp('acessos',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>ACESSOS</div>
 </div>
@@ -1094,7 +1102,23 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 </div>
 </div>
 
-
+<!-- ═══ ORGÂNICO VS TRACKED ═══ -->
+<div id="ov-organic" style="display:none">
+<p class="sec" style="margin-top:18px">Orgânico vs Tracked · <span style="color:var(--text3);font-size:11px">Total (Phoenix) − Tracked (Smartico) = Orgânico</span></p>
+<div class="kg" id="kp-organic"></div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot g"></span>Mix Tracked vs Orgânico · Depósitos</div><canvas id="c-org-dep-mix"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot b"></span>Mix Tracked vs Orgânico · Registros & FTD</div><canvas id="c-org-reg-mix"></canvas></div>
+</div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot gl"></span>Depósitos Diários: Tracked vs Orgânico (R$)</div><canvas id="c-org-dep-daily"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot c"></span>Net P&L Diário: Tracked vs Orgânico (R$)</div><canvas id="c-org-pl-daily"></canvas></div>
+</div>
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot p"></span>Registros Diários: Tracked vs Orgânico</div><canvas id="c-org-reg-daily"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot g"></span>Turnover Diário: Tracked vs Orgânico (R$)</div><canvas id="c-org-vol-daily"></canvas></div>
+</div>
+</div>
 
 <div class="tb"><div class="th"><h3 id="tbl-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path d="M9 7h6M9 11h6M9 15h6"></path></svg>Dados do Período</h3><input class="si" placeholder="Filtrar..." oninput="fdt(this.value)"></div>
 <table><thead><tr>
@@ -1324,6 +1348,13 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
         <h3 style="color:var(--text);margin:0">Nova Campanha</h3>
         <button onclick="closeCampaignModal()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">✕</button>
       </div>
+      <div style="background:rgba(255,215,64,.1);border:1px solid rgba(255,215,64,.3);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">🚧</span>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--gold)">Função em Construção</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Campanhas salvas aqui são apenas para planejamento. A integração com o Phoenix CRM (disparo real) está em desenvolvimento. Em breve será possível criar e disparar campanhas diretamente pelo dashboard.</div>
+        </div>
+      </div>
       <div style="display:grid;gap:14px">
         <div>
           <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Nome da Campanha</label>
@@ -1383,7 +1414,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
           <button onclick="closeCampaignModal()" style="background:var(--bg2);color:var(--text3);border:1px solid var(--border);padding:10px 20px;border-radius:8px;cursor:pointer;font-size:12px">Cancelar</button>
-          <button onclick="saveCampaign()" style="background:var(--gold);color:var(--bg);border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px">💾 Salvar Campanha</button>
+          <button onclick="saveCampaign()" style="background:var(--gold);color:var(--bg);border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px">📋 Salvar Rascunho</button>
         </div>
       </div>
     </div>
@@ -1929,6 +1960,46 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 </div>
 </div>
 
+<!-- ═══ PAGE: TRÁFEGO INTERNO ═══ -->
+<div id="pg-traf" class="page">
+<p class="sec">Tráfego Interno · Custo Ads vs Retorno <span style="background:var(--goldA);color:var(--gold);font-size:10px;font-weight:800;padding:3px 10px;border-radius:6px;margin-left:10px;letter-spacing:1px;vertical-align:middle">CONTA CLARA</span></p>
+<!-- KPI Cards -->
+<div class="kg" id="kp-traf"></div>
+<!-- Charts row 1 -->
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot g"></span>Investimento vs Net P&L Diário (R$)</div><canvas id="c-traf-inv-pl"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot b"></span>ROAS & Custo por FTD (R$)</div><canvas id="c-traf-roas"></canvas></div>
+</div>
+<!-- Charts row 2 -->
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot gl"></span>Cadastros & FTDs Diários (Tráfego Pago)</div><canvas id="c-traf-funnel"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot c"></span>Acumulado: Investimento vs Retorno (R$)</div><canvas id="c-traf-cumul"></canvas></div>
+</div>
+<!-- Charts row 3 -->
+<div class="cg cg2">
+  <div class="cb"><div class="ct"><span class="dot g"></span>Depósitos vs Net Deposit (R$)</div><canvas id="c-traf-dep"></canvas></div>
+  <div class="cb"><div class="ct"><span class="dot b"></span>Conversão: Custo CAD vs Custo FTD (R$)</div><canvas id="c-traf-custos"></canvas></div>
+</div>
+<!-- Daily table -->
+<div class="tb">
+  <div class="th">
+    <h3 style="color:var(--gold)">📊 Detalhamento Diário · Tráfego Pago</h3>
+    <span id="traf-table-summary" style="font-size:11px;color:var(--text2)"></span>
+  </div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Data</th><th>Investimento</th><th>Cadastros</th><th>Custo CAD</th>
+        <th>FTDs</th><th>Custo FTD</th><th>FTD Amount</th><th>Deposit Amount</th>
+        <th>Net Deposit</th><th>Net P&L</th><th>ROAS</th>
+      </tr></thead>
+      <tbody id="traf-table"></tbody>
+      <tfoot id="traf-table-foot"></tfoot>
+    </table>
+  </div>
+</div>
+</div>
+
 <!-- ═══ PAGE: ACESSOS ═══ -->
 <div id="pg-acessos" class="page">
 <p class="sec">Controle de Acessos · Gerenciar Usuários</p>
@@ -2355,7 +2426,7 @@ function setTime(period,el){
   if(ap){const id=ap.id.replace('pg-','');RD[id]=true;
     if(id==='ov')renderOverview();else if(id==='perf')rPerf();
     else if(id==='hist')rHist();else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='afil')rAfil();else if(id==='crm')rCRM();else if(id==='recon')rRecon();
-    else if(id==='casino')rCasino();else if(id==='alertas')rAlertas();else if(id==='btag')rBtag();else if(id==='saldos')rSaldos();else if(id==='cohorts')rCohorts();else if(id==='analytics')rAnalytics();}
+    else if(id==='casino')rCasino();else if(id==='alertas')rAlertas();else if(id==='btag')rBtag();else if(id==='saldos')rSaldos();else if(id==='cohorts')rCohorts();else if(id==='traf')rTraf();else if(id==='analytics')rAnalytics();}
 }
 
 function calcKPIs(data,period){
@@ -2501,6 +2572,143 @@ function kpiDrop(e){
   order.splice(ti,0,fromId);
   saveKpiLayout(order,getKpiHidden());
   renderOverview();
+}
+
+// ═══ ORGÂNICO VS TRACKED ═══
+function calcOrganic(data){
+  if(typeof AFF==='undefined'||!AFF.days)return null;
+  const dates=new Set(data.map(d=>d.date));
+  // Total from Phoenix (D array)
+  const tot={nr:0,ftd:0,ds:0,ws:0,ngr:0,vol:0,nc:0,fda:0};
+  data.forEach(d=>{tot.nr+=d.nr;tot.ftd+=d.ftd;tot.ds+=d.ds;tot.ws+=d.ws;tot.ngr+=d.ngr;tot.vol+=(d.c_to||0)+(d.sb_to||0);tot.nc+=d.ds-d.ws;tot.fda+=(d.fda||0);});
+  // Tracked from Smartico (AFF.days)
+  const trk={rg:0,ftd:0,da:0,wa:0,np:0,vol:0,nd:0,fda:0};
+  AFF.days.filter(a=>dates.has(a.d)).forEach(a=>{trk.rg+=a.rg;trk.ftd+=a.ftd;trk.da+=a.da;trk.wa+=a.wa;trk.np+=a.np;trk.vol+=a.vol;trk.nd+=a.da-a.wa;trk.fda+=(a.fda||0);});
+  // Organic = Total - Tracked
+  const org={
+    nr:Math.max(0,tot.nr-trk.rg),
+    ftd:Math.max(0,tot.ftd-trk.ftd),
+    ds:Math.max(0,tot.ds-trk.da),
+    ws:Math.max(0,tot.ws-trk.wa),
+    ngr:tot.ngr-trk.np,
+    vol:Math.max(0,tot.vol-trk.vol),
+    nc:(tot.ds-trk.da)-(tot.ws-trk.wa),
+    fda:Math.max(0,tot.fda-trk.fda)
+  };
+  // Daily breakdown
+  const daily=[];
+  data.forEach(d=>{
+    const sm=AFF.days.find(a=>a.d===d.date)||{rg:0,ftd:0,da:0,wa:0,np:0,vol:0};
+    daily.push({
+      date:d.date,df:d.df,
+      tot_nr:d.nr,trk_nr:sm.rg,org_nr:Math.max(0,d.nr-sm.rg),
+      tot_ftd:d.ftd,trk_ftd:sm.ftd,org_ftd:Math.max(0,d.ftd-sm.ftd),
+      tot_ds:d.ds,trk_ds:sm.da,org_ds:Math.max(0,d.ds-sm.da),
+      tot_ws:d.ws,trk_ws:sm.wa,org_ws:Math.max(0,d.ws-sm.wa),
+      tot_ngr:d.ngr,trk_np:sm.np,org_ngr:d.ngr-sm.np,
+      tot_vol:(d.c_to||0)+(d.sb_to||0),trk_vol:sm.vol,org_vol:Math.max(0,(d.c_to||0)+(d.sb_to||0)-sm.vol)
+    });
+  });
+  return{tot,trk,org,daily,
+    pctOrgDep:tot.ds>0?org.ds/tot.ds*100:0,
+    pctTrkDep:tot.ds>0?trk.da/tot.ds*100:0,
+    pctOrgReg:tot.nr>0?org.nr/tot.nr*100:0,
+    pctTrkReg:tot.nr>0?trk.rg/tot.nr*100:0,
+    pctOrgFtd:tot.ftd>0?org.ftd/tot.ftd*100:0,
+    pctTrkFtd:tot.ftd>0?trk.ftd/tot.ftd*100:0,
+    pctOrgVol:tot.vol>0?org.vol/tot.vol*100:0,
+    pctTrkVol:tot.vol>0?trk.vol/tot.vol*100:0
+  };
+}
+
+function renderOrganic(data){
+  const el=document.getElementById('ov-organic');
+  const oc=calcOrganic(data);
+  if(!oc||data.length<1){el.style.display='none';return;}
+  el.style.display='';
+
+  // SVG icon helper (same as Overview)
+  const svgI=(d)=>`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  // Donut mini SVG for organic/tracked split
+  function miniDonut(pctOrg){
+    const r=8,cx=12,cy=12,circ=2*Math.PI*r;
+    const orgLen=circ*(pctOrg/100),trkLen=circ-orgLen;
+    return `<svg width="20" height="20" viewBox="0 0 24 24"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(59,130,246,.5)" stroke-width="4"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(34,197,94,.8)" stroke-width="4" stroke-dasharray="${orgLen.toFixed(1)} ${trkLen.toFixed(1)}" stroke-dashoffset="0" transform="rotate(-90 ${cx} ${cy})"/></svg>`;
+  }
+
+  // Card builder (same structure as Overview default cards)
+  function orgCard(color,icon,label,value,sub){
+    return `<div class="kpi ${color}" style="position:relative"><div class="kpi-i">${icon}</div><div class="kpi-l">${label}</div><div class="kpi-v">${value}</div><div class="kpi-s">${sub}</div></div>`;
+  }
+
+  // KPI Cards — same .kpi pattern as Overview
+  document.getElementById('kp-organic').innerHTML=[
+    orgCard('green',miniDonut(oc.pctOrgDep),'Depósitos Orgânico',fR(oc.org.ds),`${fP(oc.pctOrgDep)} do total · sem tracking`),
+    orgCard('blue',miniDonut(100-oc.pctOrgDep),'Depósitos Tracked',fR(oc.trk.da),`${fP(oc.pctTrkDep)} do total · Smartico`),
+    orgCard('green',svgI('<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>'),'Regs Orgânico',fN(oc.org.nr),`${fP(oc.pctOrgReg)} · leads diretos`),
+    orgCard('blue',svgI('<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8l2 2-2 2"/><path d="M17 12h5"/>'),'Regs Tracked',fN(oc.trk.rg),`${fP(oc.pctTrkReg)} · via afiliados`),
+    orgCard('green',svgI('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'),'FTD Orgânico',fN(oc.org.ftd),`${fP(oc.pctOrgFtd)} · conversão direta`),
+    orgCard('blue',svgI('<circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/>'),'FTD Tracked',fN(oc.trk.ftd),`${fP(oc.pctTrkFtd)} · via afiliados`),
+    orgCard(oc.org.ngr>=0?'green':'red',svgI('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'),'Net P&L Orgânico',fR(oc.org.ngr),'NGR total − Net PL tracked'),
+    orgCard(oc.trk.np>=0?'green':'red',svgI('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'),'Net P&L Tracked',fR(oc.trk.np),'Smartico Net PL'),
+    orgCard('green',svgI('<circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/>'),'Turnover Orgânico',fR(oc.org.vol),`${fP(oc.pctOrgVol)} do volume total`),
+    orgCard('blue',svgI('<circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/>'),'Turnover Tracked',fR(oc.trk.vol),`${fP(oc.pctTrkVol)} do volume total`),
+    orgCard(oc.org.nc>=0?'green':'red',svgI('<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><circle cx="12" cy="15" r="2"/>'),'NetCash Orgânico',fR(oc.org.nc),'Dep orgânico − Saq orgânico'),
+    orgCard(oc.trk.nd>=0?'green':'red',svgI('<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><circle cx="12" cy="15" r="2"/>'),'NetCash Tracked',fR(oc.trk.nd),'Dep tracked − Saq tracked')
+  ].join('');
+
+  const labels=oc.daily.map(d=>d.df);
+
+  // Chart 1: Donut — Mix depósitos
+  const ctx1=document.getElementById('c-org-dep-mix');
+  if(ctx1._chart)ctx1._chart.destroy();
+  ctx1._chart=new Chart(ctx1,{type:'doughnut',data:{
+    labels:['Orgânico','Tracked'],
+    datasets:[{data:[oc.org.ds,oc.trk.da],backgroundColor:['rgba(34,197,94,0.8)','rgba(59,130,246,0.8)'],borderWidth:0}]
+  },options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{labels:{color:'#999',font:{size:11}},position:'bottom'},tooltip:{callbacks:{label:function(c){const v=c.raw;const t=oc.org.ds+oc.trk.da;return c.label+': '+fmt(v)+' ('+fP(t>0?v/t*100:0)+')'}}}}}});
+
+  // Chart 2: Stacked bar — Regs & FTD mix
+  const ctx2=document.getElementById('c-org-reg-mix');
+  if(ctx2._chart)ctx2._chart.destroy();
+  ctx2._chart=new Chart(ctx2,{type:'bar',data:{
+    labels:['Registros','FTD'],
+    datasets:[
+      {label:'Orgânico',data:[oc.org.nr,oc.org.ftd],backgroundColor:'rgba(34,197,94,0.7)',borderRadius:3},
+      {label:'Tracked',data:[oc.trk.rg,oc.trk.ftd],backgroundColor:'rgba(59,130,246,0.7)',borderRadius:3}
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{stacked:true,ticks:{color:'#888'}},y:{stacked:true,ticks:{color:'#888'}}}}});
+
+  // Chart 3: Daily Deposits stacked
+  const ctx3=document.getElementById('c-org-dep-daily');
+  if(ctx3._chart)ctx3._chart.destroy();
+  ctx3._chart=new Chart(ctx3,{type:'bar',data:{labels,datasets:[
+    {label:'Orgânico',data:oc.daily.map(d=>d.org_ds),backgroundColor:'rgba(34,197,94,0.6)',borderRadius:2},
+    {label:'Tracked',data:oc.daily.map(d=>d.trk_ds),backgroundColor:'rgba(59,130,246,0.6)',borderRadius:2}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{stacked:true,ticks:{color:'#888',font:{size:9}}},y:{stacked:true,ticks:{color:'#888',callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
+
+  // Chart 4: Daily Net PL stacked
+  const ctx4=document.getElementById('c-org-pl-daily');
+  if(ctx4._chart)ctx4._chart.destroy();
+  ctx4._chart=new Chart(ctx4,{type:'bar',data:{labels,datasets:[
+    {label:'Orgânico',data:oc.daily.map(d=>d.org_ngr),backgroundColor:'rgba(34,197,94,0.6)',borderRadius:2},
+    {label:'Tracked',data:oc.daily.map(d=>d.trk_np),backgroundColor:'rgba(59,130,246,0.6)',borderRadius:2}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{stacked:true,ticks:{color:'#888',font:{size:9}}},y:{stacked:true,ticks:{color:'#888',callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
+
+  // Chart 5: Daily Regs stacked
+  const ctx5=document.getElementById('c-org-reg-daily');
+  if(ctx5._chart)ctx5._chart.destroy();
+  ctx5._chart=new Chart(ctx5,{type:'bar',data:{labels,datasets:[
+    {label:'Orgânico',data:oc.daily.map(d=>d.org_nr),backgroundColor:'rgba(34,197,94,0.6)',borderRadius:2},
+    {label:'Tracked',data:oc.daily.map(d=>d.trk_nr),backgroundColor:'rgba(59,130,246,0.6)',borderRadius:2}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{stacked:true,ticks:{color:'#888',font:{size:9}}},y:{stacked:true,ticks:{color:'#888'}}}}});
+
+  // Chart 6: Daily Turnover stacked
+  const ctx6=document.getElementById('c-org-vol-daily');
+  if(ctx6._chart)ctx6._chart.destroy();
+  ctx6._chart=new Chart(ctx6,{type:'bar',data:{labels,datasets:[
+    {label:'Orgânico',data:oc.daily.map(d=>d.org_vol),backgroundColor:'rgba(34,197,94,0.6)',borderRadius:2},
+    {label:'Tracked',data:oc.daily.map(d=>d.trk_vol),backgroundColor:'rgba(59,130,246,0.6)',borderRadius:2}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{stacked:true,ticks:{color:'#888',font:{size:9}}},y:{stacked:true,ticks:{color:'#888',callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
 }
 
 // ═══ HOURLY BAR CHARTS (24h breakdown) ═══
@@ -2730,6 +2938,8 @@ function renderOverview(){
     topsEl.style.display='';
     chartsEl.style.display='';
   }
+  // Render Orgânico vs Tracked
+  renderOrganic(data);
   // Helper: render rank list
   function _rankList(arr,color){
     if(!arr.length) return '<div style="color:#555;font-size:11px;padding:8px">Sem dados</div>';
@@ -4148,48 +4358,151 @@ function openDrilldown(type) {
 function closeDrilldown(){var modal=document.getElementById('crm-drill-modal'); modal.classList.remove('open')}
 
 function renderCRMAnalytics(){
-  var active=PHX_CAMPS.filter(function(c){return c.s==='On Schedule'}), done=PHX_CAMPS.filter(function(c){return c.s==='Done'}), total=PHX_CAMPS.length, channels={};
-  PHX_CAMPS.forEach(function(c){channels[c.ch]=(channels[c.ch]||0)+1});
-  var html = '<div class="crm-analytics-panel">';
+  var html='';
   if(typeof SMS_STATS==='undefined'){
-    html += '<div style="padding:20px;text-align:center;color:var(--text3);background:var(--bg3);border-radius:10px">Nenhuma análise de SMS disponível</div>';
-  }else{
-    var dlr=SMS_STATS.dlr||0, ctr=SMS_STATS.ctr||0, openRate=98, clickRate=5, convRate=2, costPerSMS=SMS_STATS.attempts>0?(SMS_STATS.cost/SMS_STATS.attempts).toFixed(4):0, estConversions=Math.floor(SMS_STATS.delivered*(convRate/100));
-    html += '<div class="crm-metric-row"><div class="crm-metric-card"><div class="crm-metric-label">Total Envios</div><div class="crm-metric-value">'+fN(SMS_STATS.attempts)+'</div><div class="crm-metric-sub">MessageWhiz</div></div><div class="crm-metric-card"><div class="crm-metric-label">Taxa Entrega</div><div class="crm-metric-value">'+dlr+'%</div><div class="crm-metric-sub">'+fN(SMS_STATS.delivered)+' entregues</div></div><div class="crm-metric-card"><div class="crm-metric-label">CTR Estimado</div><div class="crm-metric-value">~'+clickRate+'%</div><div class="crm-metric-sub">iGaming SMS benchmark</div></div><div class="crm-metric-card"><div class="crm-metric-label">Custo por Conv</div><div class="crm-metric-value">$'+(estConversions>0?(SMS_STATS.cost/estConversions).toFixed(2):0)+'</div><div class="crm-metric-sub">Est. conversão 2%</div></div></div>';
-    html += '<div style="background:var(--bg3);border-radius:10px;padding:14px;margin-top:10px"><div style="font-weight:700;color:var(--text);margin-bottom:10px;font-size:12px">Mix de Canais</div>';
-    var maxCh=Math.max.apply(null,Object.values(channels));
-    Object.keys(channels).forEach(function(ch){var w=(channels[ch]/maxCh)*100; var chIcon={'push':'🔔','inbox':'📥','whatsapp':'💬','sms':'📱','email':'📧'}[ch]||'📡'; html += '<div class="crm-bar-chart"><span class="crm-bar-label">'+chIcon+' '+ch+'</span><div class="crm-bar" style="width:'+w+'%">'+channels[ch]+'</div></div>'});
-    html += '</div>';
-    html += '<div style="background:var(--bg3);border-radius:10px;padding:14px;margin-top:10px"><div style="font-weight:700;color:var(--text);margin-bottom:10px;font-size:12px">Funil Estimado</div>';
-    var funnelStages=[{label:'Enviados',value:SMS_STATS.attempts,color:'var(--blue)'},{label:'Entregues',value:SMS_STATS.delivered,color:'var(--green)'},{label:'Abertos (est.)',value:Math.floor(SMS_STATS.delivered*openRate/100),color:'var(--gold)'},{label:'Clicados (est.)',value:Math.floor(SMS_STATS.delivered*clickRate/100),color:'var(--cyan)'},{label:'Conversões (est.)',value:estConversions,color:'var(--green)'}];
-    var maxVal=Math.max.apply(null,funnelStages.map(function(s){return s.value}));
-    funnelStages.forEach(function(s){var w=(s.value/maxVal)*100; html += '<div class="crm-bar-chart"><span class="crm-bar-label">'+s.label+'</span><div class="crm-bar" style="width:'+w+'%;background:'+s.color+'">'+fN(s.value)+'</div></div>'});
-    html += '</div>';
+    html+='<div style="padding:20px;text-align:center;color:var(--text3);background:var(--bg3);border-radius:10px">Dados SMS não disponíveis</div>';
+    document.getElementById('crm-analytics-body').innerHTML=html;return;
   }
-  html += '</div>';
-  document.getElementById('crm-analytics-body').innerHTML = html;
+  var dlr=SMS_STATS.dlr||0,openRate=98,clickRate=5,convRate=2;
+  var sent=SMS_STATS.attempts,del=SMS_STATS.delivered;
+  var estOpened=Math.floor(del*openRate/100),estClicked=Math.floor(del*clickRate/100),estConv=Math.floor(del*convRate/100);
+  var costPerSMS=sent>0?(SMS_STATS.cost/sent):0,costPerConv=estConv>0?(SMS_STATS.cost/estConv):0;
+  var avgDepBRL=85,estRevBRL=estConv*avgDepBRL;
+  var dailyAvg=SMS_STATS.daily.length>0?Math.ceil(sent/SMS_STATS.daily.length):0;
+  var failTotal=sent-del,burnDays=dailyAvg>0&&costPerSMS>0?(SMS_STATS.balance/(costPerSMS*dailyAvg)).toFixed(0):'∞';
+
+  /* KPI Cards */
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px">';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid #89b4fa"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Total SMS</div><div style="font-size:26px;font-weight:900;color:#89b4fa;margin:4px 0">'+fN(sent)+'</div><div style="font-size:9px;color:var(--text3)">'+dailyAvg+'/dia · '+SMS_STATS.daily.length+' dias</div></div>';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid var(--green)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">DLR Rate</div><div style="font-size:26px;font-weight:900;color:var(--green);margin:4px 0">'+dlr+'%</div><div style="font-size:9px;color:var(--text3)">'+fN(del)+' entregues · '+failTotal+' falhas</div></div>';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid var(--gold)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Custo Total</div><div style="font-size:26px;font-weight:900;color:var(--gold);margin:4px 0">$'+SMS_STATS.cost.toFixed(2)+'</div><div style="font-size:9px;color:var(--text3)">$'+costPerSMS.toFixed(4)+'/SMS · Saldo $'+SMS_STATS.balance+'</div></div>';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid var(--cyan)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Saldo Restante</div><div style="font-size:26px;font-weight:900;color:var(--cyan);margin:4px 0">~'+burnDays+'d</div><div style="font-size:9px;color:var(--text3)">$'+SMS_STATS.balance+' a '+dailyAvg+' SMS/dia</div></div>';
+  html+='</div>';
+
+  /* FUNNEL VISUAL - trapézio real */
+  var stages=[
+    {label:'SMS Enviados',value:sent,color:'#89b4fa',icon:'📤'},
+    {label:'Entregues',value:del,color:'#a6e3a1',icon:'✅'},
+    {label:'Abertos (est.)',value:estOpened,color:'#f9e2af',icon:'👁️'},
+    {label:'Clicados (est.)',value:estClicked,color:'#89dceb',icon:'👆'},
+    {label:'Convertidos (est.)',value:estConv,color:'#a6e3a1',icon:'💰'}
+  ];
+  html+='<div style="background:var(--bg3);border-radius:12px;padding:18px;margin-bottom:16px">';
+  html+='<div style="font-weight:700;color:var(--text);margin-bottom:14px;font-size:13px">Funil de Conversão SMS</div>';
+  html+='<div style="display:flex;flex-direction:column;align-items:center;gap:0">';
+  stages.forEach(function(s,i){
+    var widthPct=100-i*18;if(widthPct<18)widthPct=18;
+    var dropPct=i>0?((stages[i-1].value-s.value)/Math.max(1,stages[i-1].value)*100).toFixed(1):0;
+    var rTop=i===0?'10px':'0';var rBot=i===stages.length-1?'10px':'0';
+    html+='<div style="width:'+widthPct+'%;background:linear-gradient(90deg,'+s.color+','+s.color+'bb);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-radius:'+rTop+' '+rTop+' '+rBot+' '+rBot+';transition:.3s">';
+    html+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">'+s.icon+'</span><span style="font-size:11px;font-weight:700;color:#1e1e2e">'+s.label+'</span></div>';
+    html+='<div style="text-align:right"><span style="font-size:16px;font-weight:900;color:#1e1e2e">'+fN(s.value)+'</span>';
+    if(i>0) html+='<span style="font-size:9px;color:#45475a;margin-left:6px;background:rgba(30,30,46,.2);padding:1px 5px;border-radius:3px">▼'+dropPct+'%</span>';
+    html+='</div></div>';
+    if(i<stages.length-1){
+      var nw=100-(i+1)*18;if(nw<18)nw=18;
+      var tL=(widthPct-nw)/2;
+      html+='<div style="width:'+widthPct+'%;height:8px;background:linear-gradient(180deg,'+s.color+'55,'+stages[i+1].color+'33);clip-path:polygon(0 0,100% 0,'+(100-tL/widthPct*100)+'% 100%,'+(tL/widthPct*100)+'% 100%)"></div>';
+    }
+  });
+  html+='</div>';
+  html+='<div style="display:flex;justify-content:center;gap:20px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3)">Taxa Global</div><div style="font-size:15px;font-weight:900;color:var(--green)">'+((estConv/Math.max(1,sent))*100).toFixed(2)+'%</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3)">Custo/Conv.</div><div style="font-size:15px;font-weight:900;color:var(--gold)">$'+costPerConv.toFixed(2)+'</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3)">Receita Est.</div><div style="font-size:15px;font-weight:900;color:var(--cyan)">R$'+fN(estRevBRL)+'</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3)">ROI Est.</div><div style="font-size:15px;font-weight:900;color:'+(estRevBRL>SMS_STATS.cost*5.5?'var(--green)':'var(--red)')+'">'+((estRevBRL/(SMS_STATS.cost*5.5)-1)*100).toFixed(0)+'%</div></div>';
+  html+='</div></div>';
+
+  /* Daily SMS bars */
+  if(SMS_STATS.daily&&SMS_STATS.daily.length>0){
+    var last14=SMS_STATS.daily.slice(-14);
+    var maxD=Math.max.apply(null,last14.map(function(d){return d.t||0}));
+    var totL=last14.reduce(function(a,d){return a+d.t},0);
+    var failL=last14.reduce(function(a,d){return a+d.f},0);
+    html+='<div style="background:var(--bg3);border-radius:12px;padding:18px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-weight:700;color:var(--text);font-size:13px">📈 Volume Diário SMS</div><div style="font-size:9px;color:var(--text3)">Média: '+Math.round(totL/last14.length)+'/dia · Falhas: '+failL+' ('+((failL/Math.max(1,totL))*100).toFixed(1)+'%)</div></div>';
+    html+='<div style="display:flex;align-items:flex-end;gap:4px;height:90px">';
+    last14.forEach(function(d){
+      var h=maxD>0?Math.max(6,(d.t/maxD)*78):6;
+      var fH=d.f>0&&maxD>0?Math.max(3,(d.f/maxD)*78):0;
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center">';
+      html+='<div style="font-size:8px;color:var(--text3);margin-bottom:2px;font-weight:600">'+d.t+'</div>';
+      html+='<div style="width:100%;height:'+h+'px;background:linear-gradient(180deg,#89b4fa,rgba(137,180,250,.3));border-radius:4px 4px 0 0;position:relative">';
+      if(fH>0) html+='<div style="position:absolute;bottom:0;left:0;width:100%;height:'+fH+'px;background:rgba(255,68,68,.5)"></div>';
+      html+='</div>';
+      html+='<div style="font-size:7px;color:var(--text3);margin-top:2px">'+d.d+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+    html+='<div style="display:flex;gap:14px;font-size:8px;color:var(--text3);margin-top:8px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#89b4fa;display:inline-block"></span> Enviados</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(255,68,68,.5);display:inline-block"></span> Falhas</span></div>';
+    html+='</div>';
+  }
+  document.getElementById('crm-analytics-body').innerHTML=html;
 }
 
 function renderPixAnalysis(){
-  var pixCamps=PHX_CAMPS.filter(function(c){return c.type==='recovery'||c.seg.indexOf('PIX')>=0||c.seg.indexOf('Recovery')>=0});
-  var html = '<div style="display:grid;gap:12px">';
-  if(pixCamps.length===0){
-    html += '<div style="padding:16px;background:var(--bg3);border-radius:8px;color:var(--text2);text-align:center;font-size:11px">Nenhuma campanha PIX encontrada. Crie campanhas de recuperação de fluxo para PIX abandono.</div>';
-  }else{
-    html += '<div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:10px"><div style="font-weight:700;color:var(--text);margin-bottom:8px;font-size:12px">📊 Resumo: '+pixCamps.length+' Campanhas PIX Ativas</div><div style="font-size:10px;color:var(--text2)">Segmentos: '+pixCamps.map(function(c){return c.seg}).join(', ')+'</div></div>';
-    if(typeof SMS_STATS!=='undefined'&&SMS_STATS.daily&&SMS_STATS.daily.length>0){html += '<div style="background:var(--bg3);border-radius:10px;padding:12px"><div style="font-weight:700;color:var(--text);margin-bottom:8px;font-size:12px">📈 Volume Diário (últimos 7 dias)</div>';
-      var maxDaily=Math.max.apply(null,SMS_STATS.daily.slice(-7).map(function(d){return d.t||0}));
-      SMS_STATS.daily.slice(-7).forEach(function(d){var w=(d.t/maxDaily)*100; html += '<div class="crm-bar-chart"><span class="crm-bar-label">'+d.d+'</span><div class="crm-bar" style="width:'+w+'%">'+d.t+'</div><span class="crm-bar-value">'+d.t+'</span></div>'});
-      html += '</div>';
-    }
+  var pixCamps=PHX_CAMPS.filter(function(c){return c.n.indexOf('RF.')>=0||c.n.indexOf('RF ')>=0||c.type==='reactivation'||c.seg.indexOf('PIX')>=0||c.seg.indexOf('dep')>=0});
+  var pixActive=pixCamps.filter(function(c){return c.s==='On Schedule'});
+  var html='<div style="display:grid;gap:14px">';
+
+  /* Summary KPI cards */
+  var smsSent=typeof SMS_STATS!=='undefined'?SMS_STATS.attempts:0;
+  var smsDel=typeof SMS_STATS!=='undefined'?SMS_STATS.delivered:0;
+  var smsCost=typeof SMS_STATS!=='undefined'?SMS_STATS.cost:0;
+  var costPerSms=smsSent>0?(smsCost/smsSent).toFixed(3):'0';
+  var costPerDel=smsDel>0?(smsCost/smsDel).toFixed(3):'0';
+  var estConv=Math.round(smsDel*0.02);
+  var estRev=estConv*85;
+  var roi=smsCost>0?((estRev-smsCost*5.5)/(smsCost*5.5)*100).toFixed(0):0;
+
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center;border-left:3px solid var(--green)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Campanhas RF</div><div style="font-size:24px;font-weight:900;color:var(--green);margin:4px 0">'+pixActive.length+'</div><div style="font-size:9px;color:var(--text3)">ativas de '+pixCamps.length+' total</div></div>';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center;border-left:3px solid var(--gold)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Custo/SMS</div><div style="font-size:24px;font-weight:900;color:var(--gold);margin:4px 0">$'+costPerSms+'</div><div style="font-size:9px;color:var(--text3)">$'+costPerDel+' por entregue</div></div>';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center;border-left:3px solid var(--cyan)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Conv. Est.</div><div style="font-size:24px;font-weight:900;color:var(--cyan);margin:4px 0">'+estConv+'</div><div style="font-size:9px;color:var(--text3)">~2% de '+fN(smsDel)+' entregues</div></div>';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center;border-left:3px solid '+(parseInt(roi)>0?'var(--green)':'var(--red)')+'"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">ROI Est.</div><div style="font-size:24px;font-weight:900;color:'+(parseInt(roi)>0?'var(--green)':'var(--red)')+';margin:4px 0">'+roi+'%</div><div style="font-size:9px;color:var(--text3)">R$'+fN(estRev)+' receita estimada</div></div>';
+  html+='</div>';
+
+  /* Active RF campaigns */
+  if(pixActive.length>0){
+    html+='<div style="background:var(--bg3);border-radius:12px;padding:16px"><div style="font-weight:700;color:var(--text);margin-bottom:10px;font-size:13px">🎯 Campanhas RF Ativas ('+pixActive.length+')</div>';
+    html+='<div style="display:grid;gap:8px">';
+    pixActive.forEach(function(c){
+      var days=Math.round((new Date()-new Date(c.cd))/(1000*60*60*24));
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-radius:8px;border-left:3px solid var(--green)">';
+      html+='<div style="font-size:18px">♻️</div>';
+      html+='<div style="flex:1"><div style="font-weight:700;font-size:11px;color:var(--text)">'+c.n+'</div>';
+      html+='<div style="font-size:9px;color:var(--text3);margin-top:2px">Seg: <span style="color:var(--gold)">'+c.seg+'</span> · 🔔 '+c.ch+' · '+days+'d rodando</div></div>';
+      html+='<div style="text-align:right"><div style="font-size:9px;color:var(--green);font-weight:700">● ATIVA</div><div style="font-size:8px;color:var(--text3);margin-top:2px">'+c.ll+'</div></div>';
+      html+='</div>';
+    });
+    html+='</div></div>';
   }
-  html += '<div style="margin-top:10px"><div style="font-weight:700;color:var(--text);margin-bottom:10px;font-size:12px">💡 Recomendações Estratégicas</div>';
-  var recos=[{icon:'📡',title:'Multi-canal',desc:'Combine SMS + Push + Email para aumentar taxa de recuperação em 40-60%'},{icon:'⏰',title:'Timing Otimizado',desc:'Envios entre 19h-21h e 09h-11h têm maior conversão em iGaming'},{icon:'🧪',title:'A/B Testing',desc:'Teste diferentes mensagens: urgência vs oferta vs educacional'},{icon:'💰',title:'ROI Tracking',desc:'Meça conversões reais: PIX > Depósito > NGR negativo'},{icon:'📊',title:'Frequência Dinâmica',desc:'Máx 3-5 contatos/semana por jogador para evitar fadiga'},{icon:'🎯',title:'Segmentação RF',desc:'Foque em Recência alta + Frequência média (maior potencial de recuperação)'}];
-  var colors=['tip1','tip2','tip3','tip4','tip5','tip6'];
-  recos.forEach(function(r,i){html += '<div class="crm-reco-card '+colors[i]+'"><h4>'+r.icon+' '+r.title+'</h4><p>'+r.desc+'</p></div>'});
-  html += '</div>';
-  html += '</div>';
-  document.getElementById('crm-pix-analysis-body').innerHTML = html;
+
+  /* Strategy analysis */
+  html+='<div style="background:var(--bg3);border-radius:12px;padding:16px"><div style="font-weight:700;color:var(--text);margin-bottom:10px;font-size:13px">🔬 Análise da Estratégia Atual</div>';
+  html+='<div style="display:grid;gap:8px;font-size:11px">';
+  html+='<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border-left:3px solid var(--gold)"><strong style="color:var(--gold)">Canal único (Push)</strong><br><span style="color:var(--text2)">Todas as '+pixActive.length+' campanhas RF usam push. Taxa abertura push ~40-60%. SMS + Email pode aumentar alcance 2-3x.</span></div>';
+  html+='<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border-left:3px solid var(--cyan)"><strong style="color:var(--cyan)">Segmentação por inatividade</strong><br><span style="color:var(--text2)">Faixas: 3d, 6d, 10d, 20d, 27d. Boa cobertura. Falta 45-60d para win-back profundo.</span></div>';
+  html+='<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border-left:3px solid var(--purple)"><strong style="color:var(--purple)">SMS desconectado do Phoenix</strong><br><span style="color:var(--text2)">'+fN(smsSent)+' SMS via MessageWhiz não linkados às campanhas RF. Integrar para medir conversão real.</span></div>';
+  html+='</div></div>';
+
+  /* Recommendations */
+  html+='<div><div style="font-weight:700;color:var(--text);margin-bottom:10px;font-size:13px">💡 Recomendações Estratégicas</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px">';
+  var recos=[
+    {icon:'📡',t:'Multi-canal Integrado',d:'Push D+0, SMS D+1 se não abriu, Email D+3. Potencial +40-60% recuperação.',c:'var(--green)'},
+    {icon:'⏰',t:'Timing Otimizado',d:'19h-21h tem +35% conversão em iGaming BR. Segunda dose 09h-11h. Evitar 00h-08h.',c:'var(--gold)'},
+    {icon:'🧪',t:'A/B Testing',d:'(A) Urgência "Bônus expira em 2h!" (B) Oferta "50% extra no dep" (C) Social "327 ganharam hoje!"',c:'var(--cyan)'},
+    {icon:'💰',t:'ROI End-to-End',d:'UTM por campanha. Medir: Envio → Clique → Depósito → NGR. Custo: $'+smsCost.toFixed(2)+' → ~'+estConv+' conv.',c:'var(--purple)'},
+    {icon:'📊',t:'Frequência Dinâmica',d:'Máx 3-5 contatos/semana. 1-dep recebe mais (4-5x), VIPs menos mas personalizado.',c:'#89b4fa'},
+    {icon:'🎯',t:'Segmentação RFM',d:'Priorize Recência alta + Freq. média. Jogadores 1 dep + 3-6d inativos = mina de ouro (60% budget).',c:'var(--red)'}
+  ];
+  recos.forEach(function(r){
+    html+='<div style="background:var(--bg2);border-radius:10px;padding:14px;border-left:4px solid '+r.c+'"><div style="font-weight:700;font-size:12px;color:var(--text);margin-bottom:6px">'+r.icon+' '+r.t+'</div><div style="font-size:10px;color:var(--text2);line-height:1.5">'+r.d+'</div></div>';
+  });
+  html+='</div></div>';
+  html+='</div>';
+  document.getElementById('crm-pix-analysis-body').innerHTML=html;
 }
 
 // ═══ Integration Functions ═══
@@ -4749,6 +5062,176 @@ function getCohortData(){
   const keys=Object.keys(weeks).sort();
   return keys.map(k=>{const w=weeks[k];w.key=k;w.avgUap=w.days>0?Math.round(w.uap/w.days):0;w.ftdr=w.nr>0?Math.round(w.ftd/w.nr*1000)/10:0;w.ltv=w.ftd>0?Math.round(w.ds/w.ftd):0;return w;});
 }
+// ═══ TRÁFEGO INTERNO — Ad Cost vs Return ═══
+const TRAF_DATA=[
+{d:'2026-03-11',inv:1194.03,cad:29,ftd:10,ftdAmt:306,depAmt:336,netDep:336,netPL:1559.66},
+{d:'2026-03-12',inv:1669.40,cad:75,ftd:28,ftdAmt:3793.51,depAmt:6279.17,netDep:1031.66,netPL:-1086.36},
+{d:'2026-03-13',inv:151.28,cad:50,ftd:18,ftdAmt:1166,depAmt:7862,netDep:6731.60,netPL:8834.58},
+{d:'2026-03-14',inv:469.02,cad:41,ftd:5,ftdAmt:153.74,depAmt:1858.74,netDep:163.74,netPL:330.62},
+{d:'2026-03-15',inv:65.05,cad:4,ftd:1,ftdAmt:20,depAmt:1173,netDep:184,netPL:918.60},
+{d:'2026-03-16',inv:1162.05,cad:27,ftd:6,ftdAmt:718,depAmt:2672,netDep:1892,netPL:1263.06},
+{d:'2026-03-17',inv:1774.75,cad:28,ftd:11,ftdAmt:496,depAmt:5509,netDep:5409,netPL:3626.38},
+{d:'2026-03-18',inv:4623.72,cad:49,ftd:19,ftdAmt:766,depAmt:6749,netDep:3573,netPL:2627.72},
+{d:'2026-03-19',inv:3196.86,cad:54,ftd:31,ftdAmt:1664,depAmt:5740,netDep:5081.50,netPL:1566.05},
+{d:'2026-03-20',inv:3220.27,cad:49,ftd:16,ftdAmt:701,depAmt:4996,netDep:3101,netPL:-355.36},
+{d:'2026-03-21',inv:2906.44,cad:64,ftd:22,ftdAmt:973,depAmt:5890.22,netDep:3170.29,netPL:3553.60},
+{d:'2026-03-22',inv:4892.89,cad:81,ftd:30,ftdAmt:1136,depAmt:6857.81,netDep:-939.95,netPL:1423.20},
+{d:'2026-03-23',inv:8261.67,cad:156,ftd:58,ftdAmt:6261,depAmt:33832,netDep:15914,netPL:8156},
+{d:'2026-03-24',inv:7776.96,cad:131,ftd:53,ftdAmt:4008,depAmt:27663,netDep:12906,netPL:8646.29},
+{d:'2026-03-25',inv:6973.13,cad:95,ftd:35,ftdAmt:1159.91,depAmt:10949.38,netDep:-2989.62,netPL:-1016.41},
+{d:'2026-03-26',inv:2817.25,cad:15,ftd:7,ftdAmt:217,depAmt:16537.06,netDep:1769.06,netPL:717.24},
+{d:'2026-03-27',inv:4346.51,cad:63,ftd:35,ftdAmt:1886,depAmt:13240.50,netDep:6835.01,netPL:4561.99},
+{d:'2026-03-28',inv:6894.72,cad:80,ftd:48,ftdAmt:2268,depAmt:24237.86,netDep:15626.86,netPL:10422.90},
+{d:'2026-03-29',inv:6434.13,cad:83,ftd:40,ftdAmt:1304,depAmt:12264.91,netDep:3017.91,netPL:2092.92}
+];
+
+function rTraf(){
+  // Filter by period
+  const fd=getFilteredData(currentPeriod);
+  const pStart=fd.length?fd[0].dt:null;
+  const pEnd=fd.length?fd[fd.length-1].dt:null;
+  let tData=TRAF_DATA;
+  if(pStart&&pEnd){
+    tData=TRAF_DATA.filter(t=>{
+      const td=new Date(t.d+'T12:00:00');
+      return td>=pStart&&td<=pEnd;
+    });
+  }
+  if(!tData.length){
+    document.getElementById('kp-traf').innerHTML='<div style="color:var(--text3);padding:20px;text-align:center">Sem dados de tráfego pago para o período selecionado.</div>';
+    document.getElementById('traf-table').innerHTML='';
+    document.getElementById('traf-table-foot').innerHTML='';
+    return;
+  }
+
+  // Totals
+  const totInv=tData.reduce((s,r)=>s+r.inv,0);
+  const totCad=tData.reduce((s,r)=>s+r.cad,0);
+  const totFtd=tData.reduce((s,r)=>s+r.ftd,0);
+  const totFtdAmt=tData.reduce((s,r)=>s+r.ftdAmt,0);
+  const totDepAmt=tData.reduce((s,r)=>s+r.depAmt,0);
+  const totNetDep=tData.reduce((s,r)=>s+r.netDep,0);
+  const totNetPL=tData.reduce((s,r)=>s+r.netPL,0);
+  const custoCad=totCad>0?totInv/totCad:0;
+  const custoFtd=totFtd>0?totInv/totFtd:0;
+  const roas=totInv>0?totNetPL/totInv:0;
+  const convRate=totCad>0?(totFtd/totCad*100):0;
+  const roasNet=totInv>0?totNetDep/totInv:0;
+
+  // KPI Cards — same style as Overview .kpi cards
+  const fmt=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const trafCards=[
+    {l:'Investimento Total',v:fmt(totInv),c:'red',s:'Custo total ads'},
+    {l:'Net P&L',v:fmt(totNetPL),c:totNetPL>=0?'green':'red',s:totNetPL>=0?'Lucro líquido':'Prejuízo'},
+    {l:'ROAS',v:roas.toFixed(2)+'x',c:roas>=1?'green':'red',s:roas>=1?'Retorno positivo':'Abaixo do break-even'},
+    {l:'Cadastros',v:totCad.toLocaleString('pt-BR'),c:'cyan',s:Math.round(totCad/(tData.length||1))+'/dia média'},
+    {l:'FTDs',v:totFtd.toLocaleString('pt-BR'),c:'green',s:Math.round(totFtd/(tData.length||1))+'/dia média'},
+    {l:'Conversão CAD→FTD',v:convRate.toFixed(1)+'%',c:convRate>=30?'green':'gold',s:totFtd+' de '+totCad+' cadastros'},
+    {l:'Custo / Cadastro',v:fmt(custoCad),c:'gold',s:'Por registro'},
+    {l:'Custo / FTD',v:fmt(custoFtd),c:'red',s:'Por primeiro depósito'},
+    {l:'Deposit Amount',v:fmt(totDepAmt),c:'green',s:'Volume total depositos'},
+    {l:'Net Deposit',v:fmt(totNetDep),c:totNetDep>=0?'green':'red',s:'Dep - Saques'},
+    {l:'FTD Amount',v:fmt(totFtdAmt),c:'cyan',s:'Volume primeiros dep.'},
+    {l:'ROAS Net Dep',v:roasNet.toFixed(2)+'x',c:roasNet>=1?'green':'red',s:roasNet>=1?'Retorno positivo':'Abaixo break-even'}
+  ];
+  document.getElementById('kp-traf').innerHTML=trafCards.map(k=>
+    '<div class="kpi '+k.c+'"><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>'
+  ).join('');
+
+  // Labels
+  const labels=tData.map(r=>{const p=r.d.split('-');return p[2]+'/'+p[1];});
+
+  // Chart 1: Investimento vs Net P&L
+  const ctx1=document.getElementById('c-traf-inv-pl');
+  if(ctx1._chart)ctx1._chart.destroy();
+  ctx1._chart=new Chart(ctx1,{type:'bar',data:{labels,datasets:[
+    {label:'Investimento',data:tData.map(r=>r.inv),backgroundColor:'rgba(239,68,68,0.7)',borderRadius:3,order:2},
+    {label:'Net P&L',data:tData.map(r=>r.netPL),backgroundColor:tData.map(r=>r.netPL>=0?'rgba(34,197,94,0.7)':'rgba(239,68,68,0.3)'),borderRadius:3,order:1}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+
+  // Chart 2: ROAS & Custo FTD
+  const ctx2=document.getElementById('c-traf-roas');
+  if(ctx2._chart)ctx2._chart.destroy();
+  ctx2._chart=new Chart(ctx2,{type:'line',data:{labels,datasets:[
+    {label:'ROAS',data:tData.map(r=>r.inv>0?r.netPL/r.inv:0),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',fill:true,tension:0.3,yAxisID:'y'},
+    {label:'Custo/FTD',data:tData.map(r=>r.ftd>0?r.inv/r.ftd:0),borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.1)',fill:false,tension:0.3,yAxisID:'y1'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{type:'linear',position:'left',ticks:{color:'#f59e0b',callback:v=>v.toFixed(1)+'x'},grid:{color:'rgba(255,255,255,0.05)'}},y1:{type:'linear',position:'right',ticks:{color:'#ef4444',callback:v=>'R$'+Math.round(v)},grid:{drawOnChartArea:false}}}}});
+
+  // Chart 3: Cadastros & FTDs
+  const ctx3=document.getElementById('c-traf-funnel');
+  if(ctx3._chart)ctx3._chart.destroy();
+  ctx3._chart=new Chart(ctx3,{type:'bar',data:{labels,datasets:[
+    {label:'Cadastros',data:tData.map(r=>r.cad),backgroundColor:'rgba(59,130,246,0.6)',borderRadius:3},
+    {label:'FTDs',data:tData.map(r=>r.ftd),backgroundColor:'rgba(34,197,94,0.7)',borderRadius:3}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888'}}}}});
+
+  // Chart 4: Acumulado
+  let cumInv=0,cumPL=0,cumDep=0;
+  const cumInvArr=[],cumPLArr=[],cumDepArr=[];
+  tData.forEach(r=>{cumInv+=r.inv;cumPL+=r.netPL;cumDep+=r.depAmt;cumInvArr.push(cumInv);cumPLArr.push(cumPL);cumDepArr.push(cumDep);});
+  const ctx4=document.getElementById('c-traf-cumul');
+  if(ctx4._chart)ctx4._chart.destroy();
+  ctx4._chart=new Chart(ctx4,{type:'line',data:{labels,datasets:[
+    {label:'Investimento Acum.',data:cumInvArr,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.1)',fill:true,tension:0.3},
+    {label:'Net P&L Acum.',data:cumPLArr,borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,0.1)',fill:true,tension:0.3},
+    {label:'Depósitos Acum.',data:cumDepArr,borderColor:'#3b82f6',borderDash:[5,5],fill:false,tension:0.3}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
+
+  // Chart 5: Depósitos vs Net Deposit
+  const ctx5=document.getElementById('c-traf-dep');
+  if(ctx5._chart)ctx5._chart.destroy();
+  ctx5._chart=new Chart(ctx5,{type:'bar',data:{labels,datasets:[
+    {label:'Deposit Amount',data:tData.map(r=>r.depAmt),backgroundColor:'rgba(59,130,246,0.5)',borderRadius:3},
+    {label:'Net Deposit',data:tData.map(r=>r.netDep),backgroundColor:tData.map(r=>r.netDep>=0?'rgba(34,197,94,0.6)':'rgba(239,68,68,0.5)'),borderRadius:3}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
+
+  // Chart 6: Custo CAD vs Custo FTD
+  const ctx6=document.getElementById('c-traf-custos');
+  if(ctx6._chart)ctx6._chart.destroy();
+  ctx6._chart=new Chart(ctx6,{type:'line',data:{labels,datasets:[
+    {label:'Custo/Cadastro',data:tData.map(r=>r.cad>0?r.inv/r.cad:0),borderColor:'#8b5cf6',tension:0.3,fill:false},
+    {label:'Custo/FTD',data:tData.map(r=>r.ftd>0?r.inv/r.ftd:0),borderColor:'#ef4444',tension:0.3,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:v=>'R$'+Math.round(v)}}}}});
+
+  // Table
+  let html='';
+  tData.forEach(r=>{
+    const dd=r.d.split('-');
+    const roasD=r.inv>0?(r.netPL/r.inv):0;
+    html+=`<tr>
+      <td>${dd[2]}/${dd[1]}</td>
+      <td style="color:var(--red)">${fmt(r.inv)}</td>
+      <td>${r.cad}</td>
+      <td>${fmt(r.cad>0?r.inv/r.cad:0)}</td>
+      <td>${r.ftd}</td>
+      <td>${fmt(r.ftd>0?r.inv/r.ftd:0)}</td>
+      <td>${fmt(r.ftdAmt)}</td>
+      <td>${fmt(r.depAmt)}</td>
+      <td style="color:${r.netDep>=0?'var(--green)':'var(--red)'}">${fmt(r.netDep)}</td>
+      <td style="color:${r.netPL>=0?'var(--green)':'var(--red)'}"><b>${fmt(r.netPL)}</b></td>
+      <td style="color:${roasD>=1?'var(--green)':'var(--red)'}"><b>${roasD.toFixed(2)}x</b></td>
+    </tr>`;
+  });
+  document.getElementById('traf-table').innerHTML=html;
+
+  // Footer totals
+  const roasT=totInv>0?totNetPL/totInv:0;
+  document.getElementById('traf-table-foot').innerHTML=`<tr style="font-weight:800;background:rgba(255,215,0,0.08)">
+    <td>TOTAL</td>
+    <td style="color:var(--red)">${fmt(totInv)}</td>
+    <td>${totCad}</td>
+    <td>${fmt(custoCad)}</td>
+    <td>${totFtd}</td>
+    <td>${fmt(custoFtd)}</td>
+    <td>${fmt(totFtdAmt)}</td>
+    <td>${fmt(totDepAmt)}</td>
+    <td style="color:${totNetDep>=0?'var(--green)':'var(--red)'}">${fmt(totNetDep)}</td>
+    <td style="color:${totNetPL>=0?'var(--green)':'var(--red)'}"><b>${fmt(totNetPL)}</b></td>
+    <td style="color:${roasT>=1?'var(--green)':'var(--red)'}"><b>${roasT.toFixed(2)}x</b></td>
+  </tr>`;
+  document.getElementById('traf-table-summary').textContent=tData.length+' dias com investimento · Fonte: Focus / Conta Clara';
+}
+
 // Net PL matrix: cada safra → quanto Net PL gerou em Week 0, Week 1, Week 2...
 // Week N = contribuição da safra i na semana i+N (proporcional ao FTD share)
 function buildNetPLMatrix(cohorts){
@@ -4996,29 +5479,38 @@ function rCohorts(){
 // ═══ SALDOS (Client Balances) ═══
 function rSaldos(){
   const fd=filteredData&&filteredData.length?filteredData:D.slice(-30);
-  let cumDep=0,cumSaq=0;
-  // Calculate running totals from filtered data
-  fd.forEach(d=>{cumDep+=d.ds;cumSaq+=d.ws;});
-  const netBalance=cumDep-cumSaq;
-  // Filtered period metrics
-  const dep30=fd.reduce((s,d)=>s+d.ds,0);
-  const saq30=fd.reduce((s,d)=>s+d.ws,0);
-  const net30=dep30-saq30;
-  const pressao30=dep30>0?Math.round(saq30/dep30*100):0;
+  // SALDO ACUMULADO = total histórico (TODOS os dados, sempre)
+  const allDepHist=D.reduce((s,d)=>s+d.ds,0);
+  const allSaqHist=D.reduce((s,d)=>s+d.ws,0);
+  const saldoHistorico=allDepHist-allSaqHist;
+  // Período selecionado
+  const depPeriodo=fd.reduce((s,d)=>s+d.ds,0);
+  const saqPeriodo=fd.reduce((s,d)=>s+d.ws,0);
+  const netPeriodo=depPeriodo-saqPeriodo;
+  const pressao=depPeriodo>0?Math.round(saqPeriodo/depPeriodo*100):0;
   // Max single day withdrawal
   const maxSaqDay=fd.reduce((m,d)=>d.ws>m.v?{v:d.ws,dt:d.date}:m,{v:0,dt:''});
+  // Dynamic label based on period
+  const pLabels={'today':'HOJE','yesterday':'ONTEM','week':'SEMANA','month':'MÊS','year':'2026','lifetime':'LIFETIME'};
+  const pTag=pLabels[currentPeriod]||'PERÍODO';
+  const pSub={'today':'Hoje','yesterday':'Ontem','week':'Esta semana','month':'Este mês','year':'Ano 2026','lifetime':'Todos os dados'};
+  const pSubTag=pSub[currentPeriod]||'Período';
   document.getElementById('kp-saldos').innerHTML=[
-    {l:'SALDO ACUMULADO',v:fR(netBalance),s:'Dep - Saq historico',c:netBalance>=0?'green':'red'},
-    {l:'DEP 30 DIAS',v:fR(dep30),s:'Entradas recentes',c:'cyan'},
-    {l:'SAQ 30 DIAS',v:fR(saq30),s:'Saidas recentes',c:'red'},
-    {l:'NET 30 DIAS',v:fR(net30),s:net30>=0?'Positivo':'Negativo',c:net30>=0?'green':'red'},
-    {l:'PRESSAO SAQUES',v:pressao30+'%',s:'Saq/Dep ratio 30d',c:pressao30>80?'red':pressao30>60?'gold':'green'},
+    {l:'SALDO HISTÓRICO',v:fR(saldoHistorico),s:'Dep - Saq total (todos os dados)',c:saldoHistorico>=0?'green':'red'},
+    {l:'DEP '+pTag,v:fR(depPeriodo),s:'Entradas · '+pSubTag,c:'cyan'},
+    {l:'SAQ '+pTag,v:fR(saqPeriodo),s:'Saídas · '+pSubTag,c:'red'},
+    {l:'NET '+pTag,v:fR(netPeriodo),s:netPeriodo>=0?'Positivo · '+pSubTag:'Negativo · '+pSubTag,c:netPeriodo>=0?'green':'red'},
+    {l:'PRESSÃO SAQUES',v:pressao+'%',s:'Saq/Dep ratio · '+pSubTag,c:pressao>80?'red':pressao>60?'gold':'green'},
     {l:'MAIOR SAQUE DIA',v:fR(maxSaqDay.v),s:maxSaqDay.dt||'N/A',c:'purple'},
   ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v}</div><div class="kpi-s">${x.s}</div></div>`).join('');
-  // Chart 1: Cumulative balance
-  let running=0;const cumData=[];
+  // Chart 1: Cumulative balance (true historical running total)
+  // Calculate pre-period balance from all data BEFORE the filtered period
+  const fdDates=new Set(fd.map(d=>d.date));
+  let prePeriodBal=0;
+  D.forEach(d=>{if(!fdDates.has(d.date)&&d.dt<(fd[0]?fd[0].dt:new Date())){prePeriodBal+=(d.ds-d.ws)}});
+  let running=prePeriodBal;const cumData=[];
   fd.forEach(d=>{running+=(d.ds-d.ws);cumData.push({dt:d.df,v:running});});
-  const cum30=cumData.slice(-30);
+  const cum30=cumData;
   mc('c-sal-acum',{type:'line',data:{labels:cum30.map(d=>d.dt),datasets:[{label:'Saldo Acumulado',data:cum30.map(d=>d.v),
     borderColor:'#0EA55A',backgroundColor:'rgba(14,165,90,.1)',borderWidth:2,fill:true,tension:.3,pointRadius:2}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v,false)}}}}});
@@ -5048,7 +5540,7 @@ function rSaldos(){
     if(pr>120)alerts.push({dt:d.date,desc:'Saques superam depositos em '+Math.round(pr)+'%',v:fR(d.ws),sev:'critical'});
     else if(pr>90)alerts.push({dt:d.date,desc:'Pressao de saques alta: '+Math.round(pr)+'%',v:fR(d.ws),sev:'warning'});
   });
-  if(netBalance<0)alerts.unshift({dt:'Acumulado',desc:'Saldo acumulado NEGATIVO — mais saques que depositos no total',v:fR(netBalance),sev:'critical'});
+  if(saldoHistorico<0)alerts.unshift({dt:'Acumulado',desc:'Saldo acumulado NEGATIVO — mais saques que depositos no total',v:fR(saldoHistorico),sev:'critical'});
   const salEl=document.getElementById('sal-alerts');
   if(!alerts.length){salEl.innerHTML='<div style="color:var(--green);font-size:12px">Nenhum alerta de exposicao. Saudavel!</div>';}
   else{salEl.innerHTML=alerts.slice(0,8).map(a=>{
@@ -5485,8 +5977,8 @@ function filterGames(){
 
 // ═══ SECURITY: Mapa de permissões por role ═══
 const ROLE_PAGES={
-  admin:['ov','perf','hist','fin','soc','afil','crm','recon','casino','alertas','btag','saldos','caixa','cohorts','analytics','acessos'],
-  socio:['ov','perf','hist','fin','soc','afil','crm','recon','casino','alertas','btag','saldos','caixa','cohorts','analytics'],
+  admin:['ov','perf','hist','fin','soc','afil','crm','recon','casino','alertas','btag','saldos','caixa','cohorts','traf','analytics','acessos'],
+  socio:['ov','perf','hist','fin','soc','afil','crm','recon','casino','alertas','btag','saldos','caixa','cohorts','traf','analytics'],
   crm:['crm']
 };
 function canAccess(page){
@@ -5507,7 +5999,7 @@ function sp(n,el){
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
   else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
-  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='caixa')rCaixa();else if(n==='cohorts')rCohorts();else if(n==='analytics')rAnalytics();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
+  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='caixa')rCaixa();else if(n==='cohorts')rCohorts();else if(n==='traf')rTraf();else if(n==='analytics')rAnalytics();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
 function sbNav(n,el){
   sp(n,el);
