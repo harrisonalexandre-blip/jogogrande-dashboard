@@ -1143,6 +1143,16 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 <!-- ═══ PAGE: CRM ═══ -->
 <div id="pg-crm" class="page">
 <p class="sec">CRM · Inteligência de Jogadores <span id="crm-period-label" style="font-size:11px;color:var(--gold);margin-left:8px"></span></p>
+
+<!-- CRM Sub-tabs -->
+<div style="display:flex;gap:0;margin-bottom:18px;border-bottom:2px solid var(--border)">
+  <div class="crm-subtab active" onclick="switchCrmTab('resumo',this)" style="padding:10px 24px;cursor:pointer;font-size:13px;font-weight:700;color:var(--gold);border-bottom:2px solid var(--gold);margin-bottom:-2px;transition:all .2s">📊 Resumo</div>
+  <div class="crm-subtab" onclick="switchCrmTab('campanhas',this)" style="padding:10px 24px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s">📢 Campanhas</div>
+  <div class="crm-subtab" onclick="switchCrmTab('integracoes',this)" style="padding:10px 24px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s">🔌 Integrações</div>
+</div>
+
+<!-- CRM Tab: Resumo -->
+<div id="crm-tab-resumo">
 <div id="crm-kpis" class="crm-stats"></div>
 
 <!-- ROW 1: Funil de Depositos (Full Width) -->
@@ -1247,6 +1257,282 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   <input class="si" placeholder="Buscar jogador..." oninput="crmSearch=this.value;renderCRMList()" style="margin-left:auto;max-width:200px">
 </div>
 <div id="cli-list" class="cli-list"></div>
+</div><!-- /crm-tab-resumo -->
+
+<!-- CRM Tab: Campanhas -->
+<div id="crm-tab-campanhas" style="display:none">
+  <!-- Campaign Header -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+    <div>
+      <h3 style="color:var(--text);font-size:16px;margin:0">Campanhas CRM</h3>
+      <p style="color:var(--text3);font-size:11px;margin:4px 0 0">Gerencie campanhas de retenção, reativação e conversão</p>
+    </div>
+    <button onclick="openNewCampaign()" style="background:var(--gold);color:var(--bg);border:none;padding:10px 20px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">+ Nova Campanha</button>
+  </div>
+
+  <!-- Campaign KPIs -->
+  <div id="campaign-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:18px"></div>
+
+  <!-- Active Campaigns -->
+  <div class="cb" style="margin-bottom:18px">
+    <div class="ct"><span class="dot g"></span> Campanhas Ativas</div>
+    <div id="campaign-active-list" style="font-size:12px"></div>
+  </div>
+
+  <!-- Campaign Templates -->
+  <div class="cb" style="margin-bottom:18px">
+    <div class="ct"><span class="dot b"></span> Templates de Campanha</div>
+    <div id="campaign-templates" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;padding:8px 0"></div>
+  </div>
+
+  <!-- New Campaign Modal (hidden by default) -->
+  <div id="campaign-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;justify-content:center;align-items:center">
+    <div style="background:var(--card);border-radius:14px;padding:28px;max-width:700px;width:90%;max-height:85vh;overflow-y:auto;border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h3 style="color:var(--text);margin:0">Nova Campanha</h3>
+        <button onclick="closeCampaignModal()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div style="display:grid;gap:14px">
+        <div>
+          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Nome da Campanha</label>
+          <input id="camp-name" class="si" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px" placeholder="Ex: Reativação VIPs Inativos">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
+            <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Tipo</label>
+            <select id="camp-type" class="si" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px">
+              <option value="reactivation">♻️ Reativação</option>
+              <option value="retention">🛡️ Retenção</option>
+              <option value="conversion">🎯 Conversão FTD</option>
+              <option value="upsell">📈 Upsell/Cross-sell</option>
+              <option value="winback">🔄 Win-back</option>
+              <option value="vip">👑 VIP</option>
+              <option value="abandoned">🛒 Carrinho Abandonado</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Canal</label>
+            <select id="camp-channel" class="si" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px">
+              <option value="email">📧 E-mail</option>
+              <option value="sms">📱 SMS</option>
+              <option value="push">🔔 Push Notification</option>
+              <option value="whatsapp">💬 WhatsApp</option>
+              <option value="multi">📡 Multi-canal</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Segmentação</label>
+          <select id="camp-segment" class="si" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px">
+            <option value="all">Todos os Jogadores</option>
+            <option value="vip">👑 VIPs (Dep > R$50k)</option>
+            <option value="high">💎 High Value (R$10k-50k)</option>
+            <option value="1dep">1️⃣ Apenas 1 Depósito</option>
+            <option value="inactive7">❄️ Inativos 7+ dias</option>
+            <option value="inactive30">⚫ Inativos 30+ dias</option>
+            <option value="hot">🔥 Ativos (≤3 dias)</option>
+            <option value="abandoned">🛒 PIX Abandonado</option>
+            <option value="winners">🏆 Vencedores (NGR negativo)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Mensagem</label>
+          <textarea id="camp-msg" style="width:100%;height:100px;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;resize:vertical;font-family:inherit;font-size:12px" placeholder="Escreva a mensagem da campanha... Use {nome} para personalizar"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
+            <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Data de Envio</label>
+            <input id="camp-date" type="date" class="si" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Horário</label>
+            <input id="camp-time" type="time" class="si" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px" value="18:00">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+          <button onclick="closeCampaignModal()" style="background:var(--bg2);color:var(--text3);border:1px solid var(--border);padding:10px 20px;border-radius:8px;cursor:pointer;font-size:12px">Cancelar</button>
+          <button onclick="saveCampaign()" style="background:var(--gold);color:var(--bg);border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px">💾 Salvar Campanha</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CRM Tab: Integrações -->
+<div id="crm-tab-integracoes" style="display:none">
+  <div style="margin-bottom:18px">
+    <h3 style="color:var(--text);font-size:16px;margin:0">Integrações CRM</h3>
+    <p style="color:var(--text3);font-size:11px;margin:4px 0 0">Configure provedores de SMS, E-mail e notificações para campanhas</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:18px">
+    <!-- Email Integration Card -->
+    <div class="cb" style="border:1px solid var(--border)">
+      <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
+        <span>📧 E-mail Marketing</span>
+        <span id="int-email-status" style="font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(243,139,168,.15);color:#f38ba8">Não configurado</span>
+      </div>
+      <div style="padding:12px 0;font-size:12px;color:var(--text3)">
+        <p style="margin:0 0 12px">Conecte um provedor de e-mail para enviar campanhas em massa.</p>
+        <div style="display:grid;gap:10px">
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Provedor</label>
+            <select id="int-email-provider" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
+              <option value="">Selecione...</option>
+              <option value="sendgrid">SendGrid</option>
+              <option value="mailchimp">Mailchimp / Mandrill</option>
+              <option value="ses">Amazon SES</option>
+              <option value="brevo">Brevo (ex-Sendinblue)</option>
+              <option value="resend">Resend</option>
+              <option value="smtp">SMTP Customizado</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">API Key</label>
+            <input id="int-email-key" type="password" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px" placeholder="Sua API key...">
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">E-mail Remetente</label>
+            <input id="int-email-from" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px" placeholder="noreply@seudominio.com">
+          </div>
+          <button onclick="saveIntegration('email')" style="background:var(--gold);color:var(--bg);border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px;width:fit-content">Salvar & Testar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SMS Integration Card -->
+    <div class="cb" style="border:1px solid var(--border)">
+      <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
+        <span>📱 SMS</span>
+        <span id="int-sms-status" style="font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(243,139,168,.15);color:#f38ba8">Não configurado</span>
+      </div>
+      <div style="padding:12px 0;font-size:12px;color:var(--text3)">
+        <p style="margin:0 0 12px">Conecte um gateway de SMS para disparos de campanha.</p>
+        <div style="display:grid;gap:10px">
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Provedor</label>
+            <select id="int-sms-provider" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
+              <option value="">Selecione...</option>
+              <option value="twilio">Twilio</option>
+              <option value="vonage">Vonage (Nexmo)</option>
+              <option value="zenvia">Zenvia</option>
+              <option value="infobip">Infobip</option>
+              <option value="comtele">Comtele</option>
+              <option value="smsdev">SMSDev</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">API Key / SID</label>
+            <input id="int-sms-key" type="password" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px" placeholder="Sua API key ou Account SID...">
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Auth Token / Secret</label>
+            <input id="int-sms-secret" type="password" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px" placeholder="Token de autenticação...">
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Número Remetente</label>
+            <input id="int-sms-from" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px" placeholder="+5511999999999">
+          </div>
+          <button onclick="saveIntegration('sms')" style="background:var(--gold);color:var(--bg);border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px;width:fit-content">Salvar & Testar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WhatsApp Integration Card -->
+    <div class="cb" style="border:1px solid var(--border)">
+      <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
+        <span>💬 WhatsApp Business</span>
+        <span id="int-wa-status" style="font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(243,139,168,.15);color:#f38ba8">Não configurado</span>
+      </div>
+      <div style="padding:12px 0;font-size:12px;color:var(--text3)">
+        <p style="margin:0 0 12px">Integre o WhatsApp Business API para mensagens diretas.</p>
+        <div style="display:grid;gap:10px">
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Provedor</label>
+            <select id="int-wa-provider" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
+              <option value="">Selecione...</option>
+              <option value="meta">Meta (WhatsApp Business API)</option>
+              <option value="twilio-wa">Twilio WhatsApp</option>
+              <option value="360dialog">360dialog</option>
+              <option value="gupshup">Gupshup</option>
+              <option value="z-api">Z-API</option>
+              <option value="evolution">Evolution API</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Token de Acesso</label>
+            <input id="int-wa-key" type="password" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px" placeholder="Bearer token ou API key...">
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Phone Number ID</label>
+            <input id="int-wa-phone" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px" placeholder="ID do número WhatsApp Business">
+          </div>
+          <button onclick="saveIntegration('whatsapp')" style="background:var(--gold);color:var(--bg);border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px;width:fit-content">Salvar & Testar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Push Notification Card -->
+    <div class="cb" style="border:1px solid var(--border)">
+      <div class="ct" style="display:flex;justify-content:space-between;align-items:center">
+        <span>🔔 Push Notifications</span>
+        <span id="int-push-status" style="font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(243,139,168,.15);color:#f38ba8">Não configurado</span>
+      </div>
+      <div style="padding:12px 0;font-size:12px;color:var(--text3)">
+        <p style="margin:0 0 12px">Configure push notifications via Firebase ou OneSignal.</p>
+        <div style="display:grid;gap:10px">
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Provedor</label>
+            <select id="int-push-provider" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px">
+              <option value="">Selecione...</option>
+              <option value="firebase">Firebase Cloud Messaging</option>
+              <option value="onesignal">OneSignal</option>
+              <option value="pusher">Pusher Beams</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">API Key / Server Key</label>
+            <input id="int-push-key" type="password" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px" placeholder="Server key ou REST API key...">
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">App ID</label>
+            <input id="int-push-appid" class="si" style="width:100%;padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px" placeholder="ID do aplicativo">
+          </div>
+          <button onclick="saveIntegration('push')" style="background:var(--gold);color:var(--bg);border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px;width:fit-content">Salvar & Testar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Integration Status Overview -->
+  <div class="cb">
+    <div class="ct"><span class="dot c"></span> Status das Integrações</div>
+    <div id="integration-status-list" style="font-size:12px;padding:8px 0">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <div style="background:var(--bg2);border-radius:8px;padding:14px;text-align:center">
+          <div style="font-size:24px;margin-bottom:6px">📧</div>
+          <div style="font-size:11px;color:var(--text3)">E-mail</div>
+          <div style="font-size:12px;font-weight:700;color:#f38ba8;margin-top:4px">Aguardando Setup</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:8px;padding:14px;text-align:center">
+          <div style="font-size:24px;margin-bottom:6px">📱</div>
+          <div style="font-size:11px;color:var(--text3)">SMS</div>
+          <div style="font-size:12px;font-weight:700;color:#f38ba8;margin-top:4px">Aguardando Setup</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:8px;padding:14px;text-align:center">
+          <div style="font-size:24px;margin-bottom:6px">💬</div>
+          <div style="font-size:11px;color:var(--text3)">WhatsApp</div>
+          <div style="font-size:12px;font-weight:700;color:#f38ba8;margin-top:4px">Aguardando Setup</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:8px;padding:14px;text-align:center">
+          <div style="font-size:24px;margin-bottom:6px">🔔</div>
+          <div style="font-size:11px;color:var(--text3)">Push</div>
+          <div style="font-size:12px;font-weight:700;color:#f38ba8;margin-top:4px">Aguardando Setup</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- ═══ BACKLOG MODAL ═══ -->
@@ -3201,7 +3487,11 @@ function rCRM(){
     var dates=filteredData.map(function(d){return d.date}).sort();
     var pStart=dates[0];
     var pEnd=dates[dates.length-1];
-    cliData=CLI.filter(function(c){return c.ld>=pStart||c.fd>=pStart});
+    cliData=CLI.filter(function(c){
+  var ldOk = c.ld >= pStart && c.ld <= pEnd;
+  var fdOk = c.fd >= pStart && c.fd <= pEnd;
+  return ldOk || fdOk;
+});
     if(cliData.length===0)cliData=CLI;
   }
   var cliLabel=currentPeriod==='lifetime'?'Top '+CLI.length+' clientes':'Top '+CLI.length+' · '+cliData.length+' ativos no período';
@@ -3261,7 +3551,7 @@ function rCRM(){
     options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'#888',usePointStyle:true,font:{size:11}}}}}});
 
   // 3. Redeposit Opportunities
-  var redepOpps=cliData.filter(c=>c.dc<=2&&c.di>=2).sort((a,b)=>b.dt-a.dt);
+  var redepOpps=cliData.filter(function(c){ return c.dc === 1 && c.di >= 2 && c.di <= 30; }).sort((a,b)=>b.dt-a.dt);
   document.getElementById('crm-redep-count').textContent=redepOpps.length;
   document.getElementById('crm-redep-list').innerHTML=redepOpps.length?
     '<table style="width:100%"><thead><tr><th style="text-align:left">Jogador</th><th>Depósito</th><th>Inativo</th><th>Status</th></tr></thead><tbody>'
@@ -3517,6 +3807,172 @@ function renderCRMList(){
   }).join('');
   if(data.length===0)list.innerHTML+='<div style="text-align:center;padding:40px;color:var(--text3)">Nenhum cliente nesta categoria</div>';
 }
+
+// ═══ CRM Sub-tab Navigation ═══
+function switchCrmTab(tab, el) {
+  document.querySelectorAll('.crm-subtab').forEach(function(t) {
+    t.style.color = 'var(--text3)';
+    t.style.fontWeight = '500';
+    t.style.borderBottomColor = 'transparent';
+  });
+  el.style.color = 'var(--gold)';
+  el.style.fontWeight = '700';
+  el.style.borderBottomColor = 'var(--gold)';
+  ['resumo','campanhas','integracoes'].forEach(function(t) {
+    var e = document.getElementById('crm-tab-' + t);
+    if (e) e.style.display = t === tab ? '' : 'none';
+  });
+  if (tab === 'campanhas') renderCampaigns();
+  if (tab === 'integracoes') renderIntegrations();
+}
+
+// ═══ Campaign Functions ═══
+var campaigns = JSON.parse(localStorage.getItem('jg_campaigns') || '[]');
+
+function renderCampaigns() {
+  // KPIs
+  var active = campaigns.filter(function(c) { return c.status === 'active'; }).length;
+  var scheduled = campaigns.filter(function(c) { return c.status === 'scheduled'; }).length;
+  var totalSent = campaigns.reduce(function(s, c) { return s + (c.sent || 0); }, 0);
+  var kH = '';
+  var cKpis = [
+    {l: 'Campanhas Ativas', v: active, c: 'green'},
+    {l: 'Agendadas', v: scheduled, c: '#89b4fa'},
+    {l: 'Total Enviadas', v: campaigns.length, c: 'cyan'},
+    {l: 'Msgs Enviadas', v: fN(totalSent), c: 'var(--gold)'},
+    {l: 'Base Alcançável', v: fN(CLI.length), c: '#cba6f7'}
+  ];
+  cKpis.forEach(function(k) {
+    kH += '<div style="background:var(--bg2);border-radius:10px;padding:12px;text-align:center">';
+    kH += '<div style="font-size:10px;color:var(--text3);margin-bottom:4px">' + k.l + '</div>';
+    kH += '<div style="font-size:22px;font-weight:800;color:' + k.c + '">' + k.v + '</div></div>';
+  });
+  document.getElementById('campaign-kpis').innerHTML = kH;
+
+  // Active campaigns list
+  var aH = '';
+  if (campaigns.length === 0) {
+    aH = '<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">📢</div><div style="font-size:14px;font-weight:600;margin-bottom:6px">Nenhuma campanha criada</div><div style="font-size:11px">Clique em "+ Nova Campanha" para começar</div></div>';
+  } else {
+    aH = '<table style="width:100%;border-collapse:collapse"><thead><tr>';
+    aH += '<th style="padding:8px;text-align:left;border-bottom:2px solid var(--gold);color:var(--gold);font-size:10px">Campanha</th>';
+    aH += '<th style="padding:8px;text-align:center;border-bottom:2px solid var(--gold);color:var(--gold);font-size:10px">Tipo</th>';
+    aH += '<th style="padding:8px;text-align:center;border-bottom:2px solid var(--gold);color:var(--gold);font-size:10px">Canal</th>';
+    aH += '<th style="padding:8px;text-align:center;border-bottom:2px solid var(--gold);color:var(--gold);font-size:10px">Segmento</th>';
+    aH += '<th style="padding:8px;text-align:center;border-bottom:2px solid var(--gold);color:var(--gold);font-size:10px">Data</th>';
+    aH += '<th style="padding:8px;text-align:center;border-bottom:2px solid var(--gold);color:var(--gold);font-size:10px">Status</th>';
+    aH += '<th style="padding:8px;text-align:center;border-bottom:2px solid var(--gold);color:var(--gold);font-size:10px">Ações</th>';
+    aH += '</tr></thead><tbody>';
+    campaigns.forEach(function(c, i) {
+      var typeEmoji = {reactivation:'♻️',retention:'🛡️',conversion:'🎯',upsell:'📈',winback:'🔄',vip:'👑',abandoned:'🛒'}[c.type] || '📢';
+      var channelEmoji = {email:'📧',sms:'📱',push:'🔔',whatsapp:'💬',multi:'📡'}[c.channel] || '📢';
+      var statusColor = c.status === 'active' ? '#a6e3a1' : c.status === 'scheduled' ? '#89b4fa' : '#f38ba8';
+      aH += '<tr style="border-bottom:1px solid rgba(108,112,134,.1)">';
+      aH += '<td style="padding:8px;font-weight:600">' + c.name + '</td>';
+      aH += '<td style="padding:8px;text-align:center">' + typeEmoji + '</td>';
+      aH += '<td style="padding:8px;text-align:center">' + channelEmoji + '</td>';
+      aH += '<td style="padding:8px;text-align:center;font-size:10px">' + c.segment + '</td>';
+      aH += '<td style="padding:8px;text-align:center;font-size:10px">' + (c.date || '-') + '</td>';
+      aH += '<td style="padding:8px;text-align:center"><span style="font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,.2);color:' + statusColor + '">' + c.status + '</span></td>';
+      aH += '<td style="padding:8px;text-align:center"><button onclick="deleteCampaign(' + i + ')" style="background:none;border:none;color:#f38ba8;cursor:pointer;font-size:12px">🗑️</button></td>';
+      aH += '</tr>';
+    });
+    aH += '</tbody></table>';
+  }
+  document.getElementById('campaign-active-list').innerHTML = aH;
+
+  // Templates
+  var templates = [
+    {name:'Reativação de Inativos',desc:'Jogadores sem depósito há 7+ dias. Ofereça bônus de volta.',type:'reactivation',segment:'inactive7',icon:'♻️',color:'#a6e3a1'},
+    {name:'Conversão FTD Pendente',desc:'Registrados que nunca depositaram. Incentive o primeiro depósito.',type:'conversion',segment:'1dep',icon:'🎯',color:'#89b4fa'},
+    {name:'Recuperação PIX Abandonado',desc:'PIX gerados e não pagos. Lembre o jogador de completar.',type:'abandoned',segment:'abandoned',icon:'🛒',color:'#fab387'},
+    {name:'Retenção de VIPs',desc:'Mantenha seus melhores jogadores engajados com ofertas exclusivas.',type:'vip',segment:'vip',icon:'👑',color:'#f9e2af'},
+    {name:'Win-back Churned',desc:'Jogadores inativos há 30+ dias. Tente reconquistá-los.',type:'winback',segment:'inactive30',icon:'🔄',color:'#cba6f7'},
+    {name:'Upsell High Value',desc:'Jogadores mid-tier com potencial de virar VIP.',type:'upsell',segment:'high',icon:'📈',color:'#94e2d5'}
+  ];
+  var tH = '';
+  templates.forEach(function(t) {
+    tH += '<div style="background:var(--bg2);border-radius:10px;padding:16px;border-left:3px solid ' + t.color + ';cursor:pointer" onclick="useTemplate('' + t.type + '','' + t.segment + '','' + t.name + '')">';
+    tH += '<div style="font-size:20px;margin-bottom:6px">' + t.icon + '</div>';
+    tH += '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">' + t.name + '</div>';
+    tH += '<div style="font-size:10px;color:var(--text3);line-height:1.4">' + t.desc + '</div>';
+    tH += '<div style="font-size:10px;color:' + t.color + ';margin-top:8px;font-weight:600">Usar template →</div>';
+    tH += '</div>';
+  });
+  document.getElementById('campaign-templates').innerHTML = tH;
+}
+
+function openNewCampaign() {
+  document.getElementById('campaign-modal').style.display = 'flex';
+}
+function closeCampaignModal() {
+  document.getElementById('campaign-modal').style.display = 'none';
+}
+function useTemplate(type, segment, name) {
+  openNewCampaign();
+  document.getElementById('camp-name').value = name;
+  document.getElementById('camp-type').value = type;
+  document.getElementById('camp-segment').value = segment;
+}
+function saveCampaign() {
+  var name = document.getElementById('camp-name').value;
+  if (!name) { alert('Preencha o nome da campanha'); return; }
+  campaigns.push({
+    name: name,
+    type: document.getElementById('camp-type').value,
+    channel: document.getElementById('camp-channel').value,
+    segment: document.getElementById('camp-segment').value,
+    msg: document.getElementById('camp-msg').value,
+    date: document.getElementById('camp-date').value,
+    time: document.getElementById('camp-time').value,
+    status: 'scheduled',
+    sent: 0,
+    created: new Date().toISOString()
+  });
+  localStorage.setItem('jg_campaigns', JSON.stringify(campaigns));
+  closeCampaignModal();
+  renderCampaigns();
+}
+function deleteCampaign(i) {
+  if (confirm('Excluir campanha "' + campaigns[i].name + '"?')) {
+    campaigns.splice(i, 1);
+    localStorage.setItem('jg_campaigns', JSON.stringify(campaigns));
+    renderCampaigns();
+  }
+}
+
+// ═══ Integration Functions ═══
+function renderIntegrations() {
+  var integrations = JSON.parse(localStorage.getItem('jg_integrations') || '{}');
+  ['email','sms','whatsapp','push'].forEach(function(type) {
+    var statusEl = document.getElementById('int-' + (type === 'whatsapp' ? 'wa' : type) + '-status');
+    if (statusEl) {
+      if (integrations[type]) {
+        statusEl.textContent = 'Conectado ✓';
+        statusEl.style.background = 'rgba(166,227,161,.15)';
+        statusEl.style.color = '#a6e3a1';
+      }
+    }
+  });
+}
+function saveIntegration(type) {
+  var integrations = JSON.parse(localStorage.getItem('jg_integrations') || '{}');
+  var prefix = 'int-' + (type === 'whatsapp' ? 'wa' : type);
+  var provider = document.getElementById(prefix + '-provider');
+  var key = document.getElementById(prefix + '-key');
+  if (provider && !provider.value) { alert('Selecione um provedor'); return; }
+  if (key && !key.value) { alert('Preencha a API key'); return; }
+  integrations[type] = {
+    provider: provider ? provider.value : '',
+    configured: true,
+    date: new Date().toISOString()
+  };
+  localStorage.setItem('jg_integrations', JSON.stringify(integrations));
+  renderIntegrations();
+  alert(type.charAt(0).toUpperCase() + type.slice(1) + ' configurado com sucesso! ✓');
+}
+
+
 // ═══ BACKLOG CRUD (Redis-persisted) ═══
 const BK_DEFAULT=[
   {id:1,desc:'Integrar dados de afiliados (comissões, cliques, conversão)',status:'Planejado',prio:'Alta'},
@@ -4627,9 +5083,9 @@ function rAlertas(){
 }
 
 // ═══ SUPERSET DATA: Casino Detalhado ═══
-const SS_GAMES=[{"name": "Aviator", "provider": "Spribe", "ggr": 36265.06, "turnover": 1077888.5, "spins": 1750, "rtp": 97.65, "avg_spin": 1.68}, {"name": "Speed Auto Roulette", "provider": "Evolution", "ggr": 29037.17, "turnover": 713103.94, "spins": 623, "rtp": 95.92, "avg_spin": 6.13}, {"name": "Ruleta Automatica", "provider": "Evolution", "ggr": 20347.21, "turnover": 1094817.38, "spins": 595, "rtp": 98.14, "avg_spin": 6.79}, {"name": "Fortune Ox", "provider": "PGSOFT", "ggr": 15000.42, "turnover": 176001.31, "spins": 2167, "rtp": 91.3, "avg_spin": 0.45}, {"name": "Live Roulette", "provider": "LiveVegas", "ggr": 11477.45, "turnover": 199843.17, "spins": 155, "rtp": 94.26, "avg_spin": 17.8}, {"name": "Roulette A Aurum", "provider": "CreedRoomz", "ggr": 10062.46, "turnover": 423429.13, "spins": 386, "rtp": 97.67, "avg_spin": 8.67}, {"name": "Fortune Dragon", "provider": "PGSOFT", "ggr": 9630.68, "turnover": 157830.47, "spins": 2188, "rtp": 93.8, "avg_spin": 0.32}, {"name": "Roulette Brasileira", "provider": "CreedRoomz", "ggr": 8074.75, "turnover": 294705.0, "spins": 510, "rtp": 97.26, "avg_spin": 7.83}, {"name": "Sugar Rush 1000", "provider": "Pragmatic Play", "ggr": 7649.13, "turnover": 44932.42, "spins": 555, "rtp": 82.95, "avg_spin": 0.79}, {"name": "Divine Drop", "provider": "Hacksaw Gaming", "ggr": 6915.21, "turnover": 29478.67, "spins": 34, "rtp": 76.98, "avg_spin": 5.54}];
-const SS_PROVS=[{"name": "PGSOFT", "ggr": 53390.41, "turnover": 1587739.19, "payout": 1534348.78, "spins": 21159, "games": 143, "rtp": 96.64}, {"name": "Evolution", "ggr": 50783.86, "turnover": 2443195.84, "payout": 2392411.98, "spins": 3387, "games": 72, "rtp": 97.92}, {"name": "Spribe", "ggr": 37585.76, "turnover": 1079443.26, "payout": 1041857.5, "spins": 1791, "games": 5, "rtp": 96.52}, {"name": "Pragmatic Play", "ggr": 29127.56, "turnover": 935330.85, "payout": 906203.29, "spins": 14331, "games": 456, "rtp": 96.89}, {"name": "Hacksaw Gaming", "ggr": 19451.83, "turnover": 168362.58, "payout": 148910.75, "spins": 1616, "games": 123, "rtp": 88.45}, {"name": "CreedRoomz", "ggr": 16705.9, "turnover": 836705.14, "payout": 819999.24, "spins": 1401, "games": 11, "rtp": 98.0}, {"name": "LiveVegas", "ggr": 9791.91, "turnover": 245308.98, "payout": 235517.07, "spins": 444, "games": 9, "rtp": 96.01}, {"name": "Smartsoft", "ggr": 6099.17, "turnover": 182986.95, "payout": 176887.78, "spins": 365, "games": 13, "rtp": 96.67}, {"name": "Pragmatic Play Live", "ggr": 2445.67, "turnover": 40275.72, "payout": 37830.05, "spins": 118, "games": 28, "rtp": 93.93}, {"name": "Playtech", "ggr": 2061.43, "turnover": 61562.85, "payout": 59501.42, "spins": 262, "games": 82, "rtp": 96.65}];
-const SS_DAILY=[{"date": "2025-10-21", "df": "21/10", "uap": 1, "spins": 22, "avg_spin": 0.34, "turnover": 7.48, "payout": 6.87, "ggr": 0.61, "ggr_pct": 8.12, "rtp": 91.88}, {"date": "2025-10-22", "df": "22/10", "uap": 1, "spins": 1, "avg_spin": 0.48, "turnover": 0.48, "payout": 0.0, "ggr": 0.48, "ggr_pct": 100.0, "rtp": 0.0}, {"date": "2025-10-27", "df": "27/10", "uap": 2, "spins": 22, "avg_spin": 0.11, "turnover": 2.32, "payout": 7.14, "ggr": -4.82, "ggr_pct": -207.59, "rtp": 307.59}, {"date": "2025-10-29", "df": "29/10", "uap": 1, "spins": 3, "avg_spin": 0.02, "turnover": 0.06, "payout": 0.18, "ggr": -0.12, "ggr_pct": -290.0, "rtp": 390.0}, {"date": "2025-10-30", "df": "30/10", "uap": 1, "spins": 4, "avg_spin": 0.8, "turnover": 3.2, "payout": 3.46, "ggr": -0.26, "ggr_pct": -8.5, "rtp": 108.5}, {"date": "2025-11-10", "df": "10/11", "uap": 2, "spins": 11, "avg_spin": 0.16, "turnover": 1.77, "payout": 0.5, "ggr": 1.27, "ggr_pct": 72.41, "rtp": 27.59}, {"date": "2025-11-11", "df": "11/11", "uap": 3, "spins": 37, "avg_spin": 0.23, "turnover": 8.52, "payout": 3.74, "ggr": 4.78, "ggr_pct": 56.21, "rtp": 43.79}, {"date": "2025-11-13", "df": "13/11", "uap": 19, "spins": 474, "avg_spin": 1.87, "turnover": 885.48, "payout": 717.07, "ggr": 168.41, "ggr_pct": 19.0, "rtp": 81.0}, {"date": "2025-11-14", "df": "14/11", "uap": 100, "spins": 9222, "avg_spin": 2.11, "turnover": 19422.76, "payout": 16946.45, "ggr": 2476.31, "ggr_pct": 12.77, "rtp": 87.23}, {"date": "2025-11-15", "df": "15/11", "uap": 112, "spins": 15205, "avg_spin": 1.79, "turnover": 27251.64, "payout": 26486.43, "ggr": 765.21, "ggr_pct": 2.79, "rtp": 97.21}, {"date": "2025-11-16", "df": "16/11", "uap": 95, "spins": 16606, "avg_spin": 1.56, "turnover": 25942.17, "payout": 26096.87, "ggr": -154.7, "ggr_pct": -0.59, "rtp": 100.59}, {"date": "2025-11-17", "df": "17/11", "uap": 108, "spins": 16119, "avg_spin": 1.96, "turnover": 31663.5, "payout": 28865.03, "ggr": 2798.47, "ggr_pct": 8.81, "rtp": 91.19}, {"date": "2025-11-18", "df": "18/11", "uap": 125, "spins": 26767, "avg_spin": 0.8, "turnover": 21324.66, "payout": 26074.13, "ggr": -4749.47, "ggr_pct": -22.34, "rtp": 122.34}, {"date": "2025-11-19", "df": "19/11", "uap": 195, "spins": 62974, "avg_spin": 2.22, "turnover": 139607.41, "payout": 148727.08, "ggr": -9119.67, "ggr_pct": -6.53, "rtp": 106.53}, {"date": "2025-11-20", "df": "20/11", "uap": 233, "spins": 79496, "avg_spin": 0.63, "turnover": 50206.72, "payout": 47330.85, "ggr": 2875.87, "ggr_pct": 5.88, "rtp": 94.12}, {"date": "2025-11-21", "df": "21/11", "uap": 248, "spins": 75909, "avg_spin": 1.44, "turnover": 109475.78, "payout": 110089.12, "ggr": -613.34, "ggr_pct": -0.48, "rtp": 100.48}, {"date": "2025-11-22", "df": "22/11", "uap": 215, "spins": 79916, "avg_spin": 0.77, "turnover": 61923.27, "payout": 64015.96, "ggr": -2092.69, "ggr_pct": -3.2, "rtp": 103.2}, {"date": "2025-11-23", "df": "23/11", "uap": 217, "spins": 70730, "avg_spin": 0.87, "turnover": 61359.9, "payout": 55916.21, "ggr": 5443.69, "ggr_pct": 9.01, "rtp": 90.99}, {"date": "2025-11-24", "df": "24/11", "uap": 191, "spins": 75373, "avg_spin": 1.08, "turnover": 81599.59, "payout": 68499.04, "ggr": 13100.55, "ggr_pct": 16.16, "rtp": 83.84}, {"date": "2025-11-25", "df": "25/11", "uap": 179, "spins": 54110, "avg_spin": 1.12, "turnover": 60352.43, "payout": 64702.94, "ggr": -4350.51, "ggr_pct": -7.06, "rtp": 107.06}, {"date": "2025-11-26", "df": "26/11", "uap": 222, "spins": 71300, "avg_spin": 1.32, "turnover": 94045.74, "payout": 90951.77, "ggr": 3093.97, "ggr_pct": 3.38, "rtp": 96.62}, {"date": "2025-11-27", "df": "27/11", "uap": 213, "spins": 71571, "avg_spin": 1.55, "turnover": 110953.44, "payout": 102648.78, "ggr": 8304.66, "ggr_pct": 7.56, "rtp": 92.44}, {"date": "2025-11-28", "df": "28/11", "uap": 199, "spins": 68954, "avg_spin": 1.27, "turnover": 87727.23, "payout": 86341.96, "ggr": 1385.27, "ggr_pct": 1.72, "rtp": 98.28}, {"date": "2025-11-29", "df": "29/11", "uap": 241, "spins": 71397, "avg_spin": 0.92, "turnover": 65548.11, "payout": 58232.99, "ggr": 7315.12, "ggr_pct": 11.28, "rtp": 88.72}, {"date": "2025-11-30", "df": "30/11", "uap": 186, "spins": 57594, "avg_spin": 0.79, "turnover": 45426.65, "payout": 44693.27, "ggr": 733.38, "ggr_pct": 1.78, "rtp": 98.22}, {"date": "2025-12-01", "df": "01/12", "uap": 222, "spins": 88431, "avg_spin": 0.61, "turnover": 53747.91, "payout": 58769.99, "ggr": -5022.08, "ggr_pct": -9.17, "rtp": 109.17}, {"date": "2025-12-02", "df": "02/12", "uap": 237, "spins": 67834, "avg_spin": 1.12, "turnover": 75749.54, "payout": 74247.17, "ggr": 1502.37, "ggr_pct": 2.06, "rtp": 97.94}, {"date": "2025-12-03", "df": "03/12", "uap": 228, "spins": 69870, "avg_spin": 0.98, "turnover": 68597.9, "payout": 62410.6, "ggr": 6187.3, "ggr_pct": 9.12, "rtp": 90.88}, {"date": "2025-12-04", "df": "04/12", "uap": 190, "spins": 51162, "avg_spin": 0.74, "turnover": 38105.66, "payout": 38671.6, "ggr": -565.94, "ggr_pct": -1.38, "rtp": 101.38}, {"date": "2025-12-05", "df": "05/12", "uap": 233, "spins": 61894, "avg_spin": 0.81, "turnover": 50130.85, "payout": 43775.59, "ggr": 6355.26, "ggr_pct": 12.79, "rtp": 87.21}, {"date": "2025-12-06", "df": "06/12", "uap": 269, "spins": 85141, "avg_spin": 1.06, "turnover": 90364.4, "payout": 92970.38, "ggr": -2605.98, "ggr_pct": -2.77, "rtp": 102.77}, {"date": "2025-12-07", "df": "07/12", "uap": 225, "spins": 88171, "avg_spin": 0.78, "turnover": 68800.16, "payout": 65832.39, "ggr": 2967.77, "ggr_pct": 4.45, "rtp": 95.55}, {"date": "2025-12-08", "df": "08/12", "uap": 205, "spins": 54041, "avg_spin": 1.45, "turnover": 78504.06, "payout": 67589.34, "ggr": 10914.72, "ggr_pct": 13.97, "rtp": 86.03}, {"date": "2025-12-09", "df": "09/12", "uap": 205, "spins": 56228, "avg_spin": 0.98, "turnover": 55053.4, "payout": 53772.78, "ggr": 1280.62, "ggr_pct": 2.4, "rtp": 97.6}, {"date": "2025-12-10", "df": "10/12", "uap": 444, "spins": 46965, "avg_spin": 1.99, "turnover": 93516.91, "payout": 92541.41, "ggr": 975.5, "ggr_pct": 1.0, "rtp": 99.0}, {"date": "2025-12-11", "df": "11/12", "uap": 222, "spins": 39153, "avg_spin": 1.73, "turnover": 67906.85, "payout": 67312.71, "ggr": 594.14, "ggr_pct": 0.84, "rtp": 99.16}, {"date": "2025-12-12", "df": "12/12", "uap": 187, "spins": 47464, "avg_spin": 1.21, "turnover": 57337.37, "payout": 58389.19, "ggr": -1051.82, "ggr_pct": -1.89, "rtp": 101.89}, {"date": "2025-12-13", "df": "13/12", "uap": 163, "spins": 41003, "avg_spin": 0.89, "turnover": 36622.77, "payout": 35016.48, "ggr": 1606.29, "ggr_pct": 4.33, "rtp": 95.67}, {"date": "2025-12-14", "df": "14/12", "uap": 153, "spins": 38464, "avg_spin": 1.1, "turnover": 42264.09, "payout": 38910.34, "ggr": 3353.75, "ggr_pct": 7.9, "rtp": 92.1}, {"date": "2025-12-15", "df": "15/12", "uap": 175, "spins": 37507, "avg_spin": 1.57, "turnover": 58726.17, "payout": 56084.21, "ggr": 2641.96, "ggr_pct": 4.45, "rtp": 95.55}, {"date": "2025-12-16", "df": "16/12", "uap": 178, "spins": 35008, "avg_spin": 2.04, "turnover": 71531.33, "payout": 72868.59, "ggr": -1337.26, "ggr_pct": -1.9, "rtp": 101.9}, {"date": "2025-12-17", "df": "17/12", "uap": 156, "spins": 34916, "avg_spin": 2.2, "turnover": 76759.63, "payout": 75447.47, "ggr": 1312.16, "ggr_pct": 1.69, "rtp": 98.31}, {"date": "2025-12-18", "df": "18/12", "uap": 169, "spins": 43646, "avg_spin": 1.44, "turnover": 62803.0, "payout": 55461.72, "ggr": 7341.28, "ggr_pct": 11.67, "rtp": 88.33}, {"date": "2025-12-19", "df": "19/12", "uap": 199, "spins": 63281, "avg_spin": 1.17, "turnover": 73913.45, "payout": 73080.81, "ggr": 832.64, "ggr_pct": 1.07, "rtp": 98.93}, {"date": "2025-12-20", "df": "20/12", "uap": 198, "spins": 59298, "avg_spin": 1.01, "turnover": 59701.5, "payout": 63405.61, "ggr": -3704.11, "ggr_pct": -6.25, "rtp": 106.25}, {"date": "2025-12-21", "df": "21/12", "uap": 168, "spins": 39467, "avg_spin": 1.33, "turnover": 52636.64, "payout": 48840.14, "ggr": 3796.5, "ggr_pct": 7.2, "rtp": 92.8}, {"date": "2025-12-22", "df": "22/12", "uap": 184, "spins": 45112, "avg_spin": 1.12, "turnover": 50437.05, "payout": 49172.06, "ggr": 1264.99, "ggr_pct": 2.48, "rtp": 97.52}, {"date": "2025-12-23", "df": "23/12", "uap": 183, "spins": 54472, "avg_spin": 0.97, "turnover": 52683.49, "payout": 49553.32, "ggr": 3130.17, "ggr_pct": 5.88, "rtp": 94.12}, {"date": "2025-12-24", "df": "24/12", "uap": 253, "spins": 52949, "avg_spin": 1.15, "turnover": 60702.88, "payout": 59565.97, "ggr": 1136.91, "ggr_pct": 1.9, "rtp": 98.1}, {"date": "2025-12-25", "df": "25/12", "uap": 295, "spins": 52655, "avg_spin": 0.65, "turnover": 34468.33, "payout": 30491.36, "ggr": 3976.97, "ggr_pct": 11.6, "rtp": 88.4}, {"date": "2025-12-26", "df": "26/12", "uap": 317, "spins": 49884, "avg_spin": 1.01, "turnover": 50424.16, "payout": 50673.43, "ggr": -249.27, "ggr_pct": -0.45, "rtp": 100.45}, {"date": "2025-12-27", "df": "27/12", "uap": 340, "spins": 45221, "avg_spin": 0.87, "turnover": 39458.09, "payout": 36819.67, "ggr": 2638.42, "ggr_pct": 6.71, "rtp": 93.29}, {"date": "2025-12-28", "df": "28/12", "uap": 286, "spins": 40885, "avg_spin": 0.72, "turnover": 29313.97, "payout": 27715.25, "ggr": 1598.72, "ggr_pct": 5.48, "rtp": 94.52}, {"date": "2025-12-29", "df": "29/12", "uap": 316, "spins": 53957, "avg_spin": 0.58, "turnover": 31090.85, "payout": 33970.19, "ggr": -2879.34, "ggr_pct": -9.17, "rtp": 109.17}, {"date": "2025-12-30", "df": "30/12", "uap": 332, "spins": 50237, "avg_spin": 1.31, "turnover": 65762.19, "payout": 65551.16, "ggr": 211.03, "ggr_pct": 0.35, "rtp": 99.65}, {"date": "2025-12-31", "df": "31/12", "uap": 321, "spins": 45546, "avg_spin": 0.8, "turnover": 36436.43, "payout": 34295.9, "ggr": 2140.53, "ggr_pct": 5.92, "rtp": 94.08}, {"date": "2026-01-01", "df": "01/01", "uap": 262, "spins": 41840, "avg_spin": 0.67, "turnover": 28186.93, "payout": 33031.4, "ggr": -4844.47, "ggr_pct": -17.05, "rtp": 117.05}, {"date": "2026-01-02", "df": "02/01", "uap": 214, "spins": 50196, "avg_spin": 0.87, "turnover": 43823.22, "payout": 44862.28, "ggr": -1039.06, "ggr_pct": -2.29, "rtp": 102.29}, {"date": "2026-01-03", "df": "03/01", "uap": 148, "spins": 59529, "avg_spin": 1.49, "turnover": 88645.69, "payout": 69737.09, "ggr": 18908.6, "ggr_pct": 21.37, "rtp": 78.63}, {"date": "2026-01-04", "df": "04/01", "uap": 152, "spins": 41161, "avg_spin": 0.72, "turnover": 29721.94, "payout": 27225.16, "ggr": 2496.78, "ggr_pct": 8.53, "rtp": 91.47}, {"date": "2026-01-05", "df": "05/01", "uap": 147, "spins": 29521, "avg_spin": 1.02, "turnover": 30051.12, "payout": 29059.19, "ggr": 991.93, "ggr_pct": 3.41, "rtp": 96.59}, {"date": "2026-01-06", "df": "06/01", "uap": 166, "spins": 36132, "avg_spin": 3.91, "turnover": 141207.19, "payout": 138192.89, "ggr": 3014.3, "ggr_pct": 2.14, "rtp": 97.86}, {"date": "2026-01-07", "df": "07/01", "uap": 173, "spins": 37367, "avg_spin": 1.66, "turnover": 61967.38, "payout": 54797.86, "ggr": 7169.52, "ggr_pct": 11.55, "rtp": 88.45}, {"date": "2026-01-08", "df": "08/01", "uap": 225, "spins": 43401, "avg_spin": 1.24, "turnover": 53950.15, "payout": 49734.94, "ggr": 4215.21, "ggr_pct": 7.79, "rtp": 92.21}, {"date": "2026-01-09", "df": "09/01", "uap": 262, "spins": 53276, "avg_spin": 0.72, "turnover": 38548.51, "payout": 37292.76, "ggr": 1255.75, "ggr_pct": 3.22, "rtp": 96.78}, {"date": "2026-01-10", "df": "10/01", "uap": 247, "spins": 51148, "avg_spin": 0.89, "turnover": 45312.24, "payout": 44235.79, "ggr": 1076.45, "ggr_pct": 2.33, "rtp": 97.67}, {"date": "2026-01-11", "df": "11/01", "uap": 173, "spins": 40708, "avg_spin": 0.8, "turnover": 32664.43, "payout": 30571.42, "ggr": 2093.01, "ggr_pct": 6.43, "rtp": 93.57}, {"date": "2026-01-12", "df": "12/01", "uap": 179, "spins": 40630, "avg_spin": 1.01, "turnover": 41226.07, "payout": 39146.37, "ggr": 2079.7, "ggr_pct": 5.07, "rtp": 94.93}, {"date": "2026-01-13", "df": "13/01", "uap": 261, "spins": 41891, "avg_spin": 1.04, "turnover": 43653.36, "payout": 42663.74, "ggr": 989.62, "ggr_pct": 2.28, "rtp": 97.72}, {"date": "2026-01-14", "df": "14/01", "uap": 228, "spins": 49640, "avg_spin": 1.3, "turnover": 64614.47, "payout": 65793.82, "ggr": -1179.35, "ggr_pct": -1.81, "rtp": 101.81}, {"date": "2026-01-15", "df": "15/01", "uap": 235, "spins": 48675, "avg_spin": 1.12, "turnover": 54506.44, "payout": 57985.97, "ggr": -3479.53, "ggr_pct": -6.36, "rtp": 106.36}, {"date": "2026-01-16", "df": "16/01", "uap": 266, "spins": 62788, "avg_spin": 0.69, "turnover": 43415.55, "payout": 43363.54, "ggr": 52.01, "ggr_pct": 0.15, "rtp": 99.85}, {"date": "2026-01-17", "df": "17/01", "uap": 272, "spins": 70943, "avg_spin": 0.69, "turnover": 49108.66, "payout": 47192.61, "ggr": 1916.05, "ggr_pct": 3.92, "rtp": 96.08}, {"date": "2026-01-18", "df": "18/01", "uap": 238, "spins": 66408, "avg_spin": 0.67, "turnover": 44405.53, "payout": 41557.9, "ggr": 2847.63, "ggr_pct": 6.45, "rtp": 93.55}, {"date": "2026-01-19", "df": "19/01", "uap": 329, "spins": 60127, "avg_spin": 0.58, "turnover": 34878.47, "payout": 33785.92, "ggr": 1092.55, "ggr_pct": 3.2, "rtp": 96.8}, {"date": "2026-01-20", "df": "20/01", "uap": 313, "spins": 71247, "avg_spin": 1.08, "turnover": 76932.15, "payout": 75933.03, "ggr": 999.12, "ggr_pct": 0.92, "rtp": 99.08}, {"date": "2026-01-21", "df": "21/01", "uap": 259, "spins": 63011, "avg_spin": 1.16, "turnover": 72995.24, "payout": 64537.13, "ggr": 8458.11, "ggr_pct": 1.26, "rtp": 98.74}, {"date": "2026-01-22", "df": "22/01", "uap": 243, "spins": 62797, "avg_spin": 1.12, "turnover": 70486.36, "payout": 66907.92, "ggr": 3578.44, "ggr_pct": 5.05, "rtp": 94.95}, {"date": "2026-01-23", "df": "23/01", "uap": 358, "spins": 51278, "avg_spin": 1.14, "turnover": 58227.6, "payout": 56696.98, "ggr": 1530.62, "ggr_pct": 2.66, "rtp": 97.34}, {"date": "2026-01-24", "df": "24/01", "uap": 301, "spins": 55794, "avg_spin": 2.91, "turnover": 162273.42, "payout": 144088.14, "ggr": 18185.28, "ggr_pct": 11.24, "rtp": 88.76}, {"date": "2026-01-25", "df": "25/01", "uap": 173, "spins": 44050, "avg_spin": 0.91, "turnover": 40178.22, "payout": 39501.89, "ggr": 676.33, "ggr_pct": 1.77, "rtp": 98.23}, {"date": "2026-01-26", "df": "26/01", "uap": 182, "spins": 36728, "avg_spin": 2.04, "turnover": 75027.97, "payout": 69776.76, "ggr": 5251.21, "ggr_pct": 7.04, "rtp": 92.96}, {"date": "2026-01-27", "df": "27/01", "uap": 199, "spins": 41839, "avg_spin": 1.25, "turnover": 52144.46, "payout": 47978.71, "ggr": 4165.75, "ggr_pct": 8.05, "rtp": 91.95}, {"date": "2026-01-28", "df": "28/01", "uap": 206, "spins": 40529, "avg_spin": 1.15, "turnover": 46772.87, "payout": 42325.06, "ggr": 4447.81, "ggr_pct": 9.5, "rtp": 90.5}, {"date": "2026-01-29", "df": "29/01", "uap": 268, "spins": 57060, "avg_spin": 0.68, "turnover": 38878.13, "payout": 37417.25, "ggr": 1460.88, "ggr_pct": 3.81, "rtp": 96.19}, {"date": "2026-01-30", "df": "30/01", "uap": 263, "spins": 61172, "avg_spin": 1.08, "turnover": 66152.62, "payout": 65040.29, "ggr": 1112.33, "ggr_pct": 1.59, "rtp": 98.41}, {"date": "2026-01-31", "df": "31/01", "uap": 254, "spins": 69381, "avg_spin": 1.14, "turnover": 79311.24, "payout": 117874.28, "ggr": -38563.04, "ggr_pct": -48.84, "rtp": 148.84}, {"date": "2026-02-01", "df": "01/02", "uap": 252, "spins": 66110, "avg_spin": 0.74, "turnover": 48840.07, "payout": 48129.84, "ggr": 710.23, "ggr_pct": 1.19, "rtp": 98.81}, {"date": "2026-02-02", "df": "02/02", "uap": 217, "spins": 50790, "avg_spin": 0.89, "turnover": 45393.89, "payout": 43345.06, "ggr": 2048.83, "ggr_pct": 4.33, "rtp": 95.67}, {"date": "2026-02-03", "df": "03/02", "uap": 230, "spins": 52880, "avg_spin": 1.04, "turnover": 55036.0, "payout": 53990.53, "ggr": 1045.47, "ggr_pct": 1.86, "rtp": 98.14}, {"date": "2026-02-04", "df": "04/02", "uap": 200, "spins": 52359, "avg_spin": 0.82, "turnover": 42826.34, "payout": 41414.43, "ggr": 1411.91, "ggr_pct": 3.32, "rtp": 96.68}, {"date": "2026-02-05", "df": "05/02", "uap": 236, "spins": 50554, "avg_spin": 1.06, "turnover": 53672.45, "payout": 56815.13, "ggr": -3142.68, "ggr_pct": -5.88, "rtp": 105.88}, {"date": "2026-02-06", "df": "06/02", "uap": 237, "spins": 43735, "avg_spin": 1.39, "turnover": 60727.22, "payout": 58848.9, "ggr": 1878.32, "ggr_pct": 2.25, "rtp": 97.75}, {"date": "2026-02-07", "df": "07/02", "uap": 218, "spins": 55214, "avg_spin": 1.27, "turnover": 70132.34, "payout": 72208.76, "ggr": -2076.42, "ggr_pct": -3.21, "rtp": 103.21}, {"date": "2026-02-08", "df": "08/02", "uap": 178, "spins": 36729, "avg_spin": 0.88, "turnover": 32249.75, "payout": 33444.59, "ggr": -1194.84, "ggr_pct": -3.7, "rtp": 103.7}, {"date": "2026-02-09", "df": "09/02", "uap": 246, "spins": 57403, "avg_spin": 1.21, "turnover": 69377.02, "payout": 66929.15, "ggr": 2447.87, "ggr_pct": 1.54, "rtp": 98.46}, {"date": "2026-02-10", "df": "10/02", "uap": 283, "spins": 81999, "avg_spin": 1.4, "turnover": 114691.65, "payout": 106606.87, "ggr": 8084.78, "ggr_pct": 6.51, "rtp": 93.49}, {"date": "2026-02-11", "df": "11/02", "uap": 283, "spins": 77502, "avg_spin": 0.87, "turnover": 67712.43, "payout": 65838.44, "ggr": 1873.99, "ggr_pct": 2.26, "rtp": 97.74}, {"date": "2026-02-12", "df": "12/02", "uap": 290, "spins": 79128, "avg_spin": 0.83, "turnover": 65881.74, "payout": 64846.12, "ggr": 1035.62, "ggr_pct": 1.63, "rtp": 98.37}, {"date": "2026-02-13", "df": "13/02", "uap": 315, "spins": 77595, "avg_spin": 0.75, "turnover": 58372.58, "payout": 56156.39, "ggr": 2216.19, "ggr_pct": 3.89, "rtp": 96.11}, {"date": "2026-02-14", "df": "14/02", "uap": 327, "spins": 78249, "avg_spin": 0.69, "turnover": 54352.59, "payout": 53404.44, "ggr": 948.15, "ggr_pct": 1.87, "rtp": 98.13}, {"date": "2026-02-15", "df": "15/02", "uap": 328, "spins": 72008, "avg_spin": 0.58, "turnover": 41886.9, "payout": 39628.14, "ggr": 2258.76, "ggr_pct": 5.57, "rtp": 94.43}, {"date": "2026-02-16", "df": "16/02", "uap": 266, "spins": 83138, "avg_spin": 0.44, "turnover": 36724.83, "payout": 34202.89, "ggr": 2521.94, "ggr_pct": 7.04, "rtp": 92.96}, {"date": "2026-02-17", "df": "17/02", "uap": 290, "spins": 94938, "avg_spin": 0.36, "turnover": 34164.98, "payout": 29332.06, "ggr": 4832.92, "ggr_pct": 14.43, "rtp": 85.57}, {"date": "2026-02-18", "df": "18/02", "uap": 258, "spins": 67994, "avg_spin": 0.56, "turnover": 37890.07, "payout": 37747.36, "ggr": 142.71, "ggr_pct": 0.06, "rtp": 99.94}, {"date": "2026-02-19", "df": "19/02", "uap": 240, "spins": 61438, "avg_spin": 0.84, "turnover": 51553.79, "payout": 46967.15, "ggr": 4586.64, "ggr_pct": 8.55, "rtp": 91.45}, {"date": "2026-02-20", "df": "20/02", "uap": 356, "spins": 76737, "avg_spin": 0.59, "turnover": 45029.09, "payout": 40869.79, "ggr": 4159.3, "ggr_pct": 9.3, "rtp": 90.7}, {"date": "2026-02-21", "df": "21/02", "uap": 258, "spins": 82917, "avg_spin": 0.69, "turnover": 57145.09, "payout": 54248.59, "ggr": 2896.5, "ggr_pct": 5.09, "rtp": 94.91}, {"date": "2026-02-22", "df": "22/02", "uap": 230, "spins": 87152, "avg_spin": 0.99, "turnover": 86155.74, "payout": 80338.88, "ggr": 5816.86, "ggr_pct": 6.71, "rtp": 93.29}, {"date": "2026-02-23", "df": "23/02", "uap": 198, "spins": 46042, "avg_spin": 1.5, "turnover": 68936.66, "payout": 61229.9, "ggr": 7706.76, "ggr_pct": 11.15, "rtp": 88.85}, {"date": "2026-02-24", "df": "24/02", "uap": 230, "spins": 66952, "avg_spin": 0.77, "turnover": 51463.32, "payout": 48066.6, "ggr": 3396.72, "ggr_pct": 6.51, "rtp": 93.49}, {"date": "2026-02-25", "df": "25/02", "uap": 274, "spins": 99448, "avg_spin": 0.39, "turnover": 38843.08, "payout": 35832.8, "ggr": 3010.28, "ggr_pct": 7.63, "rtp": 92.37}, {"date": "2026-02-26", "df": "26/02", "uap": 247, "spins": 78744, "avg_spin": 0.65, "turnover": 51073.49, "payout": 49279.96, "ggr": 1793.53, "ggr_pct": 3.42, "rtp": 96.58}, {"date": "2026-02-27", "df": "27/02", "uap": 259, "spins": 100487, "avg_spin": 0.58, "turnover": 58765.55, "payout": 57388.92, "ggr": 1376.63, "ggr_pct": 2.08, "rtp": 97.92}, {"date": "2026-02-28", "df": "28/02", "uap": 296, "spins": 110096, "avg_spin": 0.59, "turnover": 64492.3, "payout": 61674.87, "ggr": 2817.43, "ggr_pct": 4.22, "rtp": 95.78}, {"date": "2026-03-01", "df": "01/03", "uap": 284, "spins": 90516, "avg_spin": 0.49, "turnover": 44116.9, "payout": 44212.24, "ggr": -95.34, "ggr_pct": -0.43, "rtp": 100.43}, {"date": "2026-03-02", "df": "02/03", "uap": 283, "spins": 81559, "avg_spin": 0.48, "turnover": 38987.88, "payout": 39459.11, "ggr": -471.23, "ggr_pct": -1.19, "rtp": 101.19}, {"date": "2026-03-03", "df": "03/03", "uap": 299, "spins": 66489, "avg_spin": 0.75, "turnover": 50000.51, "payout": 49383.91, "ggr": 616.6, "ggr_pct": 1.28, "rtp": 98.72}, {"date": "2026-03-04", "df": "04/03", "uap": 216, "spins": 66692, "avg_spin": 0.94, "turnover": 62769.37, "payout": 58400.41, "ggr": 4368.96, "ggr_pct": 6.96, "rtp": 93.04}, {"date": "2026-03-05", "df": "05/03", "uap": 170, "spins": 55633, "avg_spin": 0.73, "turnover": 40842.78, "payout": 43811.91, "ggr": -2969.13, "ggr_pct": -7.25, "rtp": 107.25}, {"date": "2026-03-06", "df": "06/03", "uap": 196, "spins": 53584, "avg_spin": 1.01, "turnover": 54145.05, "payout": 57556.77, "ggr": -3411.72, "ggr_pct": -6.28, "rtp": 106.28}, {"date": "2026-03-07", "df": "07/03", "uap": 165, "spins": 52578, "avg_spin": 1.25, "turnover": 65494.79, "payout": 65189.47, "ggr": 305.32, "ggr_pct": 0.48, "rtp": 99.52}, {"date": "2026-03-08", "df": "08/03", "uap": 166, "spins": 43038, "avg_spin": 1.27, "turnover": 54582.04, "payout": 53173.76, "ggr": 1408.28, "ggr_pct": 2.57, "rtp": 97.43}, {"date": "2026-03-09", "df": "09/03", "uap": 145, "spins": 35710, "avg_spin": 1.2, "turnover": 42725.97, "payout": 40260.19, "ggr": 2465.78, "ggr_pct": 5.75, "rtp": 94.25}, {"date": "2026-03-10", "df": "10/03", "uap": 188, "spins": 43749, "avg_spin": 1.2, "turnover": 52326.79, "payout": 48901.47, "ggr": 3425.32, "ggr_pct": 6.62, "rtp": 93.38}, {"date": "2026-03-11", "df": "11/03", "uap": 214, "spins": 42893, "avg_spin": 1.04, "turnover": 44560.97, "payout": 45788.79, "ggr": -1227.82, "ggr_pct": -2.76, "rtp": 102.76}, {"date": "2026-03-12", "df": "12/03", "uap": 206, "spins": 41875, "avg_spin": 1.44, "turnover": 60503.7, "payout": 59182.81, "ggr": 1320.89, "ggr_pct": 2.18, "rtp": 97.82}, {"date": "2026-03-13", "df": "13/03", "uap": 175, "spins": 48311, "avg_spin": 1.46, "turnover": 70597.33, "payout": 66112.62, "ggr": 4484.71, "ggr_pct": 6.35, "rtp": 93.65}, {"date": "2026-03-14", "df": "14/03", "uap": 172, "spins": 36085, "avg_spin": 1.25, "turnover": 45128.47, "payout": 41272.66, "ggr": 3855.81, "ggr_pct": 8.54, "rtp": 91.46}, {"date": "2026-03-15", "df": "15/03", "uap": 135, "spins": 39967, "avg_spin": 0.97, "turnover": 38782.92, "payout": 37518.38, "ggr": 1264.54, "ggr_pct": 3.23, "rtp": 96.77}, {"date": "2026-03-16", "df": "16/03", "uap": 140, "spins": 34873, "avg_spin": 0.97, "turnover": 33656.8, "payout": 31236.75, "ggr": 2420.05, "ggr_pct": 7.19, "rtp": 92.81}, {"date": "2026-03-17", "df": "17/03", "uap": 158, "spins": 30502, "avg_spin": 1.81, "turnover": 55117.23, "payout": 50638.71, "ggr": 4478.52, "ggr_pct": 8.13, "rtp": 91.87}, {"date": "2026-03-18", "df": "18/03", "uap": 144, "spins": 30121, "avg_spin": 1.94, "turnover": 58285.29, "payout": 57424.6, "ggr": 860.69, "ggr_pct": 1.48, "rtp": 98.52}, {"date": "2026-03-19", "df": "19/03", "uap": 210, "spins": 50569, "avg_spin": 1.5, "turnover": 76031.54, "payout": 76978.05, "ggr": -946.51, "ggr_pct": -1.25, "rtp": 101.25}, {"date": "2026-03-20", "df": "20/03", "uap": 184, "spins": 52221, "avg_spin": 1.42, "turnover": 73913.58, "payout": 71124.59, "ggr": 2788.99, "ggr_pct": 3.76, "rtp": 96.24}, {"date": "2026-03-21", "df": "21/03", "uap": 582, "spins": 94672, "avg_spin": 0.81, "turnover": 76991.88, "payout": 73523.7, "ggr": 3468.18, "ggr_pct": 4.48, "rtp": 95.52}, {"date": "2026-03-22", "df": "22/03", "uap": 311, "spins": 63012, "avg_spin": 1.03, "turnover": 64911.27, "payout": 63096.29, "ggr": 1814.98, "ggr_pct": 2.8, "rtp": 97.2}, {"date": "2026-03-23", "df": "23/03", "uap": 420, "spins": 87915, "avg_spin": 0.99, "turnover": 87078.49, "payout": 84030.31, "ggr": 3048.18, "ggr_pct": 3.5, "rtp": 96.5}, {"date": "2026-03-24", "df": "24/03", "uap": 299, "spins": 71319, "avg_spin": 0.98, "turnover": 69690.59, "payout": 67419.4, "ggr": 2271.19, "ggr_pct": 3.28, "rtp": 96.72}, {"date": "2026-03-25", "df": "25/03", "uap": 323, "spins": 78840, "avg_spin": 1.1, "turnover": 86695.98, "payout": 83181.53, "ggr": 3514.45, "ggr_pct": 4.07, "rtp": 95.93}, {"date": "2026-03-26", "df": "26/03", "uap": 317, "spins": 82981, "avg_spin": 0.92, "turnover": 76115.45, "payout": 76156.69, "ggr": -41.24, "ggr_pct": -0.04, "rtp": 100.04}, {"date": "2026-03-27", "df": "27/03", "uap": 285, "spins": 70674, "avg_spin": 1.01, "turnover": 71318.65, "payout": 73492.33, "ggr": -2173.68, "ggr_pct": -3.01, "rtp": 103.01}, {"date": "2026-03-28", "df": "28/03", "uap": 279, "spins": 71369, "avg_spin": 0.99, "turnover": 70528.12, "payout": 68508.9, "ggr": 2019.22, "ggr_pct": 2.85, "rtp": 97.15}, {"date": "2026-03-29", "df": "29/03", "uap": 288, "spins": 75481, "avg_spin": 0.87, "turnover": 65322.01, "payout": 66524.9, "ggr": -1202.89, "ggr_pct": -1.85, "rtp": 101.85}];
+const SS_GAMES=[{"name": "Aviator","provider": "Spribe","ggr": 36265.06,"turnover": 1077888.5,"spins": 640872,"rtp": 96.64,"avg_spin": 1.68},{"name": "Speed Auto Roulette","provider": "Evolution","ggr": 29037.17,"turnover": 713103.94,"spins": 116372,"rtp": 95.93,"avg_spin": 6.13},{"name": "Ruleta Automatica","provider": "Evolution","ggr": 20347.21,"turnover": 1094817.38,"spins": 161234,"rtp": 98.14,"avg_spin": 6.79},{"name": "Fortune Ox","provider": "PGSOFT","ggr": 15000.42,"turnover": 176001.31,"spins": 388449,"rtp": 91.48,"avg_spin": 0.45},{"name": "Live Roulette","provider": "LiveVegas","ggr": 11477.45,"turnover": 199843.17,"spins": 11225,"rtp": 94.26,"avg_spin": 17.8},{"name": "Roulette A Aurum","provider": "CreedRoomz","ggr": 10062.46,"turnover": 423429.13,"spins": 48844,"rtp": 97.62,"avg_spin": 8.67},{"name": "Fortune Dragon","provider": "PGSOFT","ggr": 9630.68,"turnover": 157830.47,"spins": 500607,"rtp": 93.9,"avg_spin": 0.32},{"name": "Roulette Brasileira","provider": "CreedRoomz","ggr": 8074.75,"turnover": 294705.0,"spins": 37635,"rtp": 97.26,"avg_spin": 7.83},{"name": "Sugar Rush 1000","provider": "Pragmatic Play","ggr": 7649.13,"turnover": 44932.42,"spins": 56594,"rtp": 82.98,"avg_spin": 0.79},{"name": "Divine Drop","provider": "Hacksaw Gaming","ggr": 6915.21,"turnover": 29478.67,"spins": 5319,"rtp": 76.54,"avg_spin": 5.54}];
+const SS_PROVS=[{"name": "PGSOFT","ggr": 53390.41,"turnover": 1587739.19,"payout": 1534348.78,"spins": 4580799,"games": 143,"rtp": 96.64},{"name": "Evolution","ggr": 50783.86,"turnover": 2443195.84,"payout": 2392411.98,"spins": 375682,"games": 72,"rtp": 97.92},{"name": "Spribe","ggr": 37585.76,"turnover": 1079443.26,"payout": 1041857.5,"spins": 641504,"games": 5,"rtp": 96.52},{"name": "Pragmatic Play","ggr": 29127.56,"turnover": 935330.85,"payout": 906203.29,"spins": 1292444,"games": 456,"rtp": 96.89},{"name": "Hacksaw Gaming","ggr": 19451.83,"turnover": 168362.58,"payout": 148910.75,"spins": 73784,"games": 123,"rtp": 88.45},{"name": "CreedRoomz","ggr": 16705.9,"turnover": 836705.14,"payout": 819999.24,"spins": 111320,"games": 11,"rtp": 98.0},{"name": "LiveVegas","ggr": 9791.91,"turnover": 245308.98,"payout": 235517.07,"spins": 20171,"games": 9,"rtp": 96.01},{"name": "Smartsoft","ggr": 6099.17,"turnover": 182986.95,"payout": 176887.78,"spins": 61359,"games": 13,"rtp": 96.67},{"name": "Pragmatic Play Live","ggr": 2445.67,"turnover": 40275.72,"payout": 37830.05,"spins": 8949,"games": 28,"rtp": 93.93},{"name": "Playtech","ggr": 2061.43,"turnover": 61562.85,"payout": 59501.42,"spins": 14095,"games": 82,"rtp": 96.65}];
+const SS_DAILY=[{"date": "2025-10-21","df": "21/10","uap": 1,"spins": 22,"avg_spin": 0.34,"turnover": 7.48,"payout": 6.87,"ggr": 0.61,"ggr_pct": 8.12,"rtp": 91.88},{"date": "2025-10-22","df": "22/10","uap": 1,"spins": 1,"avg_spin": 0.48,"turnover": 0.48,"payout": 0,"ggr": 0.48,"ggr_pct": 100.0,"rtp": 0.0},{"date": "2025-10-27","df": "27/10","uap": 2,"spins": 22,"avg_spin": 0.11,"turnover": 2.32,"payout": 7.14,"ggr": -4.82,"ggr_pct": -207.59,"rtp": 307.59},{"date": "2025-10-29","df": "29/10","uap": 1,"spins": 3,"avg_spin": 0.02,"turnover": 0.06,"payout": 0.18,"ggr": -0.12,"ggr_pct": -290.0,"rtp": 390.0},{"date": "2025-10-30","df": "30/10","uap": 1,"spins": 4,"avg_spin": 0.8,"turnover": 3.2,"payout": 3.46,"ggr": -0.26,"ggr_pct": -8.5,"rtp": 108.5},{"date": "2025-11-10","df": "10/11","uap": 2,"spins": 11,"avg_spin": 0.16,"turnover": 1.77,"payout": 0.5,"ggr": 1.27,"ggr_pct": 72.41,"rtp": 27.59},{"date": "2025-11-11","df": "11/11","uap": 3,"spins": 37,"avg_spin": 0.23,"turnover": 8.52,"payout": 3.74,"ggr": 4.78,"ggr_pct": 56.21,"rtp": 43.79},{"date": "2025-11-13","df": "13/11","uap": 19,"spins": 474,"avg_spin": 1.87,"turnover": 885.48,"payout": 717.07,"ggr": 168.41,"ggr_pct": 19.0,"rtp": 81.0},{"date": "2025-11-14","df": "14/11","uap": 100,"spins": 9222,"avg_spin": 2.11,"turnover": 19422.76,"payout": 16946.45,"ggr": 2476.31,"ggr_pct": 12.77,"rtp": 87.23},{"date": "2025-11-15","df": "15/11","uap": 112,"spins": 15205,"avg_spin": 1.79,"turnover": 27251.64,"payout": 26486.43,"ggr": 765.21,"ggr_pct": 2.79,"rtp": 97.21},{"date": "2025-11-16","df": "16/11","uap": 95,"spins": 16606,"avg_spin": 1.56,"turnover": 25942.17,"payout": 26096.87,"ggr": -154.7,"ggr_pct": -0.59,"rtp": 100.59},{"date": "2025-11-17","df": "17/11","uap": 108,"spins": 16119,"avg_spin": 1.96,"turnover": 31663.5,"payout": 28865.03,"ggr": 2798.47,"ggr_pct": 8.81,"rtp": 91.19},{"date": "2025-11-18","df": "18/11","uap": 125,"spins": 26767,"avg_spin": 0.8,"turnover": 21324.66,"payout": 26074.13,"ggr": -4749.47,"ggr_pct": -22.34,"rtp": 122.34},{"date": "2025-11-19","df": "19/11","uap": 195,"spins": 62974,"avg_spin": 2.22,"turnover": 139607.41,"payout": 148727.08,"ggr": -9119.67,"ggr_pct": -6.53,"rtp": 106.53},{"date": "2025-11-20","df": "20/11","uap": 233,"spins": 79496,"avg_spin": 0.63,"turnover": 50206.72,"payout": 47330.85,"ggr": 2875.87,"ggr_pct": 5.88,"rtp": 94.12},{"date": "2025-11-21","df": "21/11","uap": 248,"spins": 75909,"avg_spin": 1.44,"turnover": 109475.78,"payout": 110089.12,"ggr": -613.34,"ggr_pct": -0.48,"rtp": 100.48},{"date": "2025-11-22","df": "22/11","uap": 215,"spins": 79916,"avg_spin": 0.77,"turnover": 61923.27,"payout": 64015.96,"ggr": -2092.69,"ggr_pct": -3.2,"rtp": 103.2},{"date": "2025-11-23","df": "23/11","uap": 217,"spins": 70730,"avg_spin": 0.87,"turnover": 61359.9,"payout": 55916.21,"ggr": 5443.69,"ggr_pct": 9.01,"rtp": 90.99},{"date": "2025-11-24","df": "24/11","uap": 191,"spins": 75373,"avg_spin": 1.08,"turnover": 81599.59,"payout": 68499.04,"ggr": 13100.55,"ggr_pct": 16.16,"rtp": 83.84},{"date": "2025-11-25","df": "25/11","uap": 179,"spins": 54110,"avg_spin": 1.12,"turnover": 60352.43,"payout": 64702.94,"ggr": -4350.51,"ggr_pct": -7.06,"rtp": 107.06},{"date": "2025-11-26","df": "26/11","uap": 222,"spins": 71300,"avg_spin": 1.32,"turnover": 94045.74,"payout": 90951.77,"ggr": 3093.97,"ggr_pct": 3.38,"rtp": 96.62},{"date": "2025-11-27","df": "27/11","uap": 213,"spins": 71571,"avg_spin": 1.55,"turnover": 110953.44,"payout": 102648.78,"ggr": 8304.66,"ggr_pct": 7.56,"rtp": 92.44},{"date": "2025-11-28","df": "28/11","uap": 199,"spins": 68954,"avg_spin": 1.27,"turnover": 87727.23,"payout": 86341.96,"ggr": 1385.27,"ggr_pct": 1.72,"rtp": 98.28},{"date": "2025-11-29","df": "29/11","uap": 241,"spins": 71397,"avg_spin": 0.92,"turnover": 65548.11,"payout": 58232.99,"ggr": 7315.12,"ggr_pct": 11.28,"rtp": 88.72},{"date": "2025-11-30","df": "30/11","uap": 186,"spins": 57594,"avg_spin": 0.79,"turnover": 45426.65,"payout": 44693.27,"ggr": 733.38,"ggr_pct": 1.78,"rtp": 98.22},{"date": "2025-12-01","df": "01/12","uap": 222,"spins": 88431,"avg_spin": 0.61,"turnover": 53747.91,"payout": 58769.99,"ggr": -5022.08,"ggr_pct": -9.17,"rtp": 109.17},{"date": "2025-12-02","df": "02/12","uap": 237,"spins": 67834,"avg_spin": 1.12,"turnover": 75749.54,"payout": 74247.17,"ggr": 1502.37,"ggr_pct": 2.06,"rtp": 97.94},{"date": "2025-12-03","df": "03/12","uap": 228,"spins": 69870,"avg_spin": 0.98,"turnover": 68597.9,"payout": 62410.6,"ggr": 6187.3,"ggr_pct": 9.12,"rtp": 90.88},{"date": "2025-12-04","df": "04/12","uap": 190,"spins": 51162,"avg_spin": 0.74,"turnover": 38105.66,"payout": 38671.6,"ggr": -565.94,"ggr_pct": -1.38,"rtp": 101.38},{"date": "2025-12-05","df": "05/12","uap": 233,"spins": 61894,"avg_spin": 0.81,"turnover": 50130.85,"payout": 43775.59,"ggr": 6355.26,"ggr_pct": 12.79,"rtp": 87.21},{"date": "2025-12-06","df": "06/12","uap": 269,"spins": 85141,"avg_spin": 1.06,"turnover": 90364.4,"payout": 92970.38,"ggr": -2605.98,"ggr_pct": -2.77,"rtp": 102.77},{"date": "2025-12-07","df": "07/12","uap": 225,"spins": 88171,"avg_spin": 0.78,"turnover": 68800.16,"payout": 65832.39,"ggr": 2967.77,"ggr_pct": 4.45,"rtp": 95.55},{"date": "2025-12-08","df": "08/12","uap": 205,"spins": 54041,"avg_spin": 1.45,"turnover": 78504.06,"payout": 67589.34,"ggr": 10914.72,"ggr_pct": 13.97,"rtp": 86.03},{"date": "2025-12-09","df": "09/12","uap": 205,"spins": 56228,"avg_spin": 0.98,"turnover": 55053.4,"payout": 53772.78,"ggr": 1280.62,"ggr_pct": 2.4,"rtp": 97.6},{"date": "2025-12-10","df": "10/12","uap": 444,"spins": 46965,"avg_spin": 1.99,"turnover": 93516.91,"payout": 92541.41,"ggr": 975.5,"ggr_pct": 1.0,"rtp": 99.0},{"date": "2025-12-11","df": "11/12","uap": 222,"spins": 39153,"avg_spin": 1.73,"turnover": 67906.85,"payout": 67312.71,"ggr": 594.14,"ggr_pct": 0.84,"rtp": 99.16},{"date": "2025-12-12","df": "12/12","uap": 187,"spins": 47464,"avg_spin": 1.21,"turnover": 57337.37,"payout": 58389.19,"ggr": -1051.82,"ggr_pct": -1.89,"rtp": 101.89},{"date": "2025-12-13","df": "13/12","uap": 163,"spins": 41003,"avg_spin": 0.89,"turnover": 36622.77,"payout": 35016.48,"ggr": 1606.29,"ggr_pct": 4.33,"rtp": 95.67},{"date": "2025-12-14","df": "14/12","uap": 153,"spins": 38464,"avg_spin": 1.1,"turnover": 42264.09,"payout": 38910.34,"ggr": 3353.75,"ggr_pct": 7.9,"rtp": 92.1},{"date": "2025-12-15","df": "15/12","uap": 175,"spins": 37507,"avg_spin": 1.57,"turnover": 58726.17,"payout": 56084.21,"ggr": 2641.96,"ggr_pct": 4.45,"rtp": 95.55},{"date": "2025-12-16","df": "16/12","uap": 178,"spins": 35008,"avg_spin": 2.04,"turnover": 71531.33,"payout": 72868.59,"ggr": -1337.26,"ggr_pct": -1.9,"rtp": 101.9},{"date": "2025-12-17","df": "17/12","uap": 156,"spins": 34916,"avg_spin": 2.2,"turnover": 76759.63,"payout": 75447.47,"ggr": 1312.16,"ggr_pct": 1.69,"rtp": 98.31},{"date": "2025-12-18","df": "18/12","uap": 169,"spins": 43646,"avg_spin": 1.44,"turnover": 62803.0,"payout": 55461.72,"ggr": 7341.28,"ggr_pct": 11.67,"rtp": 88.33},{"date": "2025-12-19","df": "19/12","uap": 199,"spins": 63281,"avg_spin": 1.17,"turnover": 73913.45,"payout": 73080.81,"ggr": 832.64,"ggr_pct": 1.07,"rtp": 98.93},{"date": "2025-12-20","df": "20/12","uap": 198,"spins": 59298,"avg_spin": 1.01,"turnover": 59701.5,"payout": 63405.61,"ggr": -3704.11,"ggr_pct": -6.25,"rtp": 106.25},{"date": "2025-12-21","df": "21/12","uap": 168,"spins": 39467,"avg_spin": 1.33,"turnover": 52636.64,"payout": 48840.14,"ggr": 3796.5,"ggr_pct": 7.2,"rtp": 92.8},{"date": "2025-12-22","df": "22/12","uap": 184,"spins": 45112,"avg_spin": 1.12,"turnover": 50437.05,"payout": 49172.06,"ggr": 1264.99,"ggr_pct": 2.48,"rtp": 97.52},{"date": "2025-12-23","df": "23/12","uap": 183,"spins": 54472,"avg_spin": 0.97,"turnover": 52683.49,"payout": 49553.32,"ggr": 3130.17,"ggr_pct": 5.88,"rtp": 94.12},{"date": "2025-12-24","df": "24/12","uap": 253,"spins": 52949,"avg_spin": 1.15,"turnover": 60702.88,"payout": 59565.97,"ggr": 1136.91,"ggr_pct": 1.9,"rtp": 98.1},{"date": "2025-12-25","df": "25/12","uap": 295,"spins": 52655,"avg_spin": 0.65,"turnover": 34468.33,"payout": 30491.36,"ggr": 3976.97,"ggr_pct": 11.6,"rtp": 88.4},{"date": "2025-12-26","df": "26/12","uap": 317,"spins": 49884,"avg_spin": 1.01,"turnover": 50424.16,"payout": 50673.43,"ggr": -249.27,"ggr_pct": -0.45,"rtp": 100.45},{"date": "2025-12-27","df": "27/12","uap": 340,"spins": 45221,"avg_spin": 0.87,"turnover": 39458.09,"payout": 36819.67,"ggr": 2638.42,"ggr_pct": 6.71,"rtp": 93.29},{"date": "2025-12-28","df": "28/12","uap": 286,"spins": 40885,"avg_spin": 0.72,"turnover": 29313.97,"payout": 27715.25,"ggr": 1598.72,"ggr_pct": 5.48,"rtp": 94.52},{"date": "2025-12-29","df": "29/12","uap": 316,"spins": 53957,"avg_spin": 0.58,"turnover": 31090.85,"payout": 33970.19,"ggr": -2879.34,"ggr_pct": -9.17,"rtp": 109.17},{"date": "2025-12-30","df": "30/12","uap": 332,"spins": 50237,"avg_spin": 1.31,"turnover": 65762.19,"payout": 65551.16,"ggr": 211.03,"ggr_pct": 0.35,"rtp": 99.65},{"date": "2025-12-31","df": "31/12","uap": 321,"spins": 45546,"avg_spin": 0.8,"turnover": 36436.43,"payout": 34295.9,"ggr": 2140.53,"ggr_pct": 5.92,"rtp": 94.08},{"date": "2026-01-01","df": "01/01","uap": 262,"spins": 41840,"avg_spin": 0.67,"turnover": 28186.93,"payout": 33031.4,"ggr": -4844.47,"ggr_pct": -17.05,"rtp": 117.05},{"date": "2026-01-02","df": "02/01","uap": 214,"spins": 50196,"avg_spin": 0.87,"turnover": 43823.22,"payout": 44862.28,"ggr": -1039.06,"ggr_pct": -2.29,"rtp": 102.29},{"date": "2026-01-03","df": "03/01","uap": 148,"spins": 59529,"avg_spin": 1.49,"turnover": 88645.69,"payout": 69737.09,"ggr": 18908.6,"ggr_pct": 21.37,"rtp": 78.63},{"date": "2026-01-04","df": "04/01","uap": 152,"spins": 41161,"avg_spin": 0.72,"turnover": 29721.94,"payout": 27225.16,"ggr": 2496.78,"ggr_pct": 8.53,"rtp": 91.47},{"date": "2026-01-05","df": "05/01","uap": 147,"spins": 29521,"avg_spin": 1.02,"turnover": 30051.12,"payout": 29059.19,"ggr": 991.93,"ggr_pct": 3.41,"rtp": 96.59},{"date": "2026-01-06","df": "06/01","uap": 166,"spins": 36132,"avg_spin": 3.91,"turnover": 141207.19,"payout": 138192.89,"ggr": 3014.3,"ggr_pct": 2.14,"rtp": 97.86},{"date": "2026-01-07","df": "07/01","uap": 173,"spins": 37367,"avg_spin": 1.66,"turnover": 61967.38,"payout": 54797.86,"ggr": 7169.52,"ggr_pct": 11.55,"rtp": 88.45},{"date": "2026-01-08","df": "08/01","uap": 225,"spins": 43401,"avg_spin": 1.24,"turnover": 53950.15,"payout": 49734.94,"ggr": 4215.21,"ggr_pct": 7.79,"rtp": 92.21},{"date": "2026-01-09","df": "09/01","uap": 262,"spins": 53276,"avg_spin": 0.72,"turnover": 38548.51,"payout": 37292.76,"ggr": 1255.75,"ggr_pct": 3.22,"rtp": 96.78},{"date": "2026-01-10","df": "10/01","uap": 247,"spins": 51148,"avg_spin": 0.89,"turnover": 45312.24,"payout": 44235.79,"ggr": 1076.45,"ggr_pct": 2.33,"rtp": 97.67},{"date": "2026-01-11","df": "11/01","uap": 173,"spins": 40708,"avg_spin": 0.8,"turnover": 32664.43,"payout": 30571.42,"ggr": 2093.01,"ggr_pct": 6.43,"rtp": 93.57},{"date": "2026-01-12","df": "12/01","uap": 179,"spins": 40630,"avg_spin": 1.01,"turnover": 41226.07,"payout": 39146.37,"ggr": 2079.7,"ggr_pct": 5.07,"rtp": 94.93},{"date": "2026-01-13","df": "13/01","uap": 261,"spins": 41891,"avg_spin": 1.04,"turnover": 43653.36,"payout": 42663.74,"ggr": 989.62,"ggr_pct": 2.28,"rtp": 97.72},{"date": "2026-01-14","df": "14/01","uap": 228,"spins": 49640,"avg_spin": 1.3,"turnover": 64614.47,"payout": 65793.82,"ggr": -1179.35,"ggr_pct": -1.81,"rtp": 101.81},{"date": "2026-01-15","df": "15/01","uap": 235,"spins": 48675,"avg_spin": 1.12,"turnover": 54506.44,"payout": 57985.97,"ggr": -3479.53,"ggr_pct": -6.36,"rtp": 106.36},{"date": "2026-01-16","df": "16/01","uap": 266,"spins": 62788,"avg_spin": 0.69,"turnover": 43415.55,"payout": 43363.54,"ggr": 52.01,"ggr_pct": 0.15,"rtp": 99.85},{"date": "2026-01-17","df": "17/01","uap": 272,"spins": 70943,"avg_spin": 0.69,"turnover": 49108.66,"payout": 47192.61,"ggr": 1916.05,"ggr_pct": 3.92,"rtp": 96.08},{"date": "2026-01-18","df": "18/01","uap": 238,"spins": 66408,"avg_spin": 0.67,"turnover": 44405.53,"payout": 41557.9,"ggr": 2847.63,"ggr_pct": 6.45,"rtp": 93.55},{"date": "2026-01-19","df": "19/01","uap": 329,"spins": 60127,"avg_spin": 0.58,"turnover": 34878.47,"payout": 33785.92,"ggr": 1092.55,"ggr_pct": 3.2,"rtp": 96.8},{"date": "2026-01-20","df": "20/01","uap": 313,"spins": 71247,"avg_spin": 1.08,"turnover": 76932.15,"payout": 75933.03,"ggr": 999.12,"ggr_pct": 0.92,"rtp": 99.08},{"date": "2026-01-21","df": "21/01","uap": 259,"spins": 63011,"avg_spin": 1.16,"turnover": 72995.24,"payout": 64537.13,"ggr": 8458.11,"ggr_pct": 1.26,"rtp": 98.74},{"date": "2026-01-22","df": "22/01","uap": 243,"spins": 62797,"avg_spin": 1.12,"turnover": 70486.36,"payout": 66907.92,"ggr": 3578.44,"ggr_pct": 5.05,"rtp": 94.95},{"date": "2026-01-23","df": "23/01","uap": 358,"spins": 51278,"avg_spin": 1.14,"turnover": 58227.6,"payout": 56696.98,"ggr": 1530.62,"ggr_pct": 2.66,"rtp": 97.34},{"date": "2026-01-24","df": "24/01","uap": 301,"spins": 55794,"avg_spin": 2.91,"turnover": 162273.42,"payout": 144088.14,"ggr": 18185.28,"ggr_pct": 11.24,"rtp": 88.76},{"date": "2026-01-25","df": "25/01","uap": 173,"spins": 44050,"avg_spin": 0.91,"turnover": 40178.22,"payout": 39501.89,"ggr": 676.33,"ggr_pct": 1.77,"rtp": 98.23},{"date": "2026-01-26","df": "26/01","uap": 182,"spins": 36728,"avg_spin": 2.04,"turnover": 75027.97,"payout": 69776.76,"ggr": 5251.21,"ggr_pct": 7.04,"rtp": 92.96},{"date": "2026-01-27","df": "27/01","uap": 199,"spins": 41839,"avg_spin": 1.25,"turnover": 52144.46,"payout": 47978.71,"ggr": 4165.75,"ggr_pct": 8.05,"rtp": 91.95},{"date": "2026-01-28","df": "28/01","uap": 206,"spins": 40529,"avg_spin": 1.15,"turnover": 46772.87,"payout": 42325.06,"ggr": 4447.81,"ggr_pct": 9.5,"rtp": 90.5},{"date": "2026-01-29","df": "29/01","uap": 268,"spins": 57060,"avg_spin": 0.68,"turnover": 38878.13,"payout": 37417.25,"ggr": 1460.88,"ggr_pct": 3.81,"rtp": 96.19},{"date": "2026-01-30","df": "30/01","uap": 263,"spins": 61172,"avg_spin": 1.08,"turnover": 66152.62,"payout": 65040.29,"ggr": 1112.33,"ggr_pct": 1.59,"rtp": 98.41},{"date": "2026-01-31","df": "31/01","uap": 254,"spins": 69381,"avg_spin": 1.14,"turnover": 79311.24,"payout": 117874.28,"ggr": -38563.04,"ggr_pct": -48.84,"rtp": 148.84},{"date": "2026-02-01","df": "01/02","uap": 252,"spins": 66110,"avg_spin": 0.74,"turnover": 48840.07,"payout": 48129.84,"ggr": 710.23,"ggr_pct": 1.19,"rtp": 98.81},{"date": "2026-02-02","df": "02/02","uap": 217,"spins": 50790,"avg_spin": 0.89,"turnover": 45393.89,"payout": 43345.06,"ggr": 2048.83,"ggr_pct": 4.33,"rtp": 95.67},{"date": "2026-02-03","df": "03/02","uap": 230,"spins": 52880,"avg_spin": 1.04,"turnover": 55036.0,"payout": 53990.53,"ggr": 1045.47,"ggr_pct": 1.86,"rtp": 98.14},{"date": "2026-02-04","df": "04/02","uap": 200,"spins": 52359,"avg_spin": 0.82,"turnover": 42826.34,"payout": 41414.43,"ggr": 1411.91,"ggr_pct": 3.32,"rtp": 96.68},{"date": "2026-02-05","df": "05/02","uap": 236,"spins": 50554,"avg_spin": 1.06,"turnover": 53672.45,"payout": 56815.13,"ggr": -3142.68,"ggr_pct": -5.88,"rtp": 105.88},{"date": "2026-02-06","df": "06/02","uap": 237,"spins": 43735,"avg_spin": 1.39,"turnover": 60727.22,"payout": 58848.9,"ggr": 1878.32,"ggr_pct": 2.25,"rtp": 97.75},{"date": "2026-02-07","df": "07/02","uap": 218,"spins": 55214,"avg_spin": 1.27,"turnover": 70132.34,"payout": 72208.76,"ggr": -2076.42,"ggr_pct": -3.21,"rtp": 103.21},{"date": "2026-02-08","df": "08/02","uap": 178,"spins": 36729,"avg_spin": 0.88,"turnover": 32249.75,"payout": 33444.59,"ggr": -1194.84,"ggr_pct": -3.7,"rtp": 103.7},{"date": "2026-02-09","df": "09/02","uap": 246,"spins": 57403,"avg_spin": 1.21,"turnover": 69377.02,"payout": 66929.15,"ggr": 2447.87,"ggr_pct": 1.54,"rtp": 98.46},{"date": "2026-02-10","df": "10/02","uap": 283,"spins": 81999,"avg_spin": 1.4,"turnover": 114691.65,"payout": 106606.87,"ggr": 8084.78,"ggr_pct": 6.51,"rtp": 93.49},{"date": "2026-02-11","df": "11/02","uap": 283,"spins": 77502,"avg_spin": 0.87,"turnover": 67712.43,"payout": 65838.44,"ggr": 1873.99,"ggr_pct": 2.26,"rtp": 97.74},{"date": "2026-02-12","df": "12/02","uap": 290,"spins": 79128,"avg_spin": 0.83,"turnover": 65881.74,"payout": 64846.12,"ggr": 1035.62,"ggr_pct": 1.63,"rtp": 98.37},{"date": "2026-02-13","df": "13/02","uap": 315,"spins": 77595,"avg_spin": 0.75,"turnover": 58372.58,"payout": 56156.39,"ggr": 2216.19,"ggr_pct": 3.89,"rtp": 96.11},{"date": "2026-02-14","df": "14/02","uap": 327,"spins": 78249,"avg_spin": 0.69,"turnover": 54352.59,"payout": 53404.44,"ggr": 948.15,"ggr_pct": 1.87,"rtp": 98.13},{"date": "2026-02-15","df": "15/02","uap": 328,"spins": 72008,"avg_spin": 0.58,"turnover": 41886.9,"payout": 39628.14,"ggr": 2258.76,"ggr_pct": 5.57,"rtp": 94.43},{"date": "2026-02-16","df": "16/02","uap": 266,"spins": 83138,"avg_spin": 0.44,"turnover": 36724.83,"payout": 34202.89,"ggr": 2521.94,"ggr_pct": 7.04,"rtp": 92.96},{"date": "2026-02-17","df": "17/02","uap": 290,"spins": 94938,"avg_spin": 0.36,"turnover": 34164.98,"payout": 29332.06,"ggr": 4832.92,"ggr_pct": 14.43,"rtp": 85.57},{"date": "2026-02-18","df": "18/02","uap": 258,"spins": 67994,"avg_spin": 0.56,"turnover": 37890.07,"payout": 37747.36,"ggr": 142.71,"ggr_pct": 0.06,"rtp": 99.94},{"date": "2026-02-19","df": "19/02","uap": 240,"spins": 61438,"avg_spin": 0.84,"turnover": 51553.79,"payout": 46967.15,"ggr": 4586.64,"ggr_pct": 8.55,"rtp": 91.45},{"date": "2026-02-20","df": "20/02","uap": 356,"spins": 76737,"avg_spin": 0.59,"turnover": 45029.09,"payout": 40869.79,"ggr": 4159.3,"ggr_pct": 9.3,"rtp": 90.7},{"date": "2026-02-21","df": "21/02","uap": 258,"spins": 82917,"avg_spin": 0.69,"turnover": 57145.09,"payout": 54248.59,"ggr": 2896.5,"ggr_pct": 5.09,"rtp": 94.91},{"date": "2026-02-22","df": "22/02","uap": 230,"spins": 87152,"avg_spin": 0.99,"turnover": 86155.74,"payout": 80338.88,"ggr": 5816.86,"ggr_pct": 6.71,"rtp": 93.29},{"date": "2026-02-23","df": "23/02","uap": 198,"spins": 46042,"avg_spin": 1.5,"turnover": 68936.66,"payout": 61229.9,"ggr": 7706.76,"ggr_pct": 11.15,"rtp": 88.85},{"date": "2026-02-24","df": "24/02","uap": 230,"spins": 66952,"avg_spin": 0.77,"turnover": 51463.32,"payout": 48066.6,"ggr": 3396.72,"ggr_pct": 6.51,"rtp": 93.49},{"date": "2026-02-25","df": "25/02","uap": 274,"spins": 99448,"avg_spin": 0.39,"turnover": 38843.08,"payout": 35832.8,"ggr": 3010.28,"ggr_pct": 7.63,"rtp": 92.37},{"date": "2026-02-26","df": "26/02","uap": 247,"spins": 78744,"avg_spin": 0.65,"turnover": 51073.49,"payout": 49279.96,"ggr": 1793.53,"ggr_pct": 3.42,"rtp": 96.58},{"date": "2026-02-27","df": "27/02","uap": 259,"spins": 100487,"avg_spin": 0.58,"turnover": 58765.55,"payout": 57388.92,"ggr": 1376.63,"ggr_pct": 2.08,"rtp": 97.92},{"date": "2026-02-28","df": "28/02","uap": 296,"spins": 110096,"avg_spin": 0.59,"turnover": 64492.3,"payout": 61674.87,"ggr": 2817.43,"ggr_pct": 4.22,"rtp": 95.78},{"date": "2026-03-01","df": "01/03","uap": 284,"spins": 90516,"avg_spin": 0.49,"turnover": 44116.9,"payout": 44212.24,"ggr": -95.34,"ggr_pct": -0.43,"rtp": 100.43},{"date": "2026-03-02","df": "02/03","uap": 283,"spins": 81559,"avg_spin": 0.48,"turnover": 38987.88,"payout": 39459.11,"ggr": -471.23,"ggr_pct": -1.19,"rtp": 101.19},{"date": "2026-03-03","df": "03/03","uap": 299,"spins": 66489,"avg_spin": 0.75,"turnover": 50000.51,"payout": 49383.91,"ggr": 616.6,"ggr_pct": 1.28,"rtp": 98.72},{"date": "2026-03-04","df": "04/03","uap": 216,"spins": 66692,"avg_spin": 0.94,"turnover": 62769.37,"payout": 58400.41,"ggr": 4368.96,"ggr_pct": 6.96,"rtp": 93.04},{"date": "2026-03-05","df": "05/03","uap": 170,"spins": 55633,"avg_spin": 0.73,"turnover": 40842.78,"payout": 43811.91,"ggr": -2969.13,"ggr_pct": -7.25,"rtp": 107.25},{"date": "2026-03-06","df": "06/03","uap": 196,"spins": 53584,"avg_spin": 1.01,"turnover": 54145.05,"payout": 57556.77,"ggr": -3411.72,"ggr_pct": -6.28,"rtp": 106.28},{"date": "2026-03-07","df": "07/03","uap": 165,"spins": 52578,"avg_spin": 1.25,"turnover": 65494.79,"payout": 65189.47,"ggr": 305.32,"ggr_pct": 0.48,"rtp": 99.52},{"date": "2026-03-08","df": "08/03","uap": 166,"spins": 43038,"avg_spin": 1.27,"turnover": 54582.04,"payout": 53173.76,"ggr": 1408.28,"ggr_pct": 2.57,"rtp": 97.43},{"date": "2026-03-09","df": "09/03","uap": 145,"spins": 35710,"avg_spin": 1.2,"turnover": 42725.97,"payout": 40260.19,"ggr": 2465.78,"ggr_pct": 5.75,"rtp": 94.25},{"date": "2026-03-10","df": "10/03","uap": 188,"spins": 43749,"avg_spin": 1.2,"turnover": 52326.79,"payout": 48901.47,"ggr": 3425.32,"ggr_pct": 6.62,"rtp": 93.38},{"date": "2026-03-11","df": "11/03","uap": 214,"spins": 42893,"avg_spin": 1.04,"turnover": 44560.97,"payout": 45788.79,"ggr": -1227.82,"ggr_pct": -2.76,"rtp": 102.76},{"date": "2026-03-12","df": "12/03","uap": 206,"spins": 41875,"avg_spin": 1.44,"turnover": 60503.7,"payout": 59182.81,"ggr": 1320.89,"ggr_pct": 2.18,"rtp": 97.82},{"date": "2026-03-13","df": "13/03","uap": 175,"spins": 48311,"avg_spin": 1.46,"turnover": 70597.33,"payout": 66112.62,"ggr": 4484.71,"ggr_pct": 6.35,"rtp": 93.65},{"date": "2026-03-14","df": "14/03","uap": 172,"spins": 36085,"avg_spin": 1.25,"turnover": 45128.47,"payout": 41272.66,"ggr": 3855.81,"ggr_pct": 8.54,"rtp": 91.46},{"date": "2026-03-15","df": "15/03","uap": 135,"spins": 39967,"avg_spin": 0.97,"turnover": 38782.92,"payout": 37518.38,"ggr": 1264.54,"ggr_pct": 3.23,"rtp": 96.77},{"date": "2026-03-16","df": "16/03","uap": 140,"spins": 34873,"avg_spin": 0.97,"turnover": 33656.8,"payout": 31236.75,"ggr": 2420.05,"ggr_pct": 7.19,"rtp": 92.81},{"date": "2026-03-17","df": "17/03","uap": 158,"spins": 30502,"avg_spin": 1.81,"turnover": 55117.23,"payout": 50638.71,"ggr": 4478.52,"ggr_pct": 8.13,"rtp": 91.87},{"date": "2026-03-18","df": "18/03","uap": 144,"spins": 30121,"avg_spin": 1.94,"turnover": 58285.29,"payout": 57424.6,"ggr": 860.69,"ggr_pct": 1.48,"rtp": 98.52},{"date": "2026-03-19","df": "19/03","uap": 210,"spins": 50569,"avg_spin": 1.5,"turnover": 76031.54,"payout": 76978.05,"ggr": -946.51,"ggr_pct": -1.25,"rtp": 101.25},{"date": "2026-03-20","df": "20/03","uap": 184,"spins": 52221,"avg_spin": 1.42,"turnover": 73913.58,"payout": 71124.59,"ggr": 2788.99,"ggr_pct": 3.76,"rtp": 96.24},{"date": "2026-03-21","df": "21/03","uap": 582,"spins": 94672,"avg_spin": 0.81,"turnover": 76991.88,"payout": 73523.7,"ggr": 3468.18,"ggr_pct": 4.48,"rtp": 95.52},{"date": "2026-03-22","df": "22/03","uap": 311,"spins": 63012,"avg_spin": 1.03,"turnover": 64911.27,"payout": 63096.29,"ggr": 1814.98,"ggr_pct": 2.8,"rtp": 97.2},{"date": "2026-03-23","df": "23/03","uap": 420,"spins": 87915,"avg_spin": 0.99,"turnover": 87078.49,"payout": 84030.31,"ggr": 3048.18,"ggr_pct": 3.5,"rtp": 96.5},{"date": "2026-03-24","df": "24/03","uap": 299,"spins": 71319,"avg_spin": 0.98,"turnover": 69690.59,"payout": 67419.4,"ggr": 2271.19,"ggr_pct": 3.28,"rtp": 96.72},{"date": "2026-03-25","df": "25/03","uap": 323,"spins": 78840,"avg_spin": 1.1,"turnover": 86695.98,"payout": 83181.53,"ggr": 3514.45,"ggr_pct": 4.07,"rtp": 95.93},{"date": "2026-03-26","df": "26/03","uap": 317,"spins": 82981,"avg_spin": 0.92,"turnover": 76115.45,"payout": 76156.69,"ggr": -41.24,"ggr_pct": -0.04,"rtp": 100.04},{"date": "2026-03-27","df": "27/03","uap": 285,"spins": 70674,"avg_spin": 1.01,"turnover": 71318.65,"payout": 73492.33,"ggr": -2173.68,"ggr_pct": -3.01,"rtp": 103.01},{"date": "2026-03-28","df": "28/03","uap": 279,"spins": 71369,"avg_spin": 0.99,"turnover": 70528.12,"payout": 68508.9,"ggr": 2019.22,"ggr_pct": 2.85,"rtp": 97.15},{"date": "2026-03-29","df": "29/03","uap": 288,"spins": 75481,"avg_spin": 0.87,"turnover": 65322.01,"payout": 66524.9,"ggr": -1202.89,"ggr_pct": -1.85,"rtp": 101.85}];
 function getFilteredSSDaily(){
   // Filtra SS_DAILY pelo período selecionado (mesma lógica do getFilteredData)
   const all=SS_DAILY;
