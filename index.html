@@ -965,23 +965,18 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   </div>
 </div>
 <!-- AI Chat Panel (desativado temporariamente — sem créditos API) -->
-<div class="ai-panel" id="ai-panel" style="display:none!important"
+<div class="ai-panel" id="ai-panel" style="display:none!important">
   <div class="ai-panel-hdr">
     <h3><span style="font-size:15px">✦</span> AI Data Analyst</h3>
     <button class="ai-panel-close" onclick="toggleAIPanel()">✕</button>
   </div>
   <div class="ai-msgs" id="ai-msgs">
-    <div class="ai-msg ai">Olá! Sou seu analista de dados. Pergunte qualquer coisa sobre o dashboard — posso analisar KPIs, comparar períodos, identificar tendências e muito mais.</div>
+    <div class="ai-msg ai">Olá! Sou seu analista de dados.</div>
   </div>
-  <div class="ai-suggestions" id="ai-suggestions">
-    <div class="ai-sug" onclick="aiAsk(this.textContent)">Qual o NGR desta semana?</div>
-    <div class="ai-sug" onclick="aiAsk(this.textContent)">Compare depósitos hoje vs ontem</div>
-    <div class="ai-sug" onclick="aiAsk(this.textContent)">Top 5 players por turnover</div>
-    <div class="ai-sug" onclick="aiAsk(this.textContent)">Como está a retenção?</div>
-  </div>
+  <div class="ai-suggestions" id="ai-suggestions"></div>
   <div class="ai-input-row">
-    <textarea class="ai-input" id="ai-input" placeholder="Pergunte sobre seus dados..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"></textarea>
-    <button class="ai-send" id="ai-send-btn" onclick="aiSend()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    <textarea class="ai-input" id="ai-input" placeholder="Pergunte sobre seus dados..." rows="1"></textarea>
+    <button class="ai-send" id="ai-send-btn">enviar</button>
   </div>
 </div>
 <div class="nav">
@@ -3554,11 +3549,14 @@ function rCRM(){
   var redepOpps=cliData.filter(function(c){ return c.dc === 1 && c.di >= 2 && c.di <= 30; }).sort((a,b)=>b.dt-a.dt);
   document.getElementById('crm-redep-count').textContent=redepOpps.length;
   document.getElementById('crm-redep-list').innerHTML=redepOpps.length?
-    '<table style="width:100%"><thead><tr><th style="text-align:left">Jogador</th><th>Depósito</th><th>Inativo</th><th>Status</th></tr></thead><tbody>'
+    '<table style="width:100%"><thead><tr><th style="text-align:left">Jogador</th><th style="text-align:right">Depósito</th><th style="text-align:center">Inativo</th><th style="text-align:center">1º Dep</th><th style="text-align:center">Prioridade</th></tr></thead><tbody>'
     +redepOpps.slice(0,100).map(c=>{
-      var stColor=c.di<=3?'var(--green)':c.di<=7?'var(--green)':c.di<=14?'var(--gold)':'var(--red)';
-      var stLabel=c.di<=3?'HOT':c.di<=7?'ATIVO':c.di<=14?'MORNO':'FRIO';
-      return '<tr><td style="font-weight:600">'+c.n.substring(0,25)+'</td><td style="color:var(--green);font-weight:700">'+fR(c.dt)+'</td><td>'+c.di+'d</td><td><span style="color:'+stColor+';font-size:10px;font-weight:700">'+stLabel+'</span></td></tr>';
+      var prioLabel='';var prioColor='';var prioEmoji='';
+      if(c.di<=3){prioLabel='🔥 HOT';prioColor='var(--red)';prioEmoji='🔥';}
+      else if(c.di<=7){prioLabel='🟡 MORNO';prioColor='var(--gold)';prioEmoji='🟡';}
+      else{prioLabel='❄️ RISCO';prioColor='var(--cyan)';prioEmoji='❄️';}
+      var fdLabel=new Date(c.fd*1000).toLocaleDateString('pt-BR');
+      return '<tr><td style="font-weight:600">'+c.n.substring(0,25)+'</td><td style="color:var(--green);font-weight:700;text-align:right">'+fR(c.dt)+'</td><td style="text-align:center;font-weight:700">'+c.di+'d</td><td style="text-align:center;font-size:10px;color:var(--text3)">'+fdLabel+'</td><td style="text-align:center"><span style="color:'+prioColor+';font-size:12px;font-weight:700">'+prioEmoji+' '+prioLabel.replace(prioEmoji+' ','')+'</span></td></tr>';
     }).join('')+'</tbody></table>'
     :'<div style="color:var(--text3);padding:20px;text-align:center">Nenhuma oportunidade identificada</div>';
 
@@ -3892,7 +3890,7 @@ function renderCampaigns() {
   ];
   var tH = '';
   templates.forEach(function(t) {
-    tH += '<div style="background:var(--bg2);border-radius:10px;padding:16px;border-left:3px solid ' + t.color + ';cursor:pointer" onclick="useTemplate('' + t.type + '','' + t.segment + '','' + t.name + '')">';
+    tH += '<div style="background:var(--bg2);border-radius:10px;padding:16px;border-left:3px solid ' + t.color + ';cursor:pointer" onclick="useTemplate(\'' + t.type + '\',\'' + t.segment + '\',\'' + t.name + '\')">';
     tH += '<div style="font-size:20px;margin-bottom:6px">' + t.icon + '</div>';
     tH += '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">' + t.name + '</div>';
     tH += '<div style="font-size:10px;color:var(--text3);line-height:1.4">' + t.desc + '</div>';
