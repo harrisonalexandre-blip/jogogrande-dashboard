@@ -532,7 +532,7 @@
       },
       {
         "id": 2984528,
-        "name": "Carlos Alberto Da Silva Pereira Silva",
+        "name": "Carlos Alberto Da Silva Pereira",
         "btag_aff": "509133",
         "total_dep": 2589.0
       },
@@ -579,12 +579,12 @@
     "date": "2026-03-31",
     "priority": 10,
     "category": "monitor",
-    "title": "📈 Semana atual vs anterior: +33% — R$514,454 vs R$386,084",
-    "description": "Esta semana: 3,215 depósitos (R$514,454). Semana passada: 2,488 (R$386,084). Momentum positivo!",
+    "title": "📈 Semana atual vs anterior: +33% — R$514,804 vs R$386,084",
+    "description": "Esta semana: 3,217 depósitos (R$514,804). Semana passada: 2,488 (R$386,084). Momentum positivo!",
     "players": [],
     "action": "Aproveitar momentum",
     "how": "1) Se positivo: campanha de \"semana VIP\". 2) Se negativo: push de emergência com bônus. 3) Analisar quais segmentos caíram. 4) Verificar se houve problema técnico.",
-    "impact": "Manter/crescer R$514,454 semanal",
+    "impact": "Manter/crescer R$514,804 semanal",
     "status": "pending"
   },
   {
@@ -945,14 +945,14 @@
     "priority": 14,
     "category": "opportunity",
     "title": "Performance de afiliados: 8 fontes ativas no mês",
-    "description": "Top: Aff #524865 (1281 regs, 40.8% conv), Aff #532643 (1146 regs, 36.3% conv), Aff #522909 (939 regs, 26.2% conv), Aff #527205 (764 regs, 29.8% conv)",
+    "description": "Top: Aff #524865 (1277 regs, 40.6% conv), Aff #532643 (1146 regs, 36.3% conv), Aff #522909 (937 regs, 26.0% conv), Aff #527205 (764 regs, 29.8% conv)",
     "players": [
       {
         "aff_id": "524865",
         "aff_name": "Aff #524865",
-        "players": 1281,
-        "depositors": 523,
-        "conv_rate": 40.8
+        "players": 1277,
+        "depositors": 519,
+        "conv_rate": 40.6
       },
       {
         "aff_id": "532643",
@@ -964,9 +964,9 @@
       {
         "aff_id": "522909",
         "aff_name": "Aff #522909",
-        "players": 939,
-        "depositors": 246,
-        "conv_rate": 26.2
+        "players": 937,
+        "depositors": 244,
+        "conv_rate": 26.0
       },
       {
         "aff_id": "527205",
@@ -978,9 +978,9 @@
       {
         "aff_id": "509133",
         "aff_name": "Funil VIP",
-        "players": 546,
+        "players": 547,
         "depositors": 115,
-        "conv_rate": 21.1
+        "conv_rate": 21.0
       },
       {
         "aff_id": "532447",
@@ -992,16 +992,16 @@
       {
         "aff_id": "523114",
         "aff_name": "Aff #523114",
-        "players": 401,
+        "players": 402,
         "depositors": 116,
         "conv_rate": 28.9
       },
       {
         "aff_id": "532597",
         "aff_name": "Aff #532597",
-        "players": 117,
+        "players": 118,
         "depositors": 84,
-        "conv_rate": 71.8
+        "conv_rate": 71.2
       }
     ],
     "action": "Otimizar investimento por afiliado baseado em conversão",
@@ -1014,12 +1014,12 @@
     "date": "2026-03-31",
     "priority": 15,
     "category": "opportunity",
-    "title": "Tipo mais lucrativo: SLOT — GGR R$226,632",
-    "description": "2802 jogadores ativos. Bet total: R$5,216,945.",
+    "title": "Tipo mais lucrativo: SLOT — GGR R$226,359",
+    "description": "2803 jogadores ativos. Bet total: R$5,218,487.",
     "players": [],
     "action": "Promover este tipo de jogo para jogadores de outros tipos",
     "how": "1) Identificar jogadores que nunca jogaram este tipo. 2) Criar campanha de cross-sell com free spins. 3) Destacar jogos populares na homepage.",
-    "impact": "Aumento de R$22,663 se crescer 10%",
+    "impact": "Aumento de R$22,636 se crescer 10%",
     "status": "pending"
   },
   {
@@ -1040,7 +1040,7 @@
     "date": "2026-03-31",
     "priority": 17,
     "category": "monitor",
-    "title": "Hoje: 319 depósitos, R$61,818 (+29% vs ontem)",
+    "title": "Hoje: 321 depósitos, R$62,168 (+29% vs ontem)",
     "description": "Ontem: 376 deps, R$48,100. Hoje até agora: 184 depositantes únicos.",
     "players": [],
     "action": "Acompanhar ao longo do dia",
@@ -1155,12 +1155,12 @@
     "date": "2026-03-31",
     "priority": 19,
     "category": "monitor",
-    "title": "Ticket médio: R$144 (9517 depósitos em 30d)",
-    "description": "Volume total 30d: R$1,373,576.",
+    "title": "Ticket médio: R$144 (9519 depósitos em 30d)",
+    "description": "Volume total 30d: R$1,373,926.",
     "players": [],
     "action": "Estratégia de upsell para aumentar ticket",
     "how": "1) Bônus progressivo por faixa. 2) Tiers visíveis no site. 3) Push: \"Deposite R$200+ e ganhe 30%\".",
-    "impact": "Se ticket subir 20%: +R$274,715/mês",
+    "impact": "Se ticket subir 20%: +R$274,785/mês",
     "status": "pending"
   },
   {
@@ -1168,25 +1168,25 @@
     "date": "2026-03-31",
     "priority": 20,
     "category": "monitor",
-    "title": "Cohort saúde: 2026-03 (35.1% conv), 2026-02 (35.5% conv), 2026-01 (29.1% conv)",
+    "title": "Cohort saúde: 2026-03 (35.0% conv), 2026-02 (35.5% conv), 2026-01 (29.1% conv)",
     "description": "Taxa de conversão registro→depósito por mês.",
     "players": [
       {
         "month": "2026-03",
-        "registrations": 6728,
-        "deposited": 2363,
-        "conv_rate": 35.1
+        "registrations": 6719,
+        "deposited": 2355,
+        "conv_rate": 35.0
       },
       {
         "month": "2026-02",
-        "registrations": 6614,
-        "deposited": 2349,
+        "registrations": 6613,
+        "deposited": 2348,
         "conv_rate": 35.5
       },
       {
         "month": "2026-01",
-        "registrations": 6199,
-        "deposited": 1806,
+        "registrations": 6197,
+        "deposited": 1804,
         "conv_rate": 29.1
       },
       {
