@@ -4879,40 +4879,81 @@ function updateMissionCounters() {
   }
 }
 
-function cycleMissionStatus(id, btn) {
-  var card = btn.closest('.mission-card');
-  var currentStatus = card.getAttribute('data-status');
-  var nextStatus, reason = '';
-  if(currentStatus === 'pending') {
-    nextStatus = 'in_progress';
-  } else if(currentStatus === 'in_progress') {
-    var choice = confirm('Missão resolvida com sucesso?\n\nOK = Resolvido\nCancelar = Não Resolvido');
-    if(choice) {
-      nextStatus = 'resolved';
-    } else {
-      reason = prompt('Por que não foi resolvido?', '') || 'Sem motivo informado';
-      nextStatus = 'unresolved';
-    }
-  } else if(currentStatus === 'resolved' || currentStatus === 'unresolved') {
-    nextStatus = 'pending';
-  }
-  card.setAttribute('data-status', nextStatus);
-  saveMissionStatus(id, nextStatus, reason);
-  var statusLabels = {pending:'▶ Iniciar Resolução', in_progress:'⏳ Solução em Andamento...', resolved:'✅ Resolvido', unresolved:'❌ Não Resolvido'};
-  var statusColors = {pending:'rgba(255,215,64,.15)', in_progress:'rgba(30,144,255,.2)', resolved:'rgba(14,165,90,.2)', unresolved:'rgba(244,67,54,.2)'};
-  var statusBorders = {pending:'var(--gold)', in_progress:'var(--blue)', resolved:'var(--green)', unresolved:'#f44'};
-  btn.textContent = statusLabels[nextStatus];
-  btn.style.background = statusColors[nextStatus];
-  btn.style.borderColor = statusBorders[nextStatus];
-  card.style.borderLeftColor = nextStatus === 'resolved' ? 'var(--green)' : nextStatus === 'unresolved' ? '#f44' : nextStatus === 'in_progress' ? 'var(--blue)' : card.getAttribute('data-origcolor');
-  var reasonEl = card.querySelector('.mission-reason');
-  if(reasonEl) {
-    reasonEl.style.display = nextStatus === 'unresolved' ? 'block' : 'none';
-    reasonEl.textContent = '💬 ' + reason;
-  }
-  card.style.opacity = (nextStatus === 'resolved') ? '0.5' : '1';
+function startMission(id) {
+  var card = document.querySelector('.mission-card[data-id="'+id+'"]');
+  if(!card) return;
+  card.setAttribute('data-status', 'in_progress');
+  card.style.borderLeftColor = 'var(--blue)';
+  saveMissionStatus(id, 'in_progress', '');
+  renderMissionFooter(card, id, 'in_progress');
   updateMissionCounters();
 }
+
+function resolveMission(id, resolved) {
+  var card = document.querySelector('.mission-card[data-id="'+id+'"]');
+  if(!card) return;
+  var nextStatus = resolved ? 'resolved' : 'unresolved';
+  card.setAttribute('data-status', nextStatus);
+  card.style.borderLeftColor = resolved ? 'var(--green)' : '#f44';
+  card.style.opacity = resolved ? '0.5' : '1';
+  saveMissionStatus(id, nextStatus, '');
+  renderMissionFooter(card, id, nextStatus);
+  updateMissionCounters();
+}
+
+function resetMission(id) {
+  var card = document.querySelector('.mission-card[data-id="'+id+'"]');
+  if(!card) return;
+  var origColor = card.getAttribute('data-origcolor');
+  card.setAttribute('data-status', 'pending');
+  card.style.borderLeftColor = origColor;
+  card.style.opacity = '1';
+  saveMissionStatus(id, 'pending', '');
+  renderMissionFooter(card, id, 'pending');
+  updateMissionCounters();
+}
+
+function renderMissionFooter(card, id, status) {
+  var footer = card.querySelector('.mission-footer');
+  if(!footer) return;
+  var q = id.replace(/'/g, "\\'");
+  if(status === 'pending') {
+    footer.innerHTML = '<button onclick="startMission(\'' + q + '\')" style="padding:7px 16px;border-radius:8px;border:1px solid var(--gold);background:rgba(255,215,64,.12);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px"><span>▶</span> Iniciar Resolução</button>';
+  } else if(status === 'in_progress') {
+    footer.innerHTML = '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+      + '<div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;background:rgba(30,144,255,.15);border:1px solid rgba(30,144,255,.3)">'
+      + '<span style="font-size:9px">🔵</span>'
+      + '<span style="font-size:10px;font-weight:700;color:var(--blue)">EM ANDAMENTO</span>'
+      + '</div>'
+      + '<span style="font-size:10px;color:var(--text3);flex:1">Foi resolvido?</span>'
+      + '<button onclick="resolveMission(\'' + q + '\', true)" style="padding:6px 14px;border-radius:7px;border:1px solid var(--green);background:rgba(14,165,90,.15);color:var(--green);font-size:11px;font-weight:700;cursor:pointer">✅ Sim</button>'
+      + '<button onclick="resolveMission(\'' + q + '\', false)" style="padding:6px 14px;border-radius:7px;border:1px solid #f44;background:rgba(244,67,54,.12);color:#f44;font-size:11px;font-weight:700;cursor:pointer">❌ Não</button>'
+      + '</div>';
+  } else if(status === 'resolved') {
+    footer.innerHTML = '<div style="display:flex;align-items:center;gap:10px">'
+      + '<div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;background:rgba(14,165,90,.15);border:1px solid var(--green)">'
+      + '<span>✅</span><span style="font-size:10px;font-weight:700;color:var(--green)">RESOLVIDO</span>'
+      + '</div>'
+      + '<button onclick="resetMission(\'' + q + '\')" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;cursor:pointer">↩ Reabrir</button>'
+      + '</div>';
+  } else {
+    footer.innerHTML = '<div style="display:flex;align-items:center;gap:10px">'
+      + '<div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;background:rgba(244,67,54,.12);border:1px solid #f44">'
+      + '<span>❌</span><span style="font-size:10px;font-weight:700;color:#f44">NÃO RESOLVIDO</span>'
+      + '</div>'
+      + '<button onclick="resetMission(\'' + q + '\')" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;cursor:pointer">↩ Reabrir</button>'
+      + '</div>';
+  }
+}
+
+function cycleMissionStatus(id, btn) {
+  var card = btn.closest('.mission-card');
+  var s = card.getAttribute('data-status');
+  if(s === 'pending') startMission(id);
+  else if(s === 'in_progress') resolveMission(id, true);
+  else resetMission(id);
+}
+
 
 function renderMissions(missions) {
   var el = document.getElementById('crm-insights');
@@ -4928,7 +4969,7 @@ function renderMissions(missions) {
     var c = m.cat || 'monitor';
     var borderColor = m.status === 'resolved' ? 'var(--green)' : m.status === 'unresolved' ? '#f44' : m.status === 'in_progress' ? 'var(--blue)' : catColors[c];
     var opacity = m.status === 'resolved' ? '0.5' : '1';
-    html += '<div class="mission-card" data-cat="'+c+'" data-status="'+m.status+'" data-origcolor="'+catColors[c]+'" style="padding:16px 18px;margin:10px 0;border-radius:12px;border-left:4px solid '+borderColor+';background:var(--bg2);transition:all .3s;opacity:'+opacity+'">';
+    html += '<div class="mission-card" data-id="'+m.id+'" data-cat="'+c+'" data-status="'+m.status+'" data-origcolor="'+catColors[c]+'" style="padding:16px 18px;margin:10px 0;border-radius:12px;border-left:4px solid '+borderColor+';background:var(--bg2);transition:all .3s;opacity:'+opacity+'">';
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">';
     html += '<span style="font-size:9px;padding:2px 8px;border-radius:4px;background:'+catColors[c]+'22;color:'+catColors[c]+';font-weight:700">'+catIcons[c]+' '+catLabels[c]+'</span>';
     html += '<span style="font-size:9px;color:var(--text3);font-family:monospace">'+m.id+' · Prioridade #'+(i+1)+'</span>';
@@ -4944,9 +4985,16 @@ function renderMissions(missions) {
     html += '<div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px">📊 IMPACTO ESPERADO:</div>';
     html += '<div style="font-size:11px;color:var(--text2);line-height:1.5">'+m.impact+'</div>';
     html += '</div>';
-    html += '<div style="margin-top:12px;display:flex;align-items:center;gap:10px">';
-    html += '<button onclick="cycleMissionStatus(\''+m.id+'\',this)" style="padding:8px 18px;border-radius:8px;border:1px solid '+statusBorders[m.status]+';background:'+statusColors[m.status]+';color:var(--text);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s">'+statusLabels[m.status]+'</button>';
-    html += '<div class="mission-reason" style="font-size:10px;color:#f44;display:'+(m.status==='unresolved'?'block':'none')+'">'+(m.reason ? '💬 '+m.reason : '')+'</div>';
+    html += '<div class="mission-footer" style="margin-top:12px">';
+    if(m.status === 'pending') {
+      html += '<button onclick="startMission(\''+m.id+'\') " style="padding:7px 16px;border-radius:8px;border:1px solid var(--gold);background:rgba(255,215,64,.12);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px"><span>▶</span> Iniciar Resolução</button>';
+    } else if(m.status === 'in_progress') {
+      html += '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;background:rgba(30,144,255,.15);border:1px solid rgba(30,144,255,.3)"><span style="font-size:9px">🔵</span><span style="font-size:10px;font-weight:700;color:var(--blue)">EM ANDAMENTO</span></div><span style="font-size:10px;color:var(--text3);flex:1">Foi resolvido?</span><button onclick="resolveMission(\''+m.id+'\',true)" style="padding:6px 14px;border-radius:7px;border:1px solid var(--green);background:rgba(14,165,90,.15);color:var(--green);font-size:11px;font-weight:700;cursor:pointer">✅ Sim</button><button onclick="resolveMission(\''+m.id+'\',false)" style="padding:6px 14px;border-radius:7px;border:1px solid #f44;background:rgba(244,67,54,.12);color:#f44;font-size:11px;font-weight:700;cursor:pointer">❌ Não</button></div>';
+    } else if(m.status === 'resolved') {
+      html += '<div style="display:flex;align-items:center;gap:10px"><div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;background:rgba(14,165,90,.15);border:1px solid var(--green)"><span>✅</span><span style="font-size:10px;font-weight:700;color:var(--green)">RESOLVIDO</span></div><button onclick="resetMission(\''+m.id+'\')" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;cursor:pointer">↩ Reabrir</button></div>';
+    } else {
+      html += '<div style="display:flex;align-items:center;gap:10px"><div style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;background:rgba(244,67,54,.12);border:1px solid #f44"><span>❌</span><span style="font-size:10px;font-weight:700;color:#f44">NÃO RESOLVIDO</span></div><button onclick="resetMission(\''+m.id+'\')" style="padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:10px;cursor:pointer">↩ Reabrir</button></div>';
+    }
     html += '</div>';
     html += '</div>';
   });
