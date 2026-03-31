@@ -1,0 +1,1217 @@
+[
+  {
+    "id": "INS-2026-03-31-001",
+    "date": "2026-03-31",
+    "priority": 1,
+    "category": "critical",
+    "title": "6 VIPs Churned — R$310,722 em depósitos totais",
+    "description": "Jogadores de alto valor inativos há 30-90 dias: Marcelo Torres (R$84,200, 44d, SLOT, via ); Wellerson Matheus Gomes Da Silva (R$54,023, 46d, SLOT, via 509132); Adriano Campelo De Abreu (R$50,599, 84d, ?, via Funil VIP); Inara Souza Almeida Souza Almeida (R$42,230, 48d, SLOT, via 509132); Ian Victor Lacerda Da Silva (R$41,270, 60d, ?, via 522723)",
+    "players": [
+      {
+        "id": 2992653,
+        "name": "Marcelo Torres",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "total_dep": 84200.0,
+        "dep_count": 15,
+        "days_inactive": 44,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 2986694,
+        "name": "Wellerson Matheus Gomes Da Silva",
+        "btag_aff": "509132",
+        "aff_name": "509132",
+        "device": "",
+        "total_dep": 54023.0,
+        "dep_count": 236,
+        "days_inactive": 46,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 6364951,
+        "name": "Adriano Campelo De Abreu",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 50599.0,
+        "dep_count": 6,
+        "days_inactive": 84,
+        "game_style": "N/A"
+      },
+      {
+        "id": 2986509,
+        "name": "Inara Souza Almeida Souza Almeida",
+        "btag_aff": "509132",
+        "aff_name": "509132",
+        "device": "",
+        "total_dep": 42230.0,
+        "dep_count": 40,
+        "days_inactive": 48,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 6651124,
+        "name": "Ian Victor Lacerda Da Silva",
+        "btag_aff": "522723",
+        "aff_name": "522723",
+        "device": "",
+        "total_dep": 41270.0,
+        "dep_count": 39,
+        "days_inactive": 60,
+        "game_style": "N/A"
+      },
+      {
+        "id": 6253958,
+        "name": "Josiwelderson Philipe Cardoso Magalhaes",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 38400.0,
+        "dep_count": 18,
+        "days_inactive": 35,
+        "game_style": "LIVE"
+      }
+    ],
+    "action": "Campanha de win-back personalizada via WhatsApp/ligação direta",
+    "how": "1) Abrir perfil de cada player no Phoenix BO. 2) Verificar último jogo e último saque. 3) Enviar WhatsApp pessoal com oferta exclusiva (bônus 100% até R$500). 4) Se não responder em 48h, ligar. 5) Registrar resultado.",
+    "impact": "Reativação potencial de R$31,072 (se 10% voltar)",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-002",
+    "date": "2026-03-31",
+    "priority": 2,
+    "category": "critical",
+    "title": "Alerta Payout: Victoria Da Silva Cunha sacou R$44,000 vs R$17,200 depositados",
+    "description": "8 jogadores sacaram mais do que depositaram nos últimos 30d. Net payout total: R$92,595",
+    "players": [
+      {
+        "id": 10205226,
+        "name": "Victoria Da Silva Cunha",
+        "btag_aff": "532500",
+        "aff_name": "532500",
+        "device": "",
+        "total_wd": 44000.0,
+        "total_dep": 17200.0,
+        "net_payout": 26800.0
+      },
+      {
+        "id": 3038761,
+        "name": "Gilmar Gomes De Oliveira Gomes Oliveira",
+        "btag_aff": "509646",
+        "aff_name": "509646",
+        "device": "",
+        "total_wd": 20934.0,
+        "total_dep": 3709.0,
+        "net_payout": 17225.0
+      },
+      {
+        "id": 3023001,
+        "name": "Joeslei Ferreira De Oliveira Oliveira",
+        "btag_aff": "509646",
+        "aff_name": "509646",
+        "device": "",
+        "total_wd": 14000.0,
+        "total_dep": 2041.0,
+        "net_payout": 11959.0
+      },
+      {
+        "id": 2960866,
+        "name": "Francisco Das Chagas Teixeira Junior",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "total_wd": 10651.0,
+        "total_dep": 10.0,
+        "net_payout": 10641.0
+      },
+      {
+        "id": 10013845,
+        "name": "Guilherme Olivio",
+        "btag_aff": "532378",
+        "aff_name": "532378",
+        "device": "",
+        "total_wd": 9960.0,
+        "total_dep": 620.0,
+        "net_payout": 9340.0
+      },
+      {
+        "id": 10852071,
+        "name": "Rosane Sommer",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_wd": 10000.0,
+        "total_dep": 1750.0,
+        "net_payout": 8250.0
+      },
+      {
+        "id": 9345553,
+        "name": "David Marcellus Vieira Silva Marcellus",
+        "btag_aff": "509755",
+        "aff_name": "Google Ads",
+        "device": "",
+        "total_wd": 14461.0,
+        "total_dep": 9528.0,
+        "net_payout": 4933.0
+      },
+      {
+        "id": 10124357,
+        "name": "James Michelle Silva Mendes Silva Mendes",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_wd": 3790.76,
+        "total_dep": 344.0,
+        "net_payout": 3446.76
+      }
+    ],
+    "action": "Revisar atividade de jogo e verificar abuso de bônus",
+    "how": "1) Abrir cada player no Phoenix BO. 2) Verificar histórico de bônus recebidos. 3) Analisar padrão de apostas (apostas opostas em roleta = red flag). 4) Se confirmado abuso: ajustar limites de saque. 5) Se legítimo: monitorar.",
+    "impact": "Proteção de R$92,595 em payouts excessivos",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-003",
+    "date": "2026-03-31",
+    "priority": 3,
+    "category": "critical",
+    "title": "8 high-rollers esfriando — R$137,856 depositados recentemente",
+    "description": "Jogadores que depositaram >R$10K nos últimos 14 dias mas pararam. Janela de recuperação curta!",
+    "players": [
+      {
+        "id": 6705507,
+        "name": "Maria Aparecida Alves Pereira Pereira",
+        "btag_aff": "509646",
+        "aff_name": "509646",
+        "device": "",
+        "total_dep": 24050.0,
+        "days_inactive": 5,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 6229544,
+        "name": "Jailson Maximo De Macedo",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 22800.0,
+        "days_inactive": 5,
+        "game_style": "LIVE"
+      },
+      {
+        "id": 10475851,
+        "name": "Marlene Ferreira De Araujo",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_dep": 21002.0,
+        "days_inactive": 7,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 5856038,
+        "name": "Sebastiao Leandro Bastos Bastos",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "total_dep": 18104.0,
+        "days_inactive": 3,
+        "game_style": "LIVE"
+      },
+      {
+        "id": 10205226,
+        "name": "Victoria Da Silva Cunha",
+        "btag_aff": "532500",
+        "aff_name": "532500",
+        "device": "",
+        "total_dep": 17200.0,
+        "days_inactive": 4,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 10206988,
+        "name": "Victor De Sa Da Silva",
+        "btag_aff": "532500",
+        "aff_name": "532500",
+        "device": "",
+        "total_dep": 13200.0,
+        "days_inactive": 7,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 6568443,
+        "name": "Marcio Carvalho Da Silva",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 11500.0,
+        "days_inactive": 5,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 8258216,
+        "name": "Rafael Barreto Bispo Barreto Bispo",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 10000.0,
+        "days_inactive": 12,
+        "game_style": "LIVE"
+      }
+    ],
+    "action": "Push notification + oferta de cashback HOJE",
+    "how": "1) Enviar push às 14h BRT (pré-pico). 2) Mensagem: \"Sentimos sua falta, [nome]! Cashback 10% no próximo depósito\". 3) Para os top 3: WhatsApp direto. 4) Se não responder em 24h: email com free spins.",
+    "impact": "Retenção de R$137,856 em valor ativo",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-004",
+    "date": "2026-03-31",
+    "priority": 4,
+    "category": "critical",
+    "title": "641 jogadores com apenas 1 depósito esta semana (R$74,255)",
+    "description": "Janela ideal de conversão para 2º depósito (primeiras 72h). Top: Rosangela De Oliveira Da Silva (R$8,000), Victor De Sa Da Silva (R$7,000), Marcelo Moraes Ferreira (R$5,000), Diogo Dantas De Mendonca (R$4,012), Frederich Fabian Francisco Francisco (R$4,000)",
+    "players": [
+      {
+        "id": 10515449,
+        "name": "Rosangela De Oliveira Da Silva",
+        "btag_aff": "532500",
+        "aff_name": "532500",
+        "device": "",
+        "total_dep": 8000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 10206988,
+        "name": "Victor De Sa Da Silva",
+        "btag_aff": "532500",
+        "aff_name": "532500",
+        "device": "",
+        "total_dep": 7000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 9979193,
+        "name": "Marcelo Moraes Ferreira",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 5000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 8268684,
+        "name": "Diogo Dantas De Mendonca",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 4012.0,
+        "dep_count": 1
+      },
+      {
+        "id": 7156800,
+        "name": "Frederich Fabian Francisco Francisco",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 4000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 5837771,
+        "name": "Gleyson Da Silva Ramos Ramos",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 2200.0,
+        "dep_count": 1
+      },
+      {
+        "id": 5982514,
+        "name": "Robson Alves Da Silva Alves",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "total_dep": 2000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 10713605,
+        "name": "Jose Paulo Bezerra De Mello Alves De Sousa",
+        "btag_aff": "523114",
+        "aff_name": "523114",
+        "device": "",
+        "total_dep": 2000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 10056711,
+        "name": "Mayk William Barbosa Pinheiro",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 1100.0,
+        "dep_count": 1
+      },
+      {
+        "id": 6510917,
+        "name": "Neimar Gomes Gomes",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 1000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 8403071,
+        "name": "Almir Silva Da Paz Silva",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "total_dep": 1000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 5863669,
+        "name": "Luis Claudio Alves",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "total_dep": 1000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 5858058,
+        "name": "Gabryella Rayanne Sousa Mota",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 1000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 10705217,
+        "name": "Gustavo Jose Pereira Conserva",
+        "btag_aff": "532609",
+        "aff_name": "532609",
+        "device": "",
+        "total_dep": 1000.0,
+        "dep_count": 1
+      },
+      {
+        "id": 5860301,
+        "name": "Fabio Pereira Coelho Pereira Coelho",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 1000.0,
+        "dep_count": 1
+      }
+    ],
+    "action": "Campanha de 2º depósito imediata via push + email",
+    "how": "1) Disparar push+email AGORA com bônus de 2º depósito (50% até R$100). 2) Os 15 com FTD >R$500: WhatsApp direto. 3) Segmentar por valor: >R$1K=VIP treatment, R$100-1K=bônus, <R$100=free spins. 4) Meta: converter 20%.",
+    "impact": "Conversão de 20% = +128 redepositantes, R$14,851 potencial",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-005",
+    "date": "2026-03-31",
+    "priority": 5,
+    "category": "critical",
+    "title": "10 players ativos semana passada sumiram esta semana (R$80,001)",
+    "description": "Depositaram semana passada mas não voltaram. Risco iminente de churn.",
+    "players": [
+      {
+        "id": 8258216,
+        "name": "Rafael Barreto Bispo Barreto Bispo",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "total_dep": 20000.0,
+        "dep_count": 4
+      },
+      {
+        "id": 3023239,
+        "name": "Robisson Galvao De Sousa",
+        "btag_aff": "509646",
+        "aff_name": "509646",
+        "total_dep": 18340.0,
+        "dep_count": 10
+      },
+      {
+        "id": 8234138,
+        "name": "Reginaldo De Sousa Rocha Sousa Rocha",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "total_dep": 10000.0,
+        "dep_count": 2
+      },
+      {
+        "id": 9862026,
+        "name": "Klayvet Ferreira",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "total_dep": 5419.0,
+        "dep_count": 21
+      },
+      {
+        "id": 6433325,
+        "name": "Carlos Alberto Lopes",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "total_dep": 5100.0,
+        "dep_count": 3
+      },
+      {
+        "id": 2986741,
+        "name": "Alexandre Lamana Da Silva",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "total_dep": 4800.0,
+        "dep_count": 4
+      },
+      {
+        "id": 6285891,
+        "name": "Elionardo Freire Ferreira",
+        "btag_aff": "",
+        "aff_name": "",
+        "total_dep": 4700.0,
+        "dep_count": 26
+      },
+      {
+        "id": 10428276,
+        "name": "Joao Batista Lima De Medeiros",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "total_dep": 4000.0,
+        "dep_count": 6
+      },
+      {
+        "id": 3019050,
+        "name": "Marcio Miranda De Farias",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "total_dep": 4000.0,
+        "dep_count": 8
+      },
+      {
+        "id": 2980092,
+        "name": "Jose Antonio Da Silva",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "total_dep": 3642.0,
+        "dep_count": 21
+      }
+    ],
+    "action": "Campanha de reengajamento em 2 ondas",
+    "how": "1) Onda 1 (hoje): push \"Sentimos sua falta! Bônus R$50 esperando\". 2) Onda 2 (amanhã): email com free spins. 3) Top 3 por valor: WhatsApp direto do gerente.",
+    "impact": "Retenção de R$80,001 em volume semanal",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-006",
+    "date": "2026-03-31",
+    "priority": 6,
+    "category": "critical",
+    "title": "🐋 4 depósitos >R$2K hoje — VIP treatment imediato",
+    "description": "Grandes depósitos detectados hoje. Esses players precisam de atenção VIP imediata.",
+    "players": [
+      {
+        "id": 11101156,
+        "name": "Anderson Bernardes Vieira",
+        "btag_aff": "524865",
+        "total_dep": 10000.0
+      },
+      {
+        "id": 11101156,
+        "name": "Anderson Bernardes Vieira",
+        "btag_aff": "524865",
+        "total_dep": 3500.0
+      },
+      {
+        "id": 2984528,
+        "name": "Carlos Alberto Da Silva Pereira Silva",
+        "btag_aff": "509133",
+        "total_dep": 2589.0
+      },
+      {
+        "id": 3038162,
+        "name": "Leandro Molina Martins",
+        "btag_aff": "509646",
+        "total_dep": 2000.0
+      }
+    ],
+    "action": "Contato VIP imediato + boas-vindas personalizada",
+    "how": "1) Verificar se é first deposit ou recorrente. 2) Se FTD: welcome call do gerente VIP em até 1h. 3) Se recorrente: enviar mensagem de agradecimento + upgrade de tier. 4) Monitorar atividade de jogo nas próximas 24h.",
+    "impact": "Retenção de whale = R$18,089 em valor imediato",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-007",
+    "date": "2026-03-31",
+    "priority": 7,
+    "category": "critical",
+    "title": "Taxa de redepósito: 36.2% — 6347 jogadores nunca voltaram",
+    "description": "De 9,956 depositantes, apenas 3,609 fizeram 2+ depósitos. 6,347 depositaram uma vez e abandonaram.",
+    "players": [],
+    "action": "Automação de boas-vindas pós-FTD + bônus de redepósito",
+    "how": "1) Configurar no Phoenix: trigger automático 24h após FTD. 2) Email + push com bônus 50% no 2º depósito (até R$100). 3) Para FTD >R$200: WhatsApp do gerente. 4) Meta: subir taxa para 40%.",
+    "impact": "Se subir 5pp: +317 redepositantes",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-009",
+    "date": "2026-03-31",
+    "priority": 9,
+    "category": "critical",
+    "title": "Taxa de abertura de email em 15.8% — abaixo do setor (20-25%)",
+    "description": "De 10.266 enviados via UniOne, 1.633 abriram (15.8%). Taxa de clique 0.6% (meta 2-3%). Bounce rate 9.3% (meta <5%).",
+    "players": [],
+    "action": "Otimizar subject lines, timing e limpar lista",
+    "how": "1) Testar subject lines com emojis e urgência. 2) Enviar às 14h BRT (pré-pico depósitos). 3) Remover hard bounces do UniOne (955 falhas). 4) Segmentar: players ativos vs inativos com mensagens diferentes.",
+    "impact": "Dobrar taxa de abertura = +1.600 leitores, +50 cliques",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-010",
+    "date": "2026-03-31",
+    "priority": 10,
+    "category": "monitor",
+    "title": "📈 Semana atual vs anterior: +33% — R$514,454 vs R$386,084",
+    "description": "Esta semana: 3,215 depósitos (R$514,454). Semana passada: 2,488 (R$386,084). Momentum positivo!",
+    "players": [],
+    "action": "Aproveitar momentum",
+    "how": "1) Se positivo: campanha de \"semana VIP\". 2) Se negativo: push de emergência com bônus. 3) Analisar quais segmentos caíram. 4) Verificar se houve problema técnico.",
+    "impact": "Manter/crescer R$514,454 semanal",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-011",
+    "date": "2026-03-31",
+    "priority": 11,
+    "category": "opportunity",
+    "title": "12 jogadores na janela ideal de redepósito (3-7d)",
+    "description": "Players com 1-3 depósitos no último mês, último depósito há 3-7 dias. Momento perfeito para reativação.",
+    "players": [
+      {
+        "id": 10206988,
+        "name": "Victor De Sa Da Silva",
+        "btag_aff": "532500",
+        "aff_name": "532500",
+        "device": "",
+        "total_dep": 13200.0,
+        "dep_count": 3,
+        "days_inactive": 7
+      },
+      {
+        "id": 7156800,
+        "name": "Frederich Fabian Francisco Francisco",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 8000.0,
+        "dep_count": 2,
+        "days_inactive": 6
+      },
+      {
+        "id": 10515449,
+        "name": "Rosangela De Oliveira Da Silva",
+        "btag_aff": "532500",
+        "aff_name": "532500",
+        "device": "",
+        "total_dep": 8000.0,
+        "dep_count": 1,
+        "days_inactive": 7
+      },
+      {
+        "id": 9979193,
+        "name": "Marcelo Moraes Ferreira",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 5000.0,
+        "dep_count": 1,
+        "days_inactive": 7
+      },
+      {
+        "id": 9985790,
+        "name": "Ariele Vivian Da Silva Andre",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 3050.0,
+        "dep_count": 2,
+        "days_inactive": 4
+      },
+      {
+        "id": 7088511,
+        "name": "Luis Fernando Do Canto Silva",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_dep": 3000.0,
+        "dep_count": 3,
+        "days_inactive": 3
+      },
+      {
+        "id": 5858058,
+        "name": "Gabryella Rayanne Sousa Mota",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 2250.0,
+        "dep_count": 3,
+        "days_inactive": 7
+      },
+      {
+        "id": 5837771,
+        "name": "Gleyson Da Silva Ramos Ramos",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 2200.0,
+        "dep_count": 1,
+        "days_inactive": 6
+      },
+      {
+        "id": 10713605,
+        "name": "Jose Paulo Bezerra De Mello Alves De Sousa",
+        "btag_aff": "523114",
+        "aff_name": "523114",
+        "device": "",
+        "total_dep": 2000.0,
+        "dep_count": 1,
+        "days_inactive": 6
+      },
+      {
+        "id": 8403071,
+        "name": "Almir Silva Da Paz Silva",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "total_dep": 1310.0,
+        "dep_count": 3,
+        "days_inactive": 5
+      },
+      {
+        "id": 3022570,
+        "name": "Gustavo Antonio Almeida Sousa",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 1150.0,
+        "dep_count": 3,
+        "days_inactive": 3
+      },
+      {
+        "id": 2983095,
+        "name": "Marcio Aparecido Gomes Aparecido Gomes",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 1150.0,
+        "dep_count": 3,
+        "days_inactive": 3
+      }
+    ],
+    "action": "Push + email com oferta de redepósito",
+    "how": "1) Push personalizado: \"[Nome], você tem R$[bônus] esperando!\". 2) Email com últimos jogos jogados. 3) Para os top 5 por valor: WhatsApp.",
+    "impact": "Conversão de R$15,093",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-012",
+    "date": "2026-03-31",
+    "priority": 12,
+    "category": "opportunity",
+    "title": "10 jogadores frequentes com ticket baixo — oportunidade de upsell",
+    "description": "Players com 5+ depósitos no mês mas ticket médio <R$100. São engajados mas depositam pouco.",
+    "players": [
+      {
+        "id": 6251732,
+        "name": "Beatriz Brito Da Silva",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "total_dep": 4306.0,
+        "dep_count": 113,
+        "avg_deposit": 38.10619469026549
+      },
+      {
+        "id": 9528745,
+        "name": "Edjunio Oliveira Da Silva Oliveira",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_dep": 5799.0,
+        "dep_count": 100,
+        "avg_deposit": 57.99
+      },
+      {
+        "id": 9449551,
+        "name": "Osvaldo Cardoso Da Silva Junior Cardoso",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_dep": 4232.0,
+        "dep_count": 89,
+        "avg_deposit": 47.550561797752806
+      },
+      {
+        "id": 9927983,
+        "name": "Andre Marques Matos",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_dep": 4631.0,
+        "dep_count": 88,
+        "avg_deposit": 52.625
+      },
+      {
+        "id": 8226962,
+        "name": "Mario Francisco De Carvalho",
+        "btag_aff": "522723",
+        "aff_name": "522723",
+        "device": "",
+        "total_dep": 4028.51,
+        "dep_count": 84,
+        "avg_deposit": 47.95845238095239
+      },
+      {
+        "id": 9466093,
+        "name": "Cledenilson Da Silva De Moura",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_dep": 3333.0,
+        "dep_count": 74,
+        "avg_deposit": 45.04054054054054
+      },
+      {
+        "id": 9945431,
+        "name": "Matheus Turola Turola Souza",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_dep": 6445.0,
+        "dep_count": 70,
+        "avg_deposit": 92.07142857142857
+      },
+      {
+        "id": 10333933,
+        "name": "Guilherme Martins De Oliveira",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "total_dep": 4502.96,
+        "dep_count": 68,
+        "avg_deposit": 66.22
+      },
+      {
+        "id": 3021307,
+        "name": "Nadjane Santos Nunes Santos Nunes",
+        "btag_aff": "509646",
+        "aff_name": "509646",
+        "device": "",
+        "total_dep": 1133.39,
+        "dep_count": 51,
+        "avg_deposit": 22.223333333333336
+      },
+      {
+        "id": 5837549,
+        "name": "Expedito Ronney De Sousa Fonseca",
+        "btag_aff": "509132",
+        "aff_name": "509132",
+        "device": "",
+        "total_dep": 4317.0,
+        "dep_count": 51,
+        "avg_deposit": 84.6470588235294
+      }
+    ],
+    "action": "Campanha de upsell com bônus progressivo",
+    "how": "1) Oferta: \"Deposite R$200 e ganhe 30% extra\". 2) Criar tiers visíveis: Bronze→Prata→Ouro. 3) Push: \"Falta R$[X] para o próximo nível!\". 4) Meta: dobrar ticket médio.",
+    "impact": "Se ticket dobrar: +R$42,728/mês",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-013",
+    "date": "2026-03-31",
+    "priority": 13,
+    "category": "opportunity",
+    "title": "10 jogadores jogam apenas 1 tipo de jogo — cross-sell",
+    "description": "10 jogam só slots. Oportunidade de diversificação com free spins em outros tipos.",
+    "players": [
+      {
+        "id": 7545431,
+        "name": "Edson Eiji Hashimoto",
+        "btag_aff": "522723",
+        "aff_name": "522723",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 81641
+      },
+      {
+        "id": 10493954,
+        "name": "Joao Marcos Silva João Marcos Silva",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 57255
+      },
+      {
+        "id": 9945431,
+        "name": "Matheus Turola Turola Souza",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 46553
+      },
+      {
+        "id": 6956417,
+        "name": "Cintia Da Silva Marcolino Locks",
+        "btag_aff": "509646",
+        "aff_name": "509646",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 45040
+      },
+      {
+        "id": 9528745,
+        "name": "Edjunio Oliveira Da Silva Oliveira",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 43488
+      },
+      {
+        "id": 8122927,
+        "name": "Marcos Felippe Gomes Da Silva",
+        "btag_aff": "509646",
+        "aff_name": "509646",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 42792
+      },
+      {
+        "id": 6285891,
+        "name": "Elionardo Freire Ferreira",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 34681
+      },
+      {
+        "id": 3009461,
+        "name": "Roberto De Almeida Alves",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 33570
+      },
+      {
+        "id": 10281171,
+        "name": "Renan Ferreira Dos Santos Silva",
+        "btag_aff": "524865",
+        "aff_name": "524865",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 32736
+      },
+      {
+        "id": 3021307,
+        "name": "Nadjane Santos Nunes Santos Nunes",
+        "btag_aff": "509646",
+        "aff_name": "509646",
+        "device": "",
+        "game_style": "SLOT",
+        "rounds": 27761
+      }
+    ],
+    "action": "Campanha de cross-sell com free spins em novos tipos de jogo",
+    "how": "1) Para slot-only: 20 free spins em crash games (Aviator). 2) Para roulette-only: free spins em slots populares. 3) Push: \"Experimente [jogo] com 20 rodadas grátis!\"",
+    "impact": "Diversificação = menor risco de churn por monotonia",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-014",
+    "date": "2026-03-31",
+    "priority": 14,
+    "category": "opportunity",
+    "title": "Performance de afiliados: 8 fontes ativas no mês",
+    "description": "Top: Aff #524865 (1281 regs, 40.8% conv), Aff #532643 (1146 regs, 36.3% conv), Aff #522909 (939 regs, 26.2% conv), Aff #527205 (764 regs, 29.8% conv)",
+    "players": [
+      {
+        "aff_id": "524865",
+        "aff_name": "Aff #524865",
+        "players": 1281,
+        "depositors": 523,
+        "conv_rate": 40.8
+      },
+      {
+        "aff_id": "532643",
+        "aff_name": "Aff #532643",
+        "players": 1146,
+        "depositors": 416,
+        "conv_rate": 36.3
+      },
+      {
+        "aff_id": "522909",
+        "aff_name": "Aff #522909",
+        "players": 939,
+        "depositors": 246,
+        "conv_rate": 26.2
+      },
+      {
+        "aff_id": "527205",
+        "aff_name": "Aff #527205",
+        "players": 764,
+        "depositors": 228,
+        "conv_rate": 29.8
+      },
+      {
+        "aff_id": "509133",
+        "aff_name": "Funil VIP",
+        "players": 546,
+        "depositors": 115,
+        "conv_rate": 21.1
+      },
+      {
+        "aff_id": "532447",
+        "aff_name": "Aff #532447",
+        "players": 472,
+        "depositors": 225,
+        "conv_rate": 47.7
+      },
+      {
+        "aff_id": "523114",
+        "aff_name": "Aff #523114",
+        "players": 401,
+        "depositors": 116,
+        "conv_rate": 28.9
+      },
+      {
+        "aff_id": "532597",
+        "aff_name": "Aff #532597",
+        "players": 117,
+        "depositors": 84,
+        "conv_rate": 71.8
+      }
+    ],
+    "action": "Otimizar investimento por afiliado baseado em conversão",
+    "how": "1) Ranquear afiliados por taxa de conversão (não volume). 2) Aumentar budget dos com >30% conversão. 3) Cobrar melhoria dos com <10%. 4) Testar novos canais.",
+    "impact": "Otimização de CAC por afiliado",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-015",
+    "date": "2026-03-31",
+    "priority": 15,
+    "category": "opportunity",
+    "title": "Tipo mais lucrativo: SLOT — GGR R$226,632",
+    "description": "2802 jogadores ativos. Bet total: R$5,216,945.",
+    "players": [],
+    "action": "Promover este tipo de jogo para jogadores de outros tipos",
+    "how": "1) Identificar jogadores que nunca jogaram este tipo. 2) Criar campanha de cross-sell com free spins. 3) Destacar jogos populares na homepage.",
+    "impact": "Aumento de R$22,663 se crescer 10%",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-016",
+    "date": "2026-03-31",
+    "priority": 16,
+    "category": "opportunity",
+    "title": "Pico de depósitos às 15h BRT (659 deps/mês)",
+    "description": "Vale mínimo às 5h (66 deps). Diferença de 9x.",
+    "players": [],
+    "action": "Agendar campanhas para 1h antes do pico",
+    "how": "1) Campanhas push/email às 14h BRT. 2) Evitar envios entre 1h-7h. 3) Promoções relâmpago às 15h.",
+    "impact": "Maximizar conversão por timing",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-017",
+    "date": "2026-03-31",
+    "priority": 17,
+    "category": "monitor",
+    "title": "Hoje: 319 depósitos, R$61,818 (+29% vs ontem)",
+    "description": "Ontem: 376 deps, R$48,100. Hoje até agora: 184 depositantes únicos.",
+    "players": [],
+    "action": "Acompanhar ao longo do dia",
+    "how": "1) Verificar às 15h (pico). 2) Se abaixo de ontem: push de emergência. 3) Se acima: manter ritmo.",
+    "impact": "Monitoramento diário",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-018",
+    "date": "2026-03-31",
+    "priority": 18,
+    "category": "opportunity",
+    "title": "8 jogadores >R$10K churned (30-90d) — win-back",
+    "description": "Total em risco: R$361,577. Janela de recuperação ainda aberta.",
+    "players": [
+      {
+        "id": 2992653,
+        "name": "Marcelo Torres",
+        "btag_aff": "",
+        "aff_name": "",
+        "device": "",
+        "total_dep": 84200.0,
+        "dep_count": 15,
+        "days_inactive": 44,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 2986694,
+        "name": "Wellerson Matheus Gomes Da Silva",
+        "btag_aff": "509132",
+        "aff_name": "509132",
+        "device": "",
+        "total_dep": 54023.0,
+        "dep_count": 236,
+        "days_inactive": 46,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 6364951,
+        "name": "Adriano Campelo De Abreu",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 50599.0,
+        "dep_count": 6,
+        "days_inactive": 84,
+        "game_style": "N/A"
+      },
+      {
+        "id": 2986509,
+        "name": "Inara Souza Almeida Souza Almeida",
+        "btag_aff": "509132",
+        "aff_name": "509132",
+        "device": "",
+        "total_dep": 42230.0,
+        "dep_count": 40,
+        "days_inactive": 48,
+        "game_style": "SLOT"
+      },
+      {
+        "id": 6651124,
+        "name": "Ian Victor Lacerda Da Silva",
+        "btag_aff": "522723",
+        "aff_name": "522723",
+        "device": "",
+        "total_dep": 41270.0,
+        "dep_count": 39,
+        "days_inactive": 60,
+        "game_style": "N/A"
+      },
+      {
+        "id": 6253958,
+        "name": "Josiwelderson Philipe Cardoso Magalhaes",
+        "btag_aff": "509133",
+        "aff_name": "Funil VIP",
+        "device": "",
+        "total_dep": 38400.0,
+        "dep_count": 18,
+        "days_inactive": 35,
+        "game_style": "LIVE"
+      },
+      {
+        "id": 5946403,
+        "name": "Marcos Vinicius Cruz Silva",
+        "btag_aff": "509132",
+        "aff_name": "509132",
+        "device": "",
+        "total_dep": 25477.0,
+        "dep_count": 71,
+        "days_inactive": 87,
+        "game_style": "N/A"
+      },
+      {
+        "id": 3013726,
+        "name": "Edmundo Francisco Dos Santos",
+        "btag_aff": "509646",
+        "aff_name": "509646",
+        "device": "",
+        "total_dep": 25378.0,
+        "dep_count": 41,
+        "days_inactive": 68,
+        "game_style": "N/A"
+      }
+    ],
+    "action": "Campanha de win-back escalonada",
+    "how": "1) SMS + email com oferta \"última chance\". 2) Bônus agressivo: 100% até R$1K. 3) Top 3: ligação direta. 4) Investigar motivo do churn no BO.",
+    "impact": "Reativação de R$36,158",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-019",
+    "date": "2026-03-31",
+    "priority": 19,
+    "category": "monitor",
+    "title": "Ticket médio: R$144 (9517 depósitos em 30d)",
+    "description": "Volume total 30d: R$1,373,576.",
+    "players": [],
+    "action": "Estratégia de upsell para aumentar ticket",
+    "how": "1) Bônus progressivo por faixa. 2) Tiers visíveis no site. 3) Push: \"Deposite R$200+ e ganhe 30%\".",
+    "impact": "Se ticket subir 20%: +R$274,715/mês",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-020",
+    "date": "2026-03-31",
+    "priority": 20,
+    "category": "monitor",
+    "title": "Cohort saúde: 2026-03 (35.1% conv), 2026-02 (35.5% conv), 2026-01 (29.1% conv)",
+    "description": "Taxa de conversão registro→depósito por mês.",
+    "players": [
+      {
+        "month": "2026-03",
+        "registrations": 6728,
+        "deposited": 2363,
+        "conv_rate": 35.1
+      },
+      {
+        "month": "2026-02",
+        "registrations": 6614,
+        "deposited": 2349,
+        "conv_rate": 35.5
+      },
+      {
+        "month": "2026-01",
+        "registrations": 6199,
+        "deposited": 1806,
+        "conv_rate": 29.1
+      },
+      {
+        "month": "2025-12",
+        "registrations": 219,
+        "deposited": 180,
+        "conv_rate": 82.2
+      }
+    ],
+    "action": "Monitorar tendência e otimizar onboarding",
+    "how": "1) Se conversão <20%: rever landing page e welcome bonus. 2) Se >30%: analisar o que está funcionando e replicar. 3) Acompanhar mensalmente.",
+    "impact": "Otimização de funil de conversão",
+    "status": "pending"
+  },
+  {
+    "id": "INS-2026-03-31-020",
+    "date": "2026-03-31",
+    "priority": 20,
+    "category": "monitor",
+    "title": "Insight #20 — sem dados suficientes",
+    "description": "Dados insuficientes para gerar este insight hoje.",
+    "players": [],
+    "action": "N/A",
+    "how": "N/A",
+    "impact": "N/A",
+    "status": "pending"
+  }
+]

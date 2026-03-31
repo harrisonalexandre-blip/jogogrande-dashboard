@@ -887,6 +887,34 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 .kpi-trend{display:flex;align-items:center;gap:4px;margin-top:3px;font-size:10px;font-weight:700}
 .kpi-trend.up{color:var(--green)}.kpi-trend.down{color:var(--red)}.kpi-trend.neutral{color:#888}
 </style>
+<script>
+const DAILY_INSIGHTS = [
+  {
+    "id": "INS-2026-03-31-001",
+    "date": "2026-03-31",
+    "priority": 17,
+    "category": "monitor",
+    "title": "Today's Performance Snapshot",
+    "description": "Daily KPIs: R$0 deposits, 0 unique depositors, avg ticket R$0",
+    "players": [
+      {
+        "id": 0,
+        "name": "Today Summary",
+        "btag_aff": "2026-03-31",
+        "device": "KPI",
+        "game_style": "All",
+        "total_dep": 0,
+        "days_inactive": 0,
+        "dep_count": 0
+      }
+    ],
+    "action": "Daily review and comparison",
+    "how": "1. Review today's deposits vs yesterday\n2. Compare to 7-day average\n3. Check for anomalies\n4. Update team on targets\n5. Prepare tomorrow forecast",
+    "impact": "Day-over-day change: +0.0%",
+    "status": "pending"
+  }
+];
+</script>
 </head>
 <body>
 
@@ -1267,19 +1295,28 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 <!-- ROW 1: Funil de Depositos (Full Width) -->
 <div class="cb" style="margin-bottom:16px"><div class="ct"><span class="dot g"></span> Funil de Depósitos · Conversão <span style="font-size:9px;color:var(--text3);margin-left:8px">Clique nas barras para ver jogadores</span></div><div style="height:320px"><canvas id="c-crm-funnel"></canvas></div></div>
 
-<!-- ROW 1b: Insights Acionáveis -->
-<div class="cb" style="margin-bottom:18px;background:linear-gradient(135deg, rgba(30,30,46,.95), var(--card));border:1px solid rgba(255,215,64,.12)">
-  <div class="ct" style="border-bottom:1px solid rgba(255,215,64,.12);padding-bottom:10px;margin-bottom:0">
-    <span style="font-size:18px;margin-right:6px">🎯</span> Central de Insights · Ações Recomendadas
-    <span style="font-size:9px;color:var(--text3);margin-left:8px">Phoenix DB · dados em tempo real</span>
-    <div style="margin-left:auto;display:flex;gap:6px">
+<!-- ROW 1b: Central de Missões CRM -->
+<div class="cb" style="margin-bottom:18px;background:linear-gradient(135deg, rgba(30,30,46,.98), rgba(20,20,35,.95));border:1px solid rgba(255,215,64,.15);box-shadow:0 4px 24px rgba(0,0,0,.3)">
+  <div class="ct" style="border-bottom:1px solid rgba(255,215,64,.12);padding-bottom:12px;margin-bottom:0;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:22px">🎯</span>
+      <div>
+        <div style="font-size:14px;font-weight:700">Central de Missões CRM</div>
+        <div style="font-size:9px;color:var(--text3)">Phoenix DB · Atualização diária automática</div>
+      </div>
+    </div>
+    <div id="mission-counters" style="font-size:10px;margin-left:12px;padding:4px 12px;background:rgba(255,255,255,.03);border-radius:6px"></div>
+    <div style="margin-left:auto;display:flex;gap:4px;flex-wrap:wrap">
       <div class="time-btn active" onclick="filterInsights('all',this)" style="font-size:10px;padding:4px 10px">Todos</div>
       <div class="time-btn" onclick="filterInsights('critical',this)" style="font-size:10px;padding:4px 10px">🔴 Críticos</div>
       <div class="time-btn" onclick="filterInsights('opportunity',this)" style="font-size:10px;padding:4px 10px">💰 Oportunidades</div>
       <div class="time-btn" onclick="filterInsights('monitor',this)" style="font-size:10px;padding:4px 10px">👁️ Monitorar</div>
+      <div class="time-btn" onclick="filterInsights('pending',this)" style="font-size:10px;padding:4px 10px">⏳ Pendentes</div>
+      <div class="time-btn" onclick="filterInsights('in_progress',this)" style="font-size:10px;padding:4px 10px">🔄 Em Andamento</div>
+      <div class="time-btn" onclick="filterInsights('resolved',this)" style="font-size:10px;padding:4px 10px">✅ Resolvidos</div>
     </div>
   </div>
-  <div id="crm-insights" style="font-size:12px"></div>
+  <div id="crm-insights" style="font-size:12px;max-height:800px;overflow-y:auto"></div>
 </div>
 
 <!-- ROW 2: Segmentação + Oportunidades -->
@@ -2282,6 +2319,7 @@ const ABANDON={"summary": {"g": 55851, "p": 40671, "ab": 15180, "vp": 5204531, "
 const CRM_X={"funnel":[{"n":1,"p":9552},{"n":2,"p":3465},{"n":3,"p":2175},{"n":4,"p":1489},{"n":5,"p":1227},{"n":6,"p":908},{"n":7,"p":799},{"n":8,"p":573},{"n":9,"p":364},{"n":10,"p":339},{"n":11,"p":315},{"n":12,"p":295},{"n":13,"p":282},{"n":14,"p":269},{"n":15,"p":251},{"n":16,"p":235},{"n":17,"p":221},{"n":18,"p":208},{"n":19,"p":198},{"n":20,"p":189},{"n":21,"p":185},{"n":22,"p":178}],"gt":[{"t":"slots","ggr":125687,"to":4278436,"uap":48078,"gc":2456},{"t":"roulette","ggr":69710,"to":2289418,"uap":4244,"gc":109},{"t":"crash","ggr":37104,"to":1083559,"uap":2386,"gc":74},{"t":"live","ggr":-150,"to":47476,"uap":240,"gc":87}],"tg":[{"gn":"Aviator","pv":"Spribe","ggr":34200.56,"to":1050172.06,"uap":1677,"gp":221.6,"as":1.68},{"gn":"Speed Auto Roulette","pv":"Evolution","ggr":31022.25,"to":706161.0,"uap":620,"gp":438.5,"as":6.09},{"gn":"Ruleta Automatica","pv":"Evolution","ggr":22835.22,"to":1004305.67,"uap":568,"gp":227.4,"as":6.74},{"gn":"Fortune Ox","pv":"PGSOFT","ggr":15920.56,"to":172045.87,"uap":2084,"gp":941.0,"as":0.46},{"gn":"Live Roulette","pv":"LiveVegas","ggr":11463.09,"to":199388.91,"uap":154,"gp":575.1,"as":17.88},{"gn":"Roulette A Aurum","pv":"CreedRoomz","ggr":9562.21,"to":418421.92,"uap":382,"gp":223.9,"as":8.75},{"gn":"Fortune Dragon","pv":"PGSOFT","ggr":9486.21,"to":152515.17,"uap":2084,"gp":633.0,"as":0.32},{"gn":"Sugar Rush 1000","pv":"Pragmatic Play","ggr":7680.74,"to":44539.96,"uap":535,"gp":1727.4,"as":0.8},{"gn":"Roulette Brasileira","pv":"CreedRoomz","ggr":7028.19,"to":287597.28,"uap":496,"gp":245.3,"as":7.87},{"gn":"Divine Drop","pv":"Hacksaw Gaming","ggr":6901.78,"to":28617.21,"uap":33,"gp":2364.1,"as":5.96},{"gn":"King Carrot","pv":"Hacksaw Gaming","ggr":6008.7,"to":11209.94,"uap":8,"gp":5357.8,"as":20.64},{"gn":"Fortune Rabbit","pv":"PGSOFT","ggr":5313.78,"to":237574.1,"uap":2050,"gp":238.8,"as":0.46},{"gn":"Money Mouse","pv":"Pragmatic Play","ggr":5271.74,"to":38996.45,"uap":176,"gp":1365.9,"as":0.98},{"gn":"JetX","pv":"Smartsoft","ggr":5175.14,"to":169968.16,"uap":84,"gp":302.6,"as":3.77},{"gn":"Fruit Duel","pv":"Hacksaw Gaming","ggr":5101.36,"to":11987.95,"uap":2,"gp":4255.4,"as":342.51},{"gn":"Excalibur Unleashed","pv":"Pragmatic Play","ggr":4928.74,"to":10137.74,"uap":13,"gp":4864.3,"as":19.76},{"gn":"Roleta ao Vivo","pv":"Evolution","ggr":4087.07,"to":318232.76,"uap":532,"gp":127.5,"as":7.04},{"gn":"Pinata Wins","pv":"PGSOFT","ggr":3770.39,"to":50919.67,"uap":396,"gp":753.0,"as":0.27},{"gn":"Pug Life","pv":"Hacksaw Gaming","ggr":3757.58,"to":10602.18,"uap":33,"gp":3541.9,"as":9.83},{"gn":"Little Gem","pv":"Pragmatic Play","ggr":3421.31,"to":4843.76,"uap":1,"gp":7104.6,"as":9.02}],"wg":[{"gn":"Barrel Bonanza","pv":"Hacksaw Gaming","ggr":-10750.29,"to":7831.18,"uap":79,"gp":-13670.6,"as":0.71},{"gn":"Hot Coins: Hold and Win","pv":"Playson","ggr":-8585.33,"to":28834.41,"uap":50,"gp":-2989.6,"as":3.07},{"gn":"Bac Bo Ao Vivo","pv":"Evolution","ggr":-7817.52,"to":105700.49,"uap":464,"gp":-732.1,"as":7.7},{"gn":"Pompeii Megareels Megaways","pv":"Pragmatic Play","ggr":-7192.0,"to":19231.55,"uap":103,"gp":-3715.1,"as":0.92},{"gn":"Fish Road","pv":"InOut","ggr":-4837.04,"to":3771.46,"uap":96,"gp":-12847.7,"as":1.74},{"gn":"Witch Heart Megaways","pv":"Pragmatic Play","ggr":-4495.71,"to":4517.34,"uap":48,"gp":-9856.6,"as":0.7},{"gn":"3 Carts of Gold: Hold and Win","pv":"Playson","ggr":-3944.58,"to":6529.5,"uap":18,"gp":-6037.7,"as":2.16},{"gn":"The Crypt","pv":"Nolimit City","ggr":-3895.48,"to":3602.92,"uap":55,"gp":-10645.2,"as":0.34},{"gn":"Chilli Heat Megaways","pv":"Pragmatic Play","ggr":-3778.56,"to":5131.16,"uap":32,"gp":-7172.4,"as":1.46},{"gn":"Black Bull","pv":"Pragmatic Play","ggr":-3351.22,"to":27153.88,"uap":108,"gp":-1189.8,"as":1.35},{"gn":"Muertos Multiplier Megaways","pv":"Pragmatic Play","ggr":-3336.14,"to":4837.29,"uap":14,"gp":-6939.1,"as":6.41},{"gn":"Shining Hot 20","pv":"Pragmatic Play","ggr":-3213.76,"to":2395.53,"uap":21,"gp":-13090.9,"as":0.94},{"gn":"Devilicious","pv":"Pragmatic Play","ggr":-2879.93,"to":5310.88,"uap":10,"gp":-5424.2,"as":6.95},{"gn":"Roulette Auto Speed","pv":"CreedRoomz","ggr":-2464.54,"to":62993.66,"uap":309,"gp":-396.8,"as":4.0},{"gn":"5 Fortunator","pv":"Playson","ggr":-2433.99,"to":6078.92,"uap":8,"gp":-4001.6,"as":11.15},{"gn":"Hot Fiesta","pv":"Pragmatic Play","ggr":-2206.77,"to":2865.98,"uap":16,"gp":-7679.4,"as":0.88},{"gn":"Diamonds Power: Hold and Win","pv":"Playson","ggr":-2086.61,"to":8805.22,"uap":62,"gp":-2408.2,"as":0.69},{"gn":"Royal Coins: Hold and Win","pv":"Playson","ggr":-2061.44,"to":6494.89,"uap":23,"gp":-3167.2,"as":3.44},{"gn":"Lucky Neko","pv":"PGSOFT","ggr":-2054.45,"to":16224.56,"uap":393,"gp":-1235.4,"as":0.22},{"gn":"Wild Wild Riches Megaways","pv":"Pragmatic Play","ggr":-1938.99,"to":20422.55,"uap":58,"gp":-973.4,"as":1.65}],"pg":[{"gn":"Fortune Tiger","pv":"PGSOFT","ggr":714.67,"to":435366.89,"uap":3761,"gp":26.2,"as":0.43},{"gn":"Lucky Tiger","pv":"Pragmatic Play","ggr":-111.0,"to":36092.09,"uap":3567,"gp":1.3,"as":0.15},{"gn":"Fortune Dragon","pv":"PGSOFT","ggr":9486.21,"to":152515.17,"uap":2084,"gp":633.0,"as":0.32},{"gn":"Fortune Ox","pv":"PGSOFT","ggr":15920.56,"to":172045.87,"uap":2084,"gp":941.0,"as":0.46},{"gn":"Fortune Rabbit","pv":"PGSOFT","ggr":5313.78,"to":237574.1,"uap":2050,"gp":238.8,"as":0.46},{"gn":"Aviator","pv":"Spribe","ggr":34200.56,"to":1050172.06,"uap":1677,"gp":221.6,"as":1.68},{"gn":"Fortune Mouse","pv":"PGSOFT","ggr":1552.76,"to":65519.12,"uap":1063,"gp":253.7,"as":0.52},{"gn":"Sweet Bonanza","pv":"Pragmatic Play","ggr":-1508.13,"to":6302.42,"uap":1058,"gp":-2622.2,"as":4.45},{"gn":"Fortune Snake","pv":"PGSOFT","ggr":721.49,"to":80876.31,"uap":855,"gp":97.4,"as":0.61},{"gn":"Speed Auto Roulette","pv":"Evolution","ggr":31022.25,"to":706161.0,"uap":620,"gp":438.5,"as":6.09},{"gn":"Ruleta Automatica","pv":"Evolution","ggr":22835.22,"to":1004305.67,"uap":568,"gp":227.4,"as":6.74},{"gn":"Sugar Rush 1000","pv":"Pragmatic Play","ggr":7680.74,"to":44539.96,"uap":535,"gp":1727.4,"as":0.8},{"gn":"Wild Bandito","pv":"PGSOFT","ggr":1356.84,"to":17713.11,"uap":533,"gp":769.3,"as":0.14},{"gn":"Roleta ao Vivo","pv":"Evolution","ggr":4087.07,"to":318232.76,"uap":532,"gp":127.5,"as":7.04},{"gn":"Roulette Brasileira","pv":"CreedRoomz","ggr":7028.19,"to":287597.28,"uap":496,"gp":245.3,"as":7.87},{"gn":"Gates of Olympus 1000","pv":"Pragmatic Play","ggr":2719.04,"to":22299.69,"uap":474,"gp":1228.8,"as":0.61},{"gn":"Bac Bo Ao Vivo","pv":"Evolution","ggr":-7817.52,"to":105700.49,"uap":464,"gp":-732.1,"as":7.7},{"gn":"Roleta Relâmpago","pv":"Evolution","ggr":2374.17,"to":58067.04,"uap":417,"gp":405.8,"as":3.24},{"gn":"Joker's Jewels","pv":"Pragmatic Play","ggr":3078.09,"to":30690.08,"uap":411,"gp":984.6,"as":0.47},{"gn":"Gates of Olympus","pv":"Pragmatic Play","ggr":238.16,"to":18926.9,"uap":402,"gp":137.0,"as":1.75}],"rk":{"slots":{"top":[{"gn":"Ruleta Automatica","pv":"Evolution","ggr":22835.22,"to":1004305.67,"uap":568,"gp":227.4,"as":6.74},{"gn":"Fortune Ox","pv":"PGSOFT","ggr":15920.56,"to":172045.87,"uap":2084,"gp":941.0,"as":0.46},{"gn":"Fortune Dragon","pv":"PGSOFT","ggr":9486.21,"to":152515.17,"uap":2084,"gp":633.0,"as":0.32},{"gn":"Sugar Rush 1000","pv":"Pragmatic Play","ggr":7680.74,"to":44539.96,"uap":535,"gp":1727.4,"as":0.8},{"gn":"Divine Drop","pv":"Hacksaw Gaming","ggr":6901.78,"to":28617.21,"uap":33,"gp":2364.1,"as":5.96},{"gn":"King Carrot","pv":"Hacksaw Gaming","ggr":6008.7,"to":11209.94,"uap":8,"gp":5357.8,"as":20.64},{"gn":"Fortune Rabbit","pv":"PGSOFT","ggr":5313.78,"to":237574.1,"uap":2050,"gp":238.8,"as":0.46},{"gn":"Money Mouse","pv":"Pragmatic Play","ggr":5271.74,"to":38996.45,"uap":176,"gp":1365.9,"as":0.98},{"gn":"JetX","pv":"Smartsoft","ggr":5175.14,"to":169968.16,"uap":84,"gp":302.6,"as":3.77},{"gn":"Excalibur Unleashed","pv":"Pragmatic Play","ggr":4928.74,"to":10137.74,"uap":13,"gp":4864.3,"as":19.76}],"worst":[{"gn":"Barrel Bonanza","pv":"Hacksaw Gaming","ggr":-10750.29,"to":7831.18,"uap":79,"gp":-13670.6,"as":0.71},{"gn":"Hot Coins: Hold and Win","pv":"Playson","ggr":-8585.33,"to":28834.41,"uap":50,"gp":-2989.6,"as":3.07},{"gn":"Bac Bo Ao Vivo","pv":"Evolution","ggr":-7817.52,"to":105700.49,"uap":464,"gp":-732.1,"as":7.7},{"gn":"Pompeii Megareels Megaways","pv":"Pragmatic Play","ggr":-7192.0,"to":19231.55,"uap":103,"gp":-3715.1,"as":0.92},{"gn":"Fish Road","pv":"InOut","ggr":-4837.04,"to":3771.46,"uap":96,"gp":-12847.7,"as":1.74},{"gn":"Witch Heart Megaways","pv":"Pragmatic Play","ggr":-4495.71,"to":4517.34,"uap":48,"gp":-9856.6,"as":0.7},{"gn":"3 Carts of Gold: Hold and Win","pv":"Playson","ggr":-3944.58,"to":6529.5,"uap":18,"gp":-6037.7,"as":2.16},{"gn":"The Crypt","pv":"Nolimit City","ggr":-3895.48,"to":3602.92,"uap":55,"gp":-10645.2,"as":0.34},{"gn":"Chilli Heat Megaways","pv":"Pragmatic Play","ggr":-3778.56,"to":5131.16,"uap":32,"gp":-7172.4,"as":1.46},{"gn":"Black Bull","pv":"Pragmatic Play","ggr":-3351.22,"to":27153.88,"uap":108,"gp":-1189.8,"as":1.35}]},"roulette":{"top":[{"gn":"Speed Auto Roulette","pv":"Evolution","ggr":31022.25,"to":706161.0,"uap":620,"gp":438.5,"as":6.09},{"gn":"Live Roulette","pv":"LiveVegas","ggr":11463.09,"to":199388.91,"uap":154,"gp":575.1,"as":17.88},{"gn":"Roulette A Aurum","pv":"CreedRoomz","ggr":9562.21,"to":418421.92,"uap":382,"gp":223.9,"as":8.75},{"gn":"Roulette Brasileira","pv":"CreedRoomz","ggr":7028.19,"to":287597.28,"uap":496,"gp":245.3,"as":7.87},{"gn":"Roleta ao Vivo","pv":"Evolution","ggr":4087.07,"to":318232.76,"uap":532,"gp":127.5,"as":7.04},{"gn":"Roleta Relâmpago","pv":"Evolution","ggr":2374.17,"to":58067.04,"uap":417,"gp":405.8,"as":3.24},{"gn":"Roulette A","pv":"CreedRoomz","ggr":1436.64,"to":41210.39,"uap":145,"gp":343.0,"as":5.19},{"gn":"Red Door Roulette","pv":"Evolution","ggr":1292.79,"to":10665.7,"uap":88,"gp":1206.2,"as":3.63},{"gn":"Auto Mega Roulette","pv":"Pragmatic Play Live","ggr":1220.38,"to":27031.17,"uap":22,"gp":451.6,"as":5.1},{"gn":"Roleta Brasileira Live","pv":"Playtech","ggr":941.93,"to":41706.75,"uap":61,"gp":229.6,"as":8.63}],"worst":[{"gn":"Roulette Auto Speed","pv":"CreedRoomz","ggr":-2464.54,"to":62993.66,"uap":309,"gp":-396.8,"as":4.0},{"gn":"Live Roulette X1000","pv":"LiveVegas","ggr":-1595.62,"to":36552.93,"uap":142,"gp":-434.6,"as":6.74},{"gn":"Roulette C Turkish Aurum","pv":"CreedRoomz","ggr":-1113.53,"to":2679.76,"uap":4,"gp":-4155.9,"as":54.69},{"gn":"Roulette D Persian","pv":"CreedRoomz","ggr":-606.92,"to":5438.16,"uap":4,"gp":-1115.9,"as":46.48},{"gn":"Live Roulette X500","pv":"LiveVegas","ggr":-276.62,"to":6396.87,"uap":61,"gp":-436.4,"as":2.31},{"gn":"Roulette","pv":"Evolution","ggr":-220.64,"to":6502.68,"uap":15,"gp":-341.8,"as":7.22},{"gn":"Fusion Roulette","pv":"LiveVegas","ggr":-199.71,"to":492.19,"uap":24,"gp":-4038.4,"as":4.87},{"gn":"Gold Vault Roulette","pv":"Evolution","ggr":-95.77,"to":2395.55,"uap":44,"gp":-412.4,"as":4.36},{"gn":"Speed Auto Roulette","pv":"Ezugi","ggr":-39.6,"to":602.77,"uap":7,"gp":-665.3,"as":7.26},{"gn":"Turkish Roulette","pv":"Ezugi","ggr":-18.36,"to":74.61,"uap":3,"gp":-2462.5,"as":4.97}]},"live":{"top":[{"gn":"MONOPOLY Live","pv":"Evolution","ggr":209.81,"to":2669.28,"uap":16,"gp":787.3,"as":2.18},{"gn":"Snakes & Ladders Live","pv":"Pragmatic Play Live","ggr":180.52,"to":1274.03,"uap":4,"gp":1424.0,"as":1.98},{"gn":"Blackjack A","pv":"Evolution","ggr":157.25,"to":1046.54,"uap":6,"gp":1516.5,"as":4.55},{"gn":"Blackjack Clássico em Português 11","pv":"Evolution","ggr":72.38,"to":529.07,"uap":5,"gp":1366.1,"as":5.14},{"gn":"Lightning Dice","pv":"Evolution","ggr":54.97,"to":72.4,"uap":9,"gp":7590.8,"as":1.86},{"gn":"Speed Baccarat A","pv":"Evolution","ggr":35.68,"to":145.86,"uap":6,"gp":2442.0,"as":4.29},{"gn":"Mega Fire Blaze Blackjack Live","pv":"Playtech","ggr":33.04,"to":192.63,"uap":4,"gp":1715.6,"as":2.64},{"gn":"Dead or Alive 2 Feature Buy","pv":"NetEnt","ggr":25.61,"to":63.73,"uap":4,"gp":3966.7,"as":0.27},{"gn":"Coin Up: Lightning","pv":"Booongo","ggr":18.62,"to":44.1,"uap":8,"gp":4301.3,"as":0.1},{"gn":"Colt Lightning Firestorm","pv":"Play'n GO","ggr":18.06,"to":67.82,"uap":9,"gp":2694.1,"as":0.22}],"worst":[{"gn":"The Dog House - Dog or Alive","pv":"Pragmatic Play","ggr":-877.06,"to":650.96,"uap":7,"gp":-13440.1,"as":1.6},{"gn":"Adventures Beyond Wonderland Live","pv":"Playtech","ggr":-391.81,"to":1569.33,"uap":5,"gp":-2495.5,"as":2.39},{"gn":"Blackjack Clássico em Português 1","pv":"Evolution","ggr":-344.89,"to":1646.52,"uap":16,"gp":-2072.7,"as":5.88},{"gn":"Baccarat A","pv":"Ezugi","ggr":-92.11,"to":591.0,"uap":6,"gp":-1528.0,"as":9.85},{"gn":"Crazy Time A","pv":"Evolution","ggr":-45.93,"to":31460.71,"uap":33,"gp":-12.8,"as":15.59},{"gn":"Mega Fire Blaze Lucky Ball Brasileiro Live","pv":"Playtech","ggr":-1.83,"to":2.16,"uap":3,"gp":-8461.5,"as":0.43},{"gn":"Baccarat 777","pv":"EVOPLAY","ggr":0.78,"to":7.6,"uap":3,"gp":1041.7,"as":0.95},{"gn":"The Wisecracker Lightning","pv":"Red Tiger","ggr":2.21,"to":3.34,"uap":4,"gp":6403.1,"as":0.04},{"gn":"Spin A Win Wild Brasileiro Live","pv":"Playtech","ggr":2.49,"to":8.07,"uap":4,"gp":3092.8,"as":0.58},{"gn":"Zeus Lightning Power Reels","pv":"Red Tiger","ggr":5.73,"to":52.69,"uap":13,"gp":1321.4,"as":0.07}]},"crash":{"top":[{"gn":"Aviator","pv":"Spribe","ggr":34200.56,"to":1050172.06,"uap":1677,"gp":221.6,"as":1.68},{"gn":"Dice","pv":"Spribe","ggr":1266.64,"to":1389.64,"uap":21,"gp":954.3,"as":3.77},{"gn":"Raging Zeus Mines","pv":"Gaming Corps","ggr":1214.97,"to":16562.36,"uap":13,"gp":732.4,"as":4.6},{"gn":"Mines Gold","pv":"TaDa Gaming","ggr":284.27,"to":1209.7,"uap":10,"gp":2353.9,"as":3.77},{"gn":"Mines","pv":"InOut","ggr":262.24,"to":1884.16,"uap":31,"gp":1396.5,"as":2.24},{"gn":"Spaceman","pv":"Pragmatic Play","ggr":200.34,"to":1381.04,"uap":11,"gp":1458.3,"as":5.46},{"gn":"Plinko AZTEC","pv":"InOut","ggr":63.11,"to":759.98,"uap":82,"gp":838.0,"as":1.14},{"gn":"Mummys Mines","pv":"BELATRA","ggr":51.15,"to":918.52,"uap":3,"gp":554.9,"as":2.42},{"gn":"MINES","pv":"Apex777","ggr":45.79,"to":524.86,"uap":73,"gp":891.3,"as":0.52},{"gn":"Mines","pv":"TURBOGAMES","ggr":44.45,"to":272.29,"uap":8,"gp":1638.9,"as":1.24}],"worst":[{"gn":"Mines","pv":"Tapking_originals","ggr":-494.09,"to":4315.29,"uap":25,"gp":-1198.1,"as":3.44},{"gn":"Cash or Crash (DELETE)","pv":"Evolution","ggr":-85.27,"to":178.82,"uap":6,"gp":-4741.1,"as":2.59},{"gn":"PLINKO","pv":"Apex777","ggr":-79.6,"to":1398.9,"uap":215,"gp":-544.1,"as":0.2},{"gn":"Mines (Book Of Zoomies)","pv":"1fun","ggr":-33.61,"to":481.67,"uap":10,"gp":-746.8,"as":2.1},{"gn":"Jackpot Mines","pv":"Belatra","ggr":-11.22,"to":36.18,"uap":5,"gp":-3102.0,"as":0.57},{"gn":"Football Studio Dice","pv":"Evolution","ggr":-6.09,"to":44.38,"uap":4,"gp":-1365.5,"as":2.02},{"gn":"F Mines","pv":"Galaxsys","ggr":-0.37,"to":23.75,"uap":3,"gp":-104.0,"as":0.82},{"gn":"Plinko 1000","pv":"InOut","ggr":0.47,"to":2.33,"uap":4,"gp":1746.7,"as":0.05},{"gn":"Diamond Mines","pv":"Betsoft (Отключили, УКАЗАНИЕ СЕО)","ggr":0.54,"to":9.79,"uap":3,"gp":558.7,"as":0.31},{"gn":"Balloon Odyssey Crash","pv":"Kalamba (Отключили, УКАЗАНИЕ СЕО)","ggr":0.71,"to":2.85,"uap":5,"gp":2482.8,"as":0.14}]}}};
 const CRM_PH={seg:[{s:"Novo",n:457,ad:1.0,t:25827,av:57},{s:"One-Timer",n:5935,ad:1.0,t:246605,av:42},{s:"Ativo",n:1994,ad:12.2,t:3837889,av:1925},{s:"Regular",n:291,ad:20.1,t:1107575,av:3806},{s:"Em Risco",n:249,ad:11.8,t:488691,av:1963},{s:"Inativo",n:472,ad:14.0,t:879753,av:1864},{s:"Churned",n:20048,ad:0.4,t:1029201,av:51}],coh:[{m:"2025-11",f:1157,r:773,p:66.8,l:2074,d:13.0},{m:"2025-12",f:2320,r:668,p:28.8,l:493,d:3.8},{m:"2026-01",f:1693,r:691,p:40.8,l:560,d:4.2},{m:"2026-02",f:2301,r:829,p:36.0,l:187,d:2.7},{m:"2026-03",f:2463,r:640,p:26.0,l:226,d:2.2}],vips:[{n:"Valeria De Lima",dc:31,td:98590,dl:5,fd:"2026-01-20"},{n:"Luciana Maria Torres",dc:143,td:97008,dl:16,fd:"2025-11-19"},{n:"Maria Aparecida Alves",dc:35,td:93370,dl:5,fd:"2026-01-21"},{n:"Antonio Claudio Costa",dc:462,td:93122,dl:0,fd:"2025-12-14"},{n:"Marcelo Torres",dc:15,td:84200,dl:44,fd:"2025-11-17"},{n:"Jailson Maximo",dc:23,td:76930,dl:5,fd:"2025-12-20"},{n:"Celio De Oliveira",dc:39,td:58295,dl:7,fd:"2025-11-15"},{n:"Antoniel Andrade",dc:84,td:57570,dl:0,fd:"2025-11-13"},{n:"Wellerson Matheus",dc:236,td:54023,dl:47,fd:"2025-11-14"},{n:"Adriano Campelo",dc:6,td:50599,dl:84,fd:"2026-01-06"},{n:"Romario Basso",dc:51,td:46050,dl:16,fd:"2025-11-24"},{n:"Inara Souza",dc:40,td:42230,dl:48,fd:"2025-11-15"},{n:"Robisson Galvao",dc:24,td:41720,dl:9,fd:"2025-11-19"},{n:"Ian Victor Lacerda",dc:39,td:41270,dl:60,fd:"2026-01-18"}],ts:"2026-03-31 12:32"}; 
 const UNIONE={daily:[{d:"25/03",ac:1026,en:1014,et:951,ab:175,cl:4,fl:95},{d:"26/03",ac:3187,en:3105,et:2866,ab:421,cl:4,fl:322},{d:"27/03",ac:2539,en:2518,et:2341,ab:355,cl:12,fl:198},{d:"28/03",ac:2443,en:2441,et:2266,ab:378,cl:51,fl:177},{d:"29/03",ac:179,en:179,et:170,ab:80,cl:22,fl:9},{d:"30/03",ac:598,en:586,et:505,ab:115,cl:7,fl:93},{d:"31/03",ac:431,en:423,et:370,ab:109,cl:2,fl:61}],totals:{aceito:10403,enviado:10266,entregue:9469,aberto:1633,clicado:102,falhas:955},rates:{entrega:92.0,abertura:15.8,clique:0.6,ctr_open:3.8},sender:"noreply@jogogrande.com",ts:"2026-03-31"};
+const DAILY_INSIGHTS=[{"id": "INS-2026-03-31-001", "date": "2026-03-31", "priority": 1, "category": "critical", "title": "6 VIPs Churned — R$310,722 em depósitos totais", "description": "Jogadores de alto valor inativos há 30-90 dias: Marcelo Torres (R$84,200, 44d, SLOT, via ); Wellerson Matheus Gomes Da Silva (R$54,023, 46d, SLOT, via 509132); Adriano Campelo De Abreu (R$50,599, 84d, ?, via Funil VIP); Inara Souza Almeida Souza Almeida (R$42,230, 48d, SLOT, via 509132); Ian Victor Lacerda Da Silva (R$41,270, 60d, ?, via 522723)", "players": [{"id": 2992653, "name": "Marcelo Torres", "btag_aff": "", "aff_name": "", "device": "", "total_dep": 84200.0, "dep_count": 15, "days_inactive": 44, "game_style": "SLOT"}, {"id": 2986694, "name": "Wellerson Matheus Gomes Da Silva", "btag_aff": "509132", "aff_name": "509132", "device": "", "total_dep": 54023.0, "dep_count": 236, "days_inactive": 46, "game_style": "SLOT"}, {"id": 6364951, "name": "Adriano Campelo De Abreu", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 50599.0, "dep_count": 6, "days_inactive": 84, "game_style": "N/A"}, {"id": 2986509, "name": "Inara Souza Almeida Souza Almeida", "btag_aff": "509132", "aff_name": "509132", "device": "", "total_dep": 42230.0, "dep_count": 40, "days_inactive": 48, "game_style": "SLOT"}, {"id": 6651124, "name": "Ian Victor Lacerda Da Silva", "btag_aff": "522723", "aff_name": "522723", "device": "", "total_dep": 41270.0, "dep_count": 39, "days_inactive": 60, "game_style": "N/A"}, {"id": 6253958, "name": "Josiwelderson Philipe Cardoso Magalhaes", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 38400.0, "dep_count": 18, "days_inactive": 35, "game_style": "LIVE"}], "action": "Campanha de win-back personalizada via WhatsApp/ligação direta", "how": "1) Abrir perfil de cada player no Phoenix BO. 2) Verificar último jogo e último saque. 3) Enviar WhatsApp pessoal com oferta exclusiva (bônus 100% até R$500). 4) Se não responder em 48h, ligar. 5) Registrar resultado.", "impact": "Reativação potencial de R$31,072 (se 10% voltar)", "status": "pending"}, {"id": "INS-2026-03-31-002", "date": "2026-03-31", "priority": 2, "category": "critical", "title": "Alerta Payout: Victoria Da Silva Cunha sacou R$44,000 vs R$17,200 depositados", "description": "8 jogadores sacaram mais do que depositaram nos últimos 30d. Net payout total: R$92,595", "players": [{"id": 10205226, "name": "Victoria Da Silva Cunha", "btag_aff": "532500", "aff_name": "532500", "device": "", "total_wd": 44000.0, "total_dep": 17200.0, "net_payout": 26800.0}, {"id": 3038761, "name": "Gilmar Gomes De Oliveira Gomes Oliveira", "btag_aff": "509646", "aff_name": "509646", "device": "", "total_wd": 20934.0, "total_dep": 3709.0, "net_payout": 17225.0}, {"id": 3023001, "name": "Joeslei Ferreira De Oliveira Oliveira", "btag_aff": "509646", "aff_name": "509646", "device": "", "total_wd": 14000.0, "total_dep": 2041.0, "net_payout": 11959.0}, {"id": 2960866, "name": "Francisco Das Chagas Teixeira Junior", "btag_aff": "", "aff_name": "", "device": "", "total_wd": 10651.0, "total_dep": 10.0, "net_payout": 10641.0}, {"id": 10013845, "name": "Guilherme Olivio", "btag_aff": "532378", "aff_name": "532378", "device": "", "total_wd": 9960.0, "total_dep": 620.0, "net_payout": 9340.0}, {"id": 10852071, "name": "Rosane Sommer", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_wd": 10000.0, "total_dep": 1750.0, "net_payout": 8250.0}, {"id": 9345553, "name": "David Marcellus Vieira Silva Marcellus", "btag_aff": "509755", "aff_name": "Google Ads", "device": "", "total_wd": 14461.0, "total_dep": 9528.0, "net_payout": 4933.0}, {"id": 10124357, "name": "James Michelle Silva Mendes Silva Mendes", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_wd": 3790.76, "total_dep": 344.0, "net_payout": 3446.76}], "action": "Revisar atividade de jogo e verificar abuso de bônus", "how": "1) Abrir cada player no Phoenix BO. 2) Verificar histórico de bônus recebidos. 3) Analisar padrão de apostas (apostas opostas em roleta = red flag). 4) Se confirmado abuso: ajustar limites de saque. 5) Se legítimo: monitorar.", "impact": "Proteção de R$92,595 em payouts excessivos", "status": "pending"}, {"id": "INS-2026-03-31-003", "date": "2026-03-31", "priority": 3, "category": "critical", "title": "8 high-rollers esfriando — R$137,856 depositados recentemente", "description": "Jogadores que depositaram >R$10K nos últimos 14 dias mas pararam. Janela de recuperação curta!", "players": [{"id": 6705507, "name": "Maria Aparecida Alves Pereira Pereira", "btag_aff": "509646", "aff_name": "509646", "device": "", "total_dep": 24050.0, "days_inactive": 5, "game_style": "SLOT"}, {"id": 6229544, "name": "Jailson Maximo De Macedo", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 22800.0, "days_inactive": 5, "game_style": "LIVE"}, {"id": 10475851, "name": "Marlene Ferreira De Araujo", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_dep": 21002.0, "days_inactive": 7, "game_style": "SLOT"}, {"id": 5856038, "name": "Sebastiao Leandro Bastos Bastos", "btag_aff": "", "aff_name": "", "device": "", "total_dep": 18104.0, "days_inactive": 3, "game_style": "LIVE"}, {"id": 10205226, "name": "Victoria Da Silva Cunha", "btag_aff": "532500", "aff_name": "532500", "device": "", "total_dep": 17200.0, "days_inactive": 4, "game_style": "SLOT"}, {"id": 10206988, "name": "Victor De Sa Da Silva", "btag_aff": "532500", "aff_name": "532500", "device": "", "total_dep": 13200.0, "days_inactive": 7, "game_style": "SLOT"}, {"id": 6568443, "name": "Marcio Carvalho Da Silva", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 11500.0, "days_inactive": 5, "game_style": "SLOT"}, {"id": 8258216, "name": "Rafael Barreto Bispo Barreto Bispo", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 10000.0, "days_inactive": 12, "game_style": "LIVE"}], "action": "Push notification + oferta de cashback HOJE", "how": "1) Enviar push às 14h BRT (pré-pico). 2) Mensagem: \"Sentimos sua falta, [nome]! Cashback 10% no próximo depósito\". 3) Para os top 3: WhatsApp direto. 4) Se não responder em 24h: email com free spins.", "impact": "Retenção de R$137,856 em valor ativo", "status": "pending"}, {"id": "INS-2026-03-31-004", "date": "2026-03-31", "priority": 4, "category": "critical", "title": "641 jogadores com apenas 1 depósito esta semana (R$74,255)", "description": "Janela ideal de conversão para 2º depósito (primeiras 72h). Top: Rosangela De Oliveira Da Silva (R$8,000), Victor De Sa Da Silva (R$7,000), Marcelo Moraes Ferreira (R$5,000), Diogo Dantas De Mendonca (R$4,012), Frederich Fabian Francisco Francisco (R$4,000)", "players": [{"id": 10515449, "name": "Rosangela De Oliveira Da Silva", "btag_aff": "532500", "aff_name": "532500", "device": "", "total_dep": 8000.0, "dep_count": 1}, {"id": 10206988, "name": "Victor De Sa Da Silva", "btag_aff": "532500", "aff_name": "532500", "device": "", "total_dep": 7000.0, "dep_count": 1}, {"id": 9979193, "name": "Marcelo Moraes Ferreira", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 5000.0, "dep_count": 1}, {"id": 8268684, "name": "Diogo Dantas De Mendonca", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 4012.0, "dep_count": 1}, {"id": 7156800, "name": "Frederich Fabian Francisco Francisco", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 4000.0, "dep_count": 1}, {"id": 5837771, "name": "Gleyson Da Silva Ramos Ramos", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 2200.0, "dep_count": 1}, {"id": 5982514, "name": "Robson Alves Da Silva Alves", "btag_aff": "", "aff_name": "", "device": "", "total_dep": 2000.0, "dep_count": 1}, {"id": 10713605, "name": "Jose Paulo Bezerra De Mello Alves De Sousa", "btag_aff": "523114", "aff_name": "523114", "device": "", "total_dep": 2000.0, "dep_count": 1}, {"id": 10056711, "name": "Mayk William Barbosa Pinheiro", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 1100.0, "dep_count": 1}, {"id": 6510917, "name": "Neimar Gomes Gomes", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 1000.0, "dep_count": 1}, {"id": 8403071, "name": "Almir Silva Da Paz Silva", "btag_aff": "", "aff_name": "", "device": "", "total_dep": 1000.0, "dep_count": 1}, {"id": 5863669, "name": "Luis Claudio Alves", "btag_aff": "", "aff_name": "", "device": "", "total_dep": 1000.0, "dep_count": 1}, {"id": 5858058, "name": "Gabryella Rayanne Sousa Mota", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 1000.0, "dep_count": 1}, {"id": 10705217, "name": "Gustavo Jose Pereira Conserva", "btag_aff": "532609", "aff_name": "532609", "device": "", "total_dep": 1000.0, "dep_count": 1}, {"id": 5860301, "name": "Fabio Pereira Coelho Pereira Coelho", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 1000.0, "dep_count": 1}], "action": "Campanha de 2º depósito imediata via push + email", "how": "1) Disparar push+email AGORA com bônus de 2º depósito (50% até R$100). 2) Os 15 com FTD >R$500: WhatsApp direto. 3) Segmentar por valor: >R$1K=VIP treatment, R$100-1K=bônus, <R$100=free spins. 4) Meta: converter 20%.", "impact": "Conversão de 20% = +128 redepositantes, R$14,851 potencial", "status": "pending"}, {"id": "INS-2026-03-31-005", "date": "2026-03-31", "priority": 5, "category": "critical", "title": "10 players ativos semana passada sumiram esta semana (R$80,001)", "description": "Depositaram semana passada mas não voltaram. Risco iminente de churn.", "players": [{"id": 8258216, "name": "Rafael Barreto Bispo Barreto Bispo", "btag_aff": "509133", "aff_name": "Funil VIP", "total_dep": 20000.0, "dep_count": 4}, {"id": 3023239, "name": "Robisson Galvao De Sousa", "btag_aff": "509646", "aff_name": "509646", "total_dep": 18340.0, "dep_count": 10}, {"id": 8234138, "name": "Reginaldo De Sousa Rocha Sousa Rocha", "btag_aff": "509133", "aff_name": "Funil VIP", "total_dep": 10000.0, "dep_count": 2}, {"id": 9862026, "name": "Klayvet Ferreira", "btag_aff": "524865", "aff_name": "524865", "total_dep": 5419.0, "dep_count": 21}, {"id": 6433325, "name": "Carlos Alberto Lopes", "btag_aff": "509133", "aff_name": "Funil VIP", "total_dep": 5100.0, "dep_count": 3}, {"id": 2986741, "name": "Alexandre Lamana Da Silva", "btag_aff": "509133", "aff_name": "Funil VIP", "total_dep": 4800.0, "dep_count": 4}, {"id": 6285891, "name": "Elionardo Freire Ferreira", "btag_aff": "", "aff_name": "", "total_dep": 4700.0, "dep_count": 26}, {"id": 10428276, "name": "Joao Batista Lima De Medeiros", "btag_aff": "524865", "aff_name": "524865", "total_dep": 4000.0, "dep_count": 6}, {"id": 3019050, "name": "Marcio Miranda De Farias", "btag_aff": "509133", "aff_name": "Funil VIP", "total_dep": 4000.0, "dep_count": 8}, {"id": 2980092, "name": "Jose Antonio Da Silva", "btag_aff": "509133", "aff_name": "Funil VIP", "total_dep": 3642.0, "dep_count": 21}], "action": "Campanha de reengajamento em 2 ondas", "how": "1) Onda 1 (hoje): push \"Sentimos sua falta! Bônus R$50 esperando\". 2) Onda 2 (amanhã): email com free spins. 3) Top 3 por valor: WhatsApp direto do gerente.", "impact": "Retenção de R$80,001 em volume semanal", "status": "pending"}, {"id": "INS-2026-03-31-006", "date": "2026-03-31", "priority": 6, "category": "critical", "title": "🐋 4 depósitos >R$2K hoje — VIP treatment imediato", "description": "Grandes depósitos detectados hoje. Esses players precisam de atenção VIP imediata.", "players": [{"id": 11101156, "name": "Anderson Bernardes Vieira", "btag_aff": "524865", "total_dep": 10000.0}, {"id": 11101156, "name": "Anderson Bernardes Vieira", "btag_aff": "524865", "total_dep": 3500.0}, {"id": 2984528, "name": "Carlos Alberto Da Silva Pereira Silva", "btag_aff": "509133", "total_dep": 2589.0}, {"id": 3038162, "name": "Leandro Molina Martins", "btag_aff": "509646", "total_dep": 2000.0}], "action": "Contato VIP imediato + boas-vindas personalizada", "how": "1) Verificar se é first deposit ou recorrente. 2) Se FTD: welcome call do gerente VIP em até 1h. 3) Se recorrente: enviar mensagem de agradecimento + upgrade de tier. 4) Monitorar atividade de jogo nas próximas 24h.", "impact": "Retenção de whale = R$18,089 em valor imediato", "status": "pending"}, {"id": "INS-2026-03-31-007", "date": "2026-03-31", "priority": 7, "category": "critical", "title": "Taxa de redepósito: 36.2% — 6347 jogadores nunca voltaram", "description": "De 9,956 depositantes, apenas 3,609 fizeram 2+ depósitos. 6,347 depositaram uma vez e abandonaram.", "players": [], "action": "Automação de boas-vindas pós-FTD + bônus de redepósito", "how": "1) Configurar no Phoenix: trigger automático 24h após FTD. 2) Email + push com bônus 50% no 2º depósito (até R$100). 3) Para FTD >R$200: WhatsApp do gerente. 4) Meta: subir taxa para 40%.", "impact": "Se subir 5pp: +317 redepositantes", "status": "pending"}, {"id": "INS-2026-03-31-009", "date": "2026-03-31", "priority": 9, "category": "critical", "title": "Taxa de abertura de email em 15.8% — abaixo do setor (20-25%)", "description": "De 10.266 enviados via UniOne, 1.633 abriram (15.8%). Taxa de clique 0.6% (meta 2-3%). Bounce rate 9.3% (meta <5%).", "players": [], "action": "Otimizar subject lines, timing e limpar lista", "how": "1) Testar subject lines com emojis e urgência. 2) Enviar às 14h BRT (pré-pico depósitos). 3) Remover hard bounces do UniOne (955 falhas). 4) Segmentar: players ativos vs inativos com mensagens diferentes.", "impact": "Dobrar taxa de abertura = +1.600 leitores, +50 cliques", "status": "pending"}, {"id": "INS-2026-03-31-010", "date": "2026-03-31", "priority": 10, "category": "monitor", "title": "📈 Semana atual vs anterior: +33% — R$514,454 vs R$386,084", "description": "Esta semana: 3,215 depósitos (R$514,454). Semana passada: 2,488 (R$386,084). Momentum positivo!", "players": [], "action": "Aproveitar momentum", "how": "1) Se positivo: campanha de \"semana VIP\". 2) Se negativo: push de emergência com bônus. 3) Analisar quais segmentos caíram. 4) Verificar se houve problema técnico.", "impact": "Manter/crescer R$514,454 semanal", "status": "pending"}, {"id": "INS-2026-03-31-011", "date": "2026-03-31", "priority": 11, "category": "opportunity", "title": "12 jogadores na janela ideal de redepósito (3-7d)", "description": "Players com 1-3 depósitos no último mês, último depósito há 3-7 dias. Momento perfeito para reativação.", "players": [{"id": 10206988, "name": "Victor De Sa Da Silva", "btag_aff": "532500", "aff_name": "532500", "device": "", "total_dep": 13200.0, "dep_count": 3, "days_inactive": 7}, {"id": 7156800, "name": "Frederich Fabian Francisco Francisco", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 8000.0, "dep_count": 2, "days_inactive": 6}, {"id": 10515449, "name": "Rosangela De Oliveira Da Silva", "btag_aff": "532500", "aff_name": "532500", "device": "", "total_dep": 8000.0, "dep_count": 1, "days_inactive": 7}, {"id": 9979193, "name": "Marcelo Moraes Ferreira", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 5000.0, "dep_count": 1, "days_inactive": 7}, {"id": 9985790, "name": "Ariele Vivian Da Silva Andre", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 3050.0, "dep_count": 2, "days_inactive": 4}, {"id": 7088511, "name": "Luis Fernando Do Canto Silva", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_dep": 3000.0, "dep_count": 3, "days_inactive": 3}, {"id": 5858058, "name": "Gabryella Rayanne Sousa Mota", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 2250.0, "dep_count": 3, "days_inactive": 7}, {"id": 5837771, "name": "Gleyson Da Silva Ramos Ramos", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 2200.0, "dep_count": 1, "days_inactive": 6}, {"id": 10713605, "name": "Jose Paulo Bezerra De Mello Alves De Sousa", "btag_aff": "523114", "aff_name": "523114", "device": "", "total_dep": 2000.0, "dep_count": 1, "days_inactive": 6}, {"id": 8403071, "name": "Almir Silva Da Paz Silva", "btag_aff": "", "aff_name": "", "device": "", "total_dep": 1310.0, "dep_count": 3, "days_inactive": 5}, {"id": 3022570, "name": "Gustavo Antonio Almeida Sousa", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 1150.0, "dep_count": 3, "days_inactive": 3}, {"id": 2983095, "name": "Marcio Aparecido Gomes Aparecido Gomes", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 1150.0, "dep_count": 3, "days_inactive": 3}], "action": "Push + email com oferta de redepósito", "how": "1) Push personalizado: \"[Nome], você tem R$[bônus] esperando!\". 2) Email com últimos jogos jogados. 3) Para os top 5 por valor: WhatsApp.", "impact": "Conversão de R$15,093", "status": "pending"}, {"id": "INS-2026-03-31-012", "date": "2026-03-31", "priority": 12, "category": "opportunity", "title": "10 jogadores frequentes com ticket baixo — oportunidade de upsell", "description": "Players com 5+ depósitos no mês mas ticket médio <R$100. São engajados mas depositam pouco.", "players": [{"id": 6251732, "name": "Beatriz Brito Da Silva", "btag_aff": "", "aff_name": "", "device": "", "total_dep": 4306.0, "dep_count": 113, "avg_deposit": 38.10619469026549}, {"id": 9528745, "name": "Edjunio Oliveira Da Silva Oliveira", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_dep": 5799.0, "dep_count": 100, "avg_deposit": 57.99}, {"id": 9449551, "name": "Osvaldo Cardoso Da Silva Junior Cardoso", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_dep": 4232.0, "dep_count": 89, "avg_deposit": 47.550561797752806}, {"id": 9927983, "name": "Andre Marques Matos", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_dep": 4631.0, "dep_count": 88, "avg_deposit": 52.625}, {"id": 8226962, "name": "Mario Francisco De Carvalho", "btag_aff": "522723", "aff_name": "522723", "device": "", "total_dep": 4028.51, "dep_count": 84, "avg_deposit": 47.95845238095239}, {"id": 9466093, "name": "Cledenilson Da Silva De Moura", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_dep": 3333.0, "dep_count": 74, "avg_deposit": 45.04054054054054}, {"id": 9945431, "name": "Matheus Turola Turola Souza", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_dep": 6445.0, "dep_count": 70, "avg_deposit": 92.07142857142857}, {"id": 10333933, "name": "Guilherme Martins De Oliveira", "btag_aff": "524865", "aff_name": "524865", "device": "", "total_dep": 4502.96, "dep_count": 68, "avg_deposit": 66.22}, {"id": 3021307, "name": "Nadjane Santos Nunes Santos Nunes", "btag_aff": "509646", "aff_name": "509646", "device": "", "total_dep": 1133.39, "dep_count": 51, "avg_deposit": 22.223333333333336}, {"id": 5837549, "name": "Expedito Ronney De Sousa Fonseca", "btag_aff": "509132", "aff_name": "509132", "device": "", "total_dep": 4317.0, "dep_count": 51, "avg_deposit": 84.6470588235294}], "action": "Campanha de upsell com bônus progressivo", "how": "1) Oferta: \"Deposite R$200 e ganhe 30% extra\". 2) Criar tiers visíveis: Bronze→Prata→Ouro. 3) Push: \"Falta R$[X] para o próximo nível!\". 4) Meta: dobrar ticket médio.", "impact": "Se ticket dobrar: +R$42,728/mês", "status": "pending"}, {"id": "INS-2026-03-31-013", "date": "2026-03-31", "priority": 13, "category": "opportunity", "title": "10 jogadores jogam apenas 1 tipo de jogo — cross-sell", "description": "10 jogam só slots. Oportunidade de diversificação com free spins em outros tipos.", "players": [{"id": 7545431, "name": "Edson Eiji Hashimoto", "btag_aff": "522723", "aff_name": "522723", "device": "", "game_style": "SLOT", "rounds": 81641}, {"id": 10493954, "name": "Joao Marcos Silva João Marcos Silva", "btag_aff": "524865", "aff_name": "524865", "device": "", "game_style": "SLOT", "rounds": 57255}, {"id": 9945431, "name": "Matheus Turola Turola Souza", "btag_aff": "524865", "aff_name": "524865", "device": "", "game_style": "SLOT", "rounds": 46553}, {"id": 6956417, "name": "Cintia Da Silva Marcolino Locks", "btag_aff": "509646", "aff_name": "509646", "device": "", "game_style": "SLOT", "rounds": 45040}, {"id": 9528745, "name": "Edjunio Oliveira Da Silva Oliveira", "btag_aff": "524865", "aff_name": "524865", "device": "", "game_style": "SLOT", "rounds": 43488}, {"id": 8122927, "name": "Marcos Felippe Gomes Da Silva", "btag_aff": "509646", "aff_name": "509646", "device": "", "game_style": "SLOT", "rounds": 42792}, {"id": 6285891, "name": "Elionardo Freire Ferreira", "btag_aff": "", "aff_name": "", "device": "", "game_style": "SLOT", "rounds": 34681}, {"id": 3009461, "name": "Roberto De Almeida Alves", "btag_aff": "", "aff_name": "", "device": "", "game_style": "SLOT", "rounds": 33570}, {"id": 10281171, "name": "Renan Ferreira Dos Santos Silva", "btag_aff": "524865", "aff_name": "524865", "device": "", "game_style": "SLOT", "rounds": 32736}, {"id": 3021307, "name": "Nadjane Santos Nunes Santos Nunes", "btag_aff": "509646", "aff_name": "509646", "device": "", "game_style": "SLOT", "rounds": 27761}], "action": "Campanha de cross-sell com free spins em novos tipos de jogo", "how": "1) Para slot-only: 20 free spins em crash games (Aviator). 2) Para roulette-only: free spins em slots populares. 3) Push: \"Experimente [jogo] com 20 rodadas grátis!\"", "impact": "Diversificação = menor risco de churn por monotonia", "status": "pending"}, {"id": "INS-2026-03-31-014", "date": "2026-03-31", "priority": 14, "category": "opportunity", "title": "Performance de afiliados: 8 fontes ativas no mês", "description": "Top: Aff #524865 (1281 regs, 40.8% conv), Aff #532643 (1146 regs, 36.3% conv), Aff #522909 (939 regs, 26.2% conv), Aff #527205 (764 regs, 29.8% conv)", "players": [{"aff_id": "524865", "aff_name": "Aff #524865", "players": 1281, "depositors": 523, "conv_rate": 40.8}, {"aff_id": "532643", "aff_name": "Aff #532643", "players": 1146, "depositors": 416, "conv_rate": 36.3}, {"aff_id": "522909", "aff_name": "Aff #522909", "players": 939, "depositors": 246, "conv_rate": 26.2}, {"aff_id": "527205", "aff_name": "Aff #527205", "players": 764, "depositors": 228, "conv_rate": 29.8}, {"aff_id": "509133", "aff_name": "Funil VIP", "players": 546, "depositors": 115, "conv_rate": 21.1}, {"aff_id": "532447", "aff_name": "Aff #532447", "players": 472, "depositors": 225, "conv_rate": 47.7}, {"aff_id": "523114", "aff_name": "Aff #523114", "players": 401, "depositors": 116, "conv_rate": 28.9}, {"aff_id": "532597", "aff_name": "Aff #532597", "players": 117, "depositors": 84, "conv_rate": 71.8}], "action": "Otimizar investimento por afiliado baseado em conversão", "how": "1) Ranquear afiliados por taxa de conversão (não volume). 2) Aumentar budget dos com >30% conversão. 3) Cobrar melhoria dos com <10%. 4) Testar novos canais.", "impact": "Otimização de CAC por afiliado", "status": "pending"}, {"id": "INS-2026-03-31-015", "date": "2026-03-31", "priority": 15, "category": "opportunity", "title": "Tipo mais lucrativo: SLOT — GGR R$226,632", "description": "2802 jogadores ativos. Bet total: R$5,216,945.", "players": [], "action": "Promover este tipo de jogo para jogadores de outros tipos", "how": "1) Identificar jogadores que nunca jogaram este tipo. 2) Criar campanha de cross-sell com free spins. 3) Destacar jogos populares na homepage.", "impact": "Aumento de R$22,663 se crescer 10%", "status": "pending"}, {"id": "INS-2026-03-31-016", "date": "2026-03-31", "priority": 16, "category": "opportunity", "title": "Pico de depósitos às 15h BRT (659 deps/mês)", "description": "Vale mínimo às 5h (66 deps). Diferença de 9x.", "players": [], "action": "Agendar campanhas para 1h antes do pico", "how": "1) Campanhas push/email às 14h BRT. 2) Evitar envios entre 1h-7h. 3) Promoções relâmpago às 15h.", "impact": "Maximizar conversão por timing", "status": "pending"}, {"id": "INS-2026-03-31-017", "date": "2026-03-31", "priority": 17, "category": "monitor", "title": "Hoje: 319 depósitos, R$61,818 (+29% vs ontem)", "description": "Ontem: 376 deps, R$48,100. Hoje até agora: 184 depositantes únicos.", "players": [], "action": "Acompanhar ao longo do dia", "how": "1) Verificar às 15h (pico). 2) Se abaixo de ontem: push de emergência. 3) Se acima: manter ritmo.", "impact": "Monitoramento diário", "status": "pending"}, {"id": "INS-2026-03-31-018", "date": "2026-03-31", "priority": 18, "category": "opportunity", "title": "8 jogadores >R$10K churned (30-90d) — win-back", "description": "Total em risco: R$361,577. Janela de recuperação ainda aberta.", "players": [{"id": 2992653, "name": "Marcelo Torres", "btag_aff": "", "aff_name": "", "device": "", "total_dep": 84200.0, "dep_count": 15, "days_inactive": 44, "game_style": "SLOT"}, {"id": 2986694, "name": "Wellerson Matheus Gomes Da Silva", "btag_aff": "509132", "aff_name": "509132", "device": "", "total_dep": 54023.0, "dep_count": 236, "days_inactive": 46, "game_style": "SLOT"}, {"id": 6364951, "name": "Adriano Campelo De Abreu", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 50599.0, "dep_count": 6, "days_inactive": 84, "game_style": "N/A"}, {"id": 2986509, "name": "Inara Souza Almeida Souza Almeida", "btag_aff": "509132", "aff_name": "509132", "device": "", "total_dep": 42230.0, "dep_count": 40, "days_inactive": 48, "game_style": "SLOT"}, {"id": 6651124, "name": "Ian Victor Lacerda Da Silva", "btag_aff": "522723", "aff_name": "522723", "device": "", "total_dep": 41270.0, "dep_count": 39, "days_inactive": 60, "game_style": "N/A"}, {"id": 6253958, "name": "Josiwelderson Philipe Cardoso Magalhaes", "btag_aff": "509133", "aff_name": "Funil VIP", "device": "", "total_dep": 38400.0, "dep_count": 18, "days_inactive": 35, "game_style": "LIVE"}, {"id": 5946403, "name": "Marcos Vinicius Cruz Silva", "btag_aff": "509132", "aff_name": "509132", "device": "", "total_dep": 25477.0, "dep_count": 71, "days_inactive": 87, "game_style": "N/A"}, {"id": 3013726, "name": "Edmundo Francisco Dos Santos", "btag_aff": "509646", "aff_name": "509646", "device": "", "total_dep": 25378.0, "dep_count": 41, "days_inactive": 68, "game_style": "N/A"}], "action": "Campanha de win-back escalonada", "how": "1) SMS + email com oferta \"última chance\". 2) Bônus agressivo: 100% até R$1K. 3) Top 3: ligação direta. 4) Investigar motivo do churn no BO.", "impact": "Reativação de R$36,158", "status": "pending"}, {"id": "INS-2026-03-31-019", "date": "2026-03-31", "priority": 19, "category": "monitor", "title": "Ticket médio: R$144 (9517 depósitos em 30d)", "description": "Volume total 30d: R$1,373,576.", "players": [], "action": "Estratégia de upsell para aumentar ticket", "how": "1) Bônus progressivo por faixa. 2) Tiers visíveis no site. 3) Push: \"Deposite R$200+ e ganhe 30%\".", "impact": "Se ticket subir 20%: +R$274,715/mês", "status": "pending"}, {"id": "INS-2026-03-31-020", "date": "2026-03-31", "priority": 20, "category": "monitor", "title": "Cohort saúde: 2026-03 (35.1% conv), 2026-02 (35.5% conv), 2026-01 (29.1% conv)", "description": "Taxa de conversão registro→depósito por mês.", "players": [{"month": "2026-03", "registrations": 6728, "deposited": 2363, "conv_rate": 35.1}, {"month": "2026-02", "registrations": 6614, "deposited": 2349, "conv_rate": 35.5}, {"month": "2026-01", "registrations": 6199, "deposited": 1806, "conv_rate": 29.1}, {"month": "2025-12", "registrations": 219, "deposited": 180, "conv_rate": 82.2}], "action": "Monitorar tendência e otimizar onboarding", "how": "1) Se conversão <20%: rever landing page e welcome bonus. 2) Se >30%: analisar o que está funcionando e replicar. 3) Acompanhar mensalmente.", "impact": "Otimização de funil de conversão", "status": "pending"}, {"id": "INS-2026-03-31-020", "date": "2026-03-31", "priority": 20, "category": "monitor", "title": "Insight #20 — sem dados suficientes", "description": "Dados insuficientes para gerar este insight hoje.", "players": [], "action": "N/A", "how": "N/A", "impact": "N/A", "status": "pending"}];
 const PHX_CAMPS=[
 {"id":"cam-db06061f","n":"RF. 1 dep + last activity 3 days ago","s":"On Schedule","ll":"2026-03-30 19:35","cd":"2026-03-23","type":"reactivation","seg":"1 dep, 3d inativo","ch":"push"},
 {"id":"cam-6c863fc9","n":"RF. 1 dep + last activity 6 days ago","s":"On Schedule","ll":"2026-03-30 19:46","cd":"2026-03-23","type":"reactivation","seg":"1 dep, 6d inativo","ch":"push"},
@@ -4045,56 +4083,50 @@ function rAnalytics(){
 
   // ── FUNIL PRINCIPAL ──
   var funnelSteps=[
-    {label:'SESSÕES',sub:'Usuários únicos · 28d (GA4)',v:gaUsers28,icon:'👁️',color:'#3B82F6',pct:100,fromPrev:null},
-    {label:'CADASTROS',sub:'Novos registros · Phoenix 28d',v:p28Regs,icon:'📋',color:'#0EA55A',pct:gaUsers28>0?+(p28Regs/gaUsers28*100).toFixed(2):0,fromPrev:null},
-    {label:'FTDs',sub:'1º Depósito · Phoenix 28d',v:p28FTD,icon:'💳',color:'#F59E0B',pct:p28Regs>0?+(p28FTD/p28Regs*100).toFixed(1):0,fromPrev:null},
-    {label:'REDEPOSITS',sub:'FTDs que voltaram a depositar · 28d (est.)',v:p28Redep,icon:'🔄',color:'#8B5CF6',pct:p28FTD>0?+(p28Redep/p28FTD*100).toFixed(1):0,fromPrev:null}
+    {label:'SESSÕES',sub:'Usuários únicos · 28d (GA4)',v:gaUsers28,icon:'👁️',color:'#3B82F6'},
+    {label:'CADASTROS',sub:'Novos registros · Phoenix 28d',v:p28Regs,icon:'📋',color:'#10B981'},
+    {label:'FTDs',sub:'1º Depósito · Phoenix 28d',v:p28FTD,icon:'💳',color:'#F59E0B'},
+    {label:'REDEPOSITS',sub:'Redeposit estimado · 28d',v:p28Redep,icon:'🔄',color:'#8B5CF6'}
   ];
-  // Calcular drop-off entre etapas (cap a 100%)
-  for(var i=1;i<funnelSteps.length;i++){
-    var prev=funnelSteps[i-1].v;
-    var cur=funnelSteps[i].v;
-    var rawConv=prev>0?(cur/prev*100):0;
-    funnelSteps[i].convFromPrev=+(Math.min(100,rawConv).toFixed(2));
-    funnelSteps[i].dropPct=+(Math.max(0,100-rawConv).toFixed(1));
-  }
   var maxV=funnelSteps[0].v||1;
-  var funnelHtml='<div style="display:flex;align-items:stretch;gap:0;padding:12px 8px">';
+  for(var i=1;i<funnelSteps.length;i++){
+    var _prev=funnelSteps[i-1].v;var _cur=funnelSteps[i].v;
+    var _rc=_prev>0?(_cur/_prev*100):0;
+    funnelSteps[i].conv=+(Math.min(100,_rc).toFixed(1));
+    funnelSteps[i].drop=+(Math.max(0,100-_rc).toFixed(1));
+  }
+  var funnelHtml='<div style="padding:14px 16px 10px;display:flex;flex-direction:column;gap:0">';
   funnelSteps.forEach(function(s,i){
-    var barW=Math.max(8,Math.round(s.v/maxV*100));
-    var isLast=i===funnelSteps.length-1;
-    funnelHtml+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative">';
-    // Step card
-    funnelHtml+='<div style="width:100%;background:var(--bg2);border:1px solid '+s.color+'44;border-radius:10px;padding:14px 10px;text-align:center;position:relative;overflow:hidden">';
-    funnelHtml+='<div style="position:absolute;bottom:0;left:0;height:4px;width:'+barW+'%;background:'+s.color+';border-radius:0 2px 0 0;transition:width .6s"></div>';
-    funnelHtml+='<div style="font-size:20px;margin-bottom:4px">'+s.icon+'</div>';
-    funnelHtml+='<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:6px">'+s.label+'</div>';
-    funnelHtml+='<div style="font-size:28px;font-weight:900;color:'+s.color+';line-height:1">'+fN(s.v)+'</div>';
-    funnelHtml+='<div style="font-size:9px;color:var(--text3);margin-top:4px">'+s.sub+'</div>';
+    var barPct=Math.max(20,Math.round(s.v/maxV*100));
+    var marginPct=Math.round((100-barPct)/2);
+    var convColor=i>0?(s.conv>=30?'#10B981':s.conv>=10?'#F59E0B':'#EF4444'):'';
     if(i>0){
-      var convColor=s.convFromPrev>=10?'var(--green)':s.convFromPrev>=3?'var(--gold)':'var(--red)';
-      funnelHtml+='<div style="margin-top:8px;padding:4px 8px;background:var(--bg3);border-radius:6px;display:inline-block">';
-      funnelHtml+='<span style="font-size:12px;font-weight:800;color:'+convColor+'">'+s.convFromPrev+'%</span>';
-      funnelHtml+='<span style="font-size:9px;color:var(--text3);margin-left:4px">conv.</span>';
+      var ctrW=Math.min(barPct,Math.round(funnelSteps[i-1].v/maxV*100));
+      var ctrM=Math.round((100-ctrW)/2);
+      funnelHtml+='<div style="margin-left:'+ctrM+'%;width:'+ctrW+'%;display:flex;align-items:center;padding:4px 12px;gap:10px">';
+      funnelHtml+='<div style="flex:1;height:1px;border-top:1px dashed var(--border);opacity:.5"></div>';
+      funnelHtml+='<div style="text-align:center;flex-shrink:0">';
+      funnelHtml+='<div style="font-size:12px;color:var(--text3);line-height:1;margin-bottom:1px">↓</div>';
+      funnelHtml+='<div style="font-size:14px;font-weight:900;color:'+convColor+';line-height:1">'+s.conv+'%</div>';
+      funnelHtml+='<div style="font-size:8px;color:var(--text3);margin-top:1px;white-space:nowrap">converteram</div>';
+      funnelHtml+='</div>';
+      funnelHtml+='<div style="flex:1;height:1px;border-top:1px dashed var(--border);opacity:.5"></div>';
       funnelHtml+='</div>';
     }
+    funnelHtml+='<div style="margin-left:'+marginPct+'%;width:'+barPct+'%;background:'+s.color+'15;border:1.5px solid '+s.color+'60;border-radius:10px;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;overflow:hidden">';
+    funnelHtml+='<div style="position:absolute;left:0;top:0;bottom:0;width:100%;background:linear-gradient(90deg,'+s.color+'18 0%,transparent 100%);pointer-events:none"></div>';
+    funnelHtml+='<div style="display:flex;align-items:center;gap:10px;z-index:1;flex:1;min-width:0">';
+    funnelHtml+='<div style="width:36px;height:36px;border-radius:8px;background:'+s.color+'25;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+s.icon+'</div>';
+    funnelHtml+='<div style="min-width:0">';
+    funnelHtml+='<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.4px;color:'+s.color+'">'+s.label+'</div>';
+    funnelHtml+='<div style="font-size:9px;color:var(--text3);margin-top:2px">'+s.sub+'</div>';
+    funnelHtml+='</div></div>';
+    funnelHtml+='<div style="text-align:right;z-index:1;flex-shrink:0">';
+    funnelHtml+='<div style="font-size:28px;font-weight:900;color:'+s.color+';line-height:1">'+fN(s.v)+'</div>';
+    var pctTop=+(s.v/maxV*100).toFixed(1);
+    funnelHtml+='<div style="font-size:9px;color:var(--text3);margin-top:2px">'+pctTop+'% do topo</div>';
     funnelHtml+='</div>';
-    // Arrow between steps
-    if(!isLast){
-      funnelHtml+='<div style="position:absolute;right:-18px;top:50%;transform:translateY(-50%);z-index:2;text-align:center">';
-      funnelHtml+='<div style="color:var(--text3);font-size:16px">›</div>';
-      var drop=funnelSteps[i+1].dropPct;
-      funnelHtml+='<div style="font-size:8px;color:var(--red);white-space:nowrap">−'+drop+'%</div>';
-      funnelHtml+='</div>';
-    }
     funnelHtml+='</div>';
-  });
-  funnelHtml+='</div>';
-  // Barra de progresso visual embaixo
-  funnelHtml+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:0 8px 12px;margin-top:4px">';
-  funnelSteps.forEach(function(s){
-    var w=Math.max(2,Math.round(s.v/maxV*100));
-    funnelHtml+='<div style="height:6px;background:var(--bg3);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+s.color+';border-radius:4px;transition:width .6s"></div></div>';
   });
   funnelHtml+='</div>';
   document.getElementById('ga-funnel-main').innerHTML=funnelHtml;
@@ -4463,55 +4495,52 @@ function rCRM(){
   renderCrmGameRankings();
 
   // 14. Auto Insights — REAL DATA from Phoenix DB
-  var insights=[];
   var phxLink='https://bo365.work/clients?projectId=176&search=';
   function pLink(nm){return '<a href="'+phxLink+encodeURIComponent(nm.split(' ')[0])+'" target="_blank" style="color:var(--gold);text-decoration:none;border-bottom:1px dashed var(--gold)">'+nm+'</a>'}
 
-  // ═══ 10 CRITICAL INSIGHTS ═══
-  insights.push({cat:'critical',html:'🚨 <b>5 VIPs CHURNED com R$272K em depósitos totais</b> — Inativos entre 44 e 84 dias. Maior: '+pLink('Marcelo Torres')+' (R$84.2K, 44d sem jogar).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Campanha de win-back personalizada via WhatsApp/ligação. Oferecer bônus exclusivo de retorno (100% até R$500). Priorizar: Marcelo (R$84K) → Wellerson (R$54K) → Adriano (R$50K) → Inara (R$42K) → Ian (R$41K).<br><span style="color:var(--text3)">👥 '+['Marcelo Torres (R$84K,44d)','Wellerson Matheus (R$54K,46d)','Adriano Campelo (R$50K,84d)','Inara Souza (R$42K,48d)','Ian Victor (R$41K,60d)'].map(function(s){return pLink(s.split(' (')[0])+' <span style="font-size:10px">('+s.split('(')[1]+'</span>'}).join(' · ')+'</span>'});
+  // ═══ DAILY INSIGHTS FROM PHOENIX DB ═══
+  var missionData = [];
+  if(typeof DAILY_INSIGHTS !== 'undefined' && DAILY_INSIGHTS.length > 0) {
+    // Load saved statuses from localStorage
+    var savedStatuses = {};
+    try { savedStatuses = JSON.parse(localStorage.getItem('jg_mission_statuses') || '{}'); } catch(e){}
 
-  insights.push({cat:'critical',html:'💸 <b>Victoria Da Silva sacou R$44K tendo depositado R$17.2K</b> — Net payout de +R$26.8K nos últimos 30 dias.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Revisar atividade no Phoenix BO. Verificar abuso de bônus ou apostas de baixo risco (apostas opostas em roleta). Considerar ajuste de limites de saque.<br><span style="color:var(--text3)">👥 Top 5 net payout: '+pLink('Victoria Da Silva')+' (+R$26.8K) · '+pLink('Gilmar Gomes')+' (+R$17.3K) · '+pLink('Joeslei Ferreira')+' (+R$12K) · '+pLink('Francisco Teixeira')+' (+R$10.6K) · '+pLink('Guilherme Olivio')+' (+R$9.3K)</span>'});
-
-  insights.push({cat:'critical',html:'⏰ <b>4 high-rollers esfriando — R$185K depositados nos últimos 14d mas pararam</b>. '+pLink('Sebastiao Bastos')+' (R$72.4K, parou há 3d) e '+pLink('Jailson Maximo')+' (R$68.4K, 5d).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Push notification HOJE às 20h com mensagem personalizada. Para Sebastiao e Jailson: cashback 10% no próximo depósito. Para '+pLink('Maria Aparecida')+': free spins nos slots favoritos. Janela: 48h antes de virarem "mornos".<br><span style="color:var(--text3)">👥 '+pLink('Sebastiao Bastos')+' (R$72K,3d) · '+pLink('Jailson Maximo')+' (R$68K,5d) · '+pLink('Maria Aparecida')+' (R$24K,5d) · '+pLink('Marlene Ferreira')+' (R$21K,7d)</span>'});
-
-  insights.push({cat:'critical',html:'📉 <b>Taxa de redepósito geral: 36.2%</b> — De 9.942 depositantes, apenas 3.603 voltaram para o 2º depósito. 63.8% deposita uma vez e abandona.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Implementar automação de boas-vindas: email + push 24h após FTD com bônus de redepósito ("Deposite novamente e ganhe 50% até R$100"). Players >R$100 devem receber WhatsApp. Configurar no Phoenix: Campaign > Reactivation > trigger "1 dep, 1d inactive".'});
-
-  insights.push({cat:'critical',html:'🔥 <b>629 jogadores fizeram apenas 1 depósito nos últimos 7 dias</b> — Volume total R$75.8K. Top: '+pLink('Rosangela Oliveira')+' (R$8K), '+pLink('Victor De Sa')+' (R$7K), '+pLink('Marcelo Moraes')+' (R$5K).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> URGENTE: janela ideal de conversão (primeiras 72h). Disparar push+email com bônus 2º depósito. Os 15 com FTD >R$500: contato direto via WhatsApp. Meta: converter 20% = +126 redepositantes.<br><span style="color:var(--text3)">👥 Top 5: '+pLink('Rosangela Oliveira')+' (R$8K) · '+pLink('Victor De Sa')+' (R$7K) · '+pLink('Marcelo Moraes')+' (R$5K) · '+pLink('Diogo Dantas')+' (R$4K) · '+pLink('Robson Alves')+' (R$2K)</span>'});
-
-  insights.push({cat:'critical',html:'🔄 <b>10+ players de alto valor depositaram semana passada e NÃO voltaram esta semana</b> — R$89.9K perdidos. '+pLink('Rafael Barreto')+' (R$20K), '+pLink('Robisson Galvao')+' (R$18.3K).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Campanha 2 ondas: Onda 1 (hoje): push "Sentimos sua falta, [nome]! Bônus de R$50 esperando". Onda 2 (amanhã): email com free spins. Rafael e Robisson (>R$15K): contato direto via WhatsApp.<br><span style="color:var(--text3)">👥 '+pLink('Rafael Barreto')+' (R$20K) · '+pLink('Robisson Galvao')+' (R$18K) · '+pLink('Carlos Lopes')+' (R$10K) · '+pLink('Reginaldo Rocha')+' (R$10K) · '+pLink('Alexandre Lamana')+' (R$7.2K)</span>'});
-
-  var liveGt=CRM_X.gt.find(function(g){return g.t==='live'});
-  if(liveGt&&liveGt.ggr<0) insights.push({cat:'critical',html:'🃏 <b>Live Casino gerando PREJUÍZO — GGR -€'+Math.abs(liveGt.ggr).toFixed(0)+'</b>. Players vencem a casa em mesas ao vivo enquanto Slots gera +€'+fN(CRM_X.gt[0].ggr)+' de lucro.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Desabilitar wagering com bônus em mesas live. Verificar apostas opostas em roleta. Considerar limite máximo de aposta nas mesas problemáticas.'});
-
-  if(typeof UNIONE!=='undefined') insights.push({cat:'critical',html:'📧 <b>Taxa de abertura de email em 15.8% — abaixo da média do setor (20-25%)</b>. De 10.266 enviados, apenas 1.633 abriram. Clique: 0.6% (meta: 2-3%).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> 1) Revisar subject lines — testar emojis e urgência. 2) Enviar às 14h BRT (pico depósitos=15h). 3) Limpar lista: 955 falhas = 9.3% bounce (meta <5%). 4) Diversificar canais: push notification como backup.'});
-
-  insights.push({cat:'critical',html:'📈 <b>Depósitos esta semana +30% vs semana passada</b> — R$503K (3.132 deps) vs R$386K (2.488). Ticket médio R$144. Momentum positivo!<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Aproveitar momentum: campanha "Semana VIP" com benefícios escalonados. Quem depositou >R$500 → convite grupo VIP. Quem depositou <R$100 → push com match deposit.'});
-
-  insights.push({cat:'critical',html:'👑 <b>VIP #1 Luciana Maria Torres (R$97K lifetime, 143 deps) inativa há 16 dias</b>. Junto com '+pLink('Vanderlei Cesar')+' (R$82K, 12d) e '+pLink('Romario Basso')+' (R$46K, 16d).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Ligação pessoal do gerente VIP. Oferta exclusiva: cashback 15% + convite torneio. Custo bônus: ~R$2-5K. Retorno potencial se reativar: R$30-50K em depósitos.'});
-
-  // ═══ 10 OPPORTUNITY/MONITOR INSIGHTS ═══
-  insights.push({cat:'opportunity',html:'🕐 <b>Pico de depósitos às 15h BRT</b> (639 deps/mês) — Vale às 5h (66 deps). Diferença de 10x.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Agendar campanhas para 14h-15h BRT. Evitar envios entre 1h-7h. Configurar no Phoenix: Campaign schedule = 14:00 BRT.'});
-
-  insights.push({cat:'opportunity',html:'📬 <b>87% dos emails vão para Gmail</b> (9K de 10.4K). Hotmail=620, iCloud=153.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Otimizar para Gmail: SPF/DKIM/DMARC corretos (DKIM ativo). Monitorar Promotions vs Primary. Testar reputation via mail-tester.com. Backup: push + WhatsApp.'});
-
-  insights.push({cat:'opportunity',html:'💎 <b>Josiwelderson Philipe: R$38.4K depositado, inativo 35 dias</b> — 18 deps = player engajado que parou. Janela de win-back aberta.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Bônus "Volta garantida" 100% até R$1.000. Push + WhatsApp. Se não responder em 48h → ligar. Player vale ~R$2K/mês em GGR.'});
-
-  insights.push({cat:'opportunity',html:'🎮 <b>Marcos Vinicius Cruz: R$25.5K, 71 deps, inativo 87 dias</b> — Era quase diário. Churn completo.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Win-back agressivo (último recurso): SMS + email com oferta irrecusável. Investigar motivo: último jogo, último saque, reclamações. Se sacou grande valor pode ter "vencido" e parado.'});
-
-  insights.push({cat:'opportunity',html:'💰 <b>Ticket médio de depósito: R$144</b> (9.434 deps em 30d). Poucos high-rollers puxam a média.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Upsell para players R$50-100 regulares: "Deposite R$200 e ganhe 30% extra". Criar tiers visíveis: Bronze (R$100+) → Prata (R$500+) → Ouro (R$1K+) → VIP (R$5K+).'});
-
-  if(typeof ABANDON!=='undefined') insights.push({cat:'opportunity',html:'🛒 <b>PIX Abandonado: R$'+fN(ABANDON.summary.val_ab)+'</b> em PIX não pagos. '+ABANDON.summary.n_ab+' transações. Conv: '+ABANDON.summary.conv_rate+'%.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Lembrete 15min após PIX expirar: "Seu PIX de R$[valor] expirou. Gere novo e ganhe 10 free spins!". Priorizar PIX >R$500. Verificar problemas técnicos no fluxo.'});
-
-  if(typeof CRM_PH!=='undefined'){var ch=CRM_PH.seg.find(function(s){return s.s==='Churned'});if(ch) insights.push({cat:'opportunity',html:'📊 <b>'+fN(ch.n)+' jogadores Churned no Phoenix</b> — '+((ch.n/(CRM_PH.seg.reduce(function(a,c){return a+c.n},0))*100).toFixed(0))+'% da base. Ticket médio: R$'+fN(ch.av)+'.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Sub-grupos: a) 1 dep (volume) → email massa. b) >5 deps (valor) → campanha personalizada. c) VIP >R$5K → contato direto. Meta: reativar 5% = ~'+fN(Math.round(ch.n*0.05))+' players.'});}
-
-  if(typeof CRM_PH!=='undefined'&&CRM_PH.coh){var lc=CRM_PH.coh[CRM_PH.coh.length-1];insights.push({cat:'monitor',html:'📅 <b>Cohort Mar/26: '+fN(lc.f)+' FTDs, '+lc.p+'% redepositaram</b> — Nov/25 teve 66.8%. Mês ainda em andamento.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Monitorar semanalmente. Meta >35%. Se <25%, rever onboarding: welcome bonus, tutorial, primeiro jogo sugerido.'});}
-
-  insights.push({cat:'monitor',html:'🔍 <b>Kauan Antonio: 133 deps, R$19.7K, inativo 46d</b> — Heavy user que parou. Padrão similar a Wellerson (236 deps, 46d) e Marcos (71 deps, 87d).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Investigar: 3 heavy users churned simultaneamente pode indicar problema sistêmico (mudança de odds? Bug? Competidor?). Verificar reclamações no suporte.'});
-
-  insights.push({cat:'monitor',html:'📊 <b>Hoje 31/03: 135 depósitos, R$50.4K acumulado</b> — Semana encerra forte. Média semanal ~R$72K/dia.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Campanha "Último dia do mês" com bônus especial pode empurrar para cima. Monitorar se pico das 15h se mantém.'});
-
-  renderInsights(insights);
-  window._allInsights=insights;
+    DAILY_INSIGHTS.forEach(function(ins) {
+      var saved = savedStatuses[ins.id] || {};
+      var playerHtml = '';
+      if(ins.players && ins.players.length > 0) {
+        playerHtml = '<div style="margin-top:8px;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:6px;border:1px solid rgba(255,255,255,.06)">';
+        playerHtml += '<div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-weight:600">👥 JOGADORES ENVOLVIDOS:</div>';
+        ins.players.forEach(function(p) {
+          if(p.name) {
+            playerHtml += '<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:rgba(255,215,64,.08);border-radius:4px;font-size:10px">';
+            playerHtml += pLink(p.name);
+            if(p.total_dep) playerHtml += ' <span style="color:var(--green)">R$' + Math.round(p.total_dep).toLocaleString('pt-BR') + '</span>';
+            if(p.days_inactive) playerHtml += ' <span style="color:var(--red)">' + p.days_inactive + 'd</span>';
+            if(p.aff_name) playerHtml += ' <span style="color:var(--text3)">via ' + p.aff_name + '</span>';
+            if(p.game_style) playerHtml += ' <span style="color:var(--cyan)">' + p.game_style + '</span>';
+            playerHtml += '</span>';
+          }
+        });
+        playerHtml += '</div>';
+      }
+      missionData.push({
+        id: ins.id,
+        cat: ins.category,
+        priority: ins.priority,
+        title: ins.title,
+        desc: ins.description,
+        players: playerHtml,
+        action: ins.action,
+        how: ins.how,
+        impact: ins.impact,
+        status: saved.status || 'pending',
+        reason: saved.reason || ''
+      });
+    });
+  }
+  renderMissions(missionData);
+  window._allMissions = missionData;
 
   // ═══ PIX ABANDONADO / CARRINHO ═══
   if(typeof ABANDON!=='undefined'){
@@ -4804,29 +4833,114 @@ function renderCampaigns(){
   renderPixAnalysis();
 }
 var _uniChart=null;
-function renderInsights(ins){
-  var el=document.getElementById('crm-insights');if(!el)return;
-  var catColors={critical:'var(--red)',opportunity:'var(--gold)',monitor:'var(--cyan)'};
-  var catLabels={critical:'CRÍTICO',opportunity:'OPORTUNIDADE',monitor:'MONITORAR'};
-  var catIcons={critical:'🔴',opportunity:'💰',monitor:'👁️'};
-  var html='';
-  ins.forEach(function(item,i){
-    var c=item.cat||'monitor';
-    html+='<div class="insight-item" data-cat="'+c+'" style="padding:14px 16px;margin:8px 0;border-radius:10px;border-left:3px solid '+catColors[c]+';background:var(--bg2);transition:all .2s;cursor:default" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'var(--bg2)\'">';
-    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:9px;padding:2px 8px;border-radius:4px;background:'+catColors[c]+'22;color:'+catColors[c]+';font-weight:700">'+catIcons[c]+' '+catLabels[c]+'</span><span style="font-size:9px;color:var(--text3)">#'+(i+1)+'</span></div>';
-    html+='<div style="line-height:1.7;font-size:12px">'+item.html+'</div>';
-    html+='</div>';
-  });
-  el.innerHTML=html;
+function saveMissionStatus(id, status, reason) {
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem('jg_mission_statuses') || '{}'); } catch(e){}
+  saved[id] = {status: status, reason: reason || '', updatedAt: new Date().toISOString()};
+  localStorage.setItem('jg_mission_statuses', JSON.stringify(saved));
+  updateMissionCounters();
 }
-function filterInsights(cat,btn){
-  var tabs=btn.parentNode.querySelectorAll('.time-btn');
+
+function updateMissionCounters() {
+  var items = document.querySelectorAll('.mission-card');
+  var counts = {pending:0, in_progress:0, resolved:0, unresolved:0};
+  items.forEach(function(el) {
+    var s = el.getAttribute('data-status');
+    if(counts[s] !== undefined) counts[s]++;
+  });
+  var ce = document.getElementById('mission-counters');
+  if(ce) {
+    ce.innerHTML = '<span style="color:var(--red)">⏳ '+counts.pending+' Pendentes</span> · <span style="color:var(--gold)">🔄 '+counts.in_progress+' Em Andamento</span> · <span style="color:var(--green)">✅ '+counts.resolved+' Resolvidos</span>' + (counts.unresolved > 0 ? ' · <span style="color:#f44">❌ '+counts.unresolved+' Não Resolvidos</span>' : '');
+  }
+}
+
+function cycleMissionStatus(id, btn) {
+  var card = btn.closest('.mission-card');
+  var currentStatus = card.getAttribute('data-status');
+  var nextStatus, reason = '';
+  if(currentStatus === 'pending') {
+    nextStatus = 'in_progress';
+  } else if(currentStatus === 'in_progress') {
+    var choice = confirm('Missão resolvida com sucesso?\n\nOK = Resolvido\nCancelar = Não Resolvido');
+    if(choice) {
+      nextStatus = 'resolved';
+    } else {
+      reason = prompt('Por que não foi resolvido?', '') || 'Sem motivo informado';
+      nextStatus = 'unresolved';
+    }
+  } else if(currentStatus === 'resolved' || currentStatus === 'unresolved') {
+    nextStatus = 'pending';
+  }
+  card.setAttribute('data-status', nextStatus);
+  saveMissionStatus(id, nextStatus, reason);
+  var statusLabels = {pending:'▶ Iniciar Resolução', in_progress:'⏳ Solução em Andamento...', resolved:'✅ Resolvido', unresolved:'❌ Não Resolvido'};
+  var statusColors = {pending:'rgba(255,215,64,.15)', in_progress:'rgba(30,144,255,.2)', resolved:'rgba(14,165,90,.2)', unresolved:'rgba(244,67,54,.2)'};
+  var statusBorders = {pending:'var(--gold)', in_progress:'var(--blue)', resolved:'var(--green)', unresolved:'#f44'};
+  btn.textContent = statusLabels[nextStatus];
+  btn.style.background = statusColors[nextStatus];
+  btn.style.borderColor = statusBorders[nextStatus];
+  card.style.borderLeftColor = nextStatus === 'resolved' ? 'var(--green)' : nextStatus === 'unresolved' ? '#f44' : nextStatus === 'in_progress' ? 'var(--blue)' : card.getAttribute('data-origcolor');
+  var reasonEl = card.querySelector('.mission-reason');
+  if(reasonEl) {
+    reasonEl.style.display = nextStatus === 'unresolved' ? 'block' : 'none';
+    reasonEl.textContent = '💬 ' + reason;
+  }
+  card.style.opacity = (nextStatus === 'resolved') ? '0.5' : '1';
+  updateMissionCounters();
+}
+
+function renderMissions(missions) {
+  var el = document.getElementById('crm-insights');
+  if(!el) return;
+  var catColors = {critical:'var(--red)', opportunity:'var(--gold)', monitor:'var(--cyan)'};
+  var catLabels = {critical:'CRÍTICO', opportunity:'OPORTUNIDADE', monitor:'MONITORAR'};
+  var catIcons = {critical:'🔴', opportunity:'💰', monitor:'👁️'};
+  var statusLabels = {pending:'▶ Iniciar Resolução', in_progress:'⏳ Solução em Andamento...', resolved:'✅ Resolvido', unresolved:'❌ Não Resolvido'};
+  var statusColors = {pending:'rgba(255,215,64,.15)', in_progress:'rgba(30,144,255,.2)', resolved:'rgba(14,165,90,.2)', unresolved:'rgba(244,67,54,.2)'};
+  var statusBorders = {pending:'var(--gold)', in_progress:'var(--blue)', resolved:'var(--green)', unresolved:'#f44'};
+  var html = '';
+  missions.forEach(function(m, i) {
+    var c = m.cat || 'monitor';
+    var borderColor = m.status === 'resolved' ? 'var(--green)' : m.status === 'unresolved' ? '#f44' : m.status === 'in_progress' ? 'var(--blue)' : catColors[c];
+    var opacity = m.status === 'resolved' ? '0.5' : '1';
+    html += '<div class="mission-card" data-cat="'+c+'" data-status="'+m.status+'" data-origcolor="'+catColors[c]+'" style="padding:16px 18px;margin:10px 0;border-radius:12px;border-left:4px solid '+borderColor+';background:var(--bg2);transition:all .3s;opacity:'+opacity+'">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">';
+    html += '<span style="font-size:9px;padding:2px 8px;border-radius:4px;background:'+catColors[c]+'22;color:'+catColors[c]+';font-weight:700">'+catIcons[c]+' '+catLabels[c]+'</span>';
+    html += '<span style="font-size:9px;color:var(--text3);font-family:monospace">'+m.id+' · Prioridade #'+(i+1)+'</span>';
+    html += '</div>';
+    html += '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.4">'+m.title+'</div>';
+    html += '<div style="font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:8px">'+m.desc+'</div>';
+    if(m.players) html += m.players;
+    html += '<div style="margin-top:10px;padding:10px 12px;background:rgba(255,215,64,.04);border-radius:8px;border:1px solid rgba(255,215,64,.1)">';
+    html += '<div style="font-size:10px;font-weight:700;color:var(--gold);margin-bottom:4px">📋 AÇÃO RECOMENDADA:</div>';
+    html += '<div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:6px">'+m.action+'</div>';
+    html += '<div style="font-size:10px;font-weight:700;color:var(--cyan);margin-bottom:3px">🔧 COMO EXECUTAR:</div>';
+    html += '<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:6px">'+m.how+'</div>';
+    html += '<div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px">📊 IMPACTO ESPERADO:</div>';
+    html += '<div style="font-size:11px;color:var(--text2);line-height:1.5">'+m.impact+'</div>';
+    html += '</div>';
+    html += '<div style="margin-top:12px;display:flex;align-items:center;gap:10px">';
+    html += '<button onclick="cycleMissionStatus(\''+m.id+'\',this)" style="padding:8px 18px;border-radius:8px;border:1px solid '+statusBorders[m.status]+';background:'+statusColors[m.status]+';color:var(--text);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s">'+statusLabels[m.status]+'</button>';
+    html += '<div class="mission-reason" style="font-size:10px;color:#f44;display:'+(m.status==='unresolved'?'block':'none')+'">'+(m.reason ? '💬 '+m.reason : '')+'</div>';
+    html += '</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+  updateMissionCounters();
+}
+
+function filterInsights(cat, btn) {
+  var tabs = btn.parentNode.querySelectorAll('.time-btn');
   tabs.forEach(function(t){t.classList.remove('active')});
   btn.classList.add('active');
-  var items=document.querySelectorAll('.insight-item');
-  items.forEach(function(item){
-    if(cat==='all') item.style.display='block';
-    else item.style.display=item.getAttribute('data-cat')===cat?'block':'none';
+  var items = document.querySelectorAll('.mission-card');
+  items.forEach(function(item) {
+    if(cat === 'all') item.style.display = 'block';
+    else if(cat === 'pending' || cat === 'in_progress' || cat === 'resolved' || cat === 'unresolved') {
+      item.style.display = item.getAttribute('data-status') === cat ? 'block' : 'none';
+    } else {
+      item.style.display = item.getAttribute('data-cat') === cat ? 'block' : 'none';
+    }
   });
 }
 function renderUnioneEmail(){
