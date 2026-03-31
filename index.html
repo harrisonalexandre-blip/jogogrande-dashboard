@@ -2901,56 +2901,32 @@ function renderOverview(){
   const holdPct=totalVol>0?((k.cg+k.sg)/totalVol*100):0;
   const cliActive=(typeof CLI!=='undefined')?CLI.filter(c=>c.di<=7).length:0;
   const totalCli=(typeof CLI!=='undefined')?CLI.length:0;
-  // Redeposit Rate — % de jogadores que fizeram pelo menos 2 depósitos
-  // Lifetime: usa CRM_X.funnel (dep#2 / dep#1 = jogadores que voltaram)
-  // Períodos: filtra CLI por jogadores ativos no período (ld dentro do range)
-  const periodDates=data.map(d=>d.date);
-  const periodStart=periodDates.length>0?periodDates[0]:'';
-  const periodEnd=periodDates.length>0?periodDates[periodDates.length-1]:'';
+  // ═══ Redeposit Rate — % de jogadores que fizeram 2+ depósitos ═══
+  // Usa CRM_X.funnel (fonte: Phoenix player funnel) — métrica estrutural de retenção
+  // funnel[0].p = jogadores com 1+ dep (9552), funnel[1].p = jogadores com 2+ dep (3465)
   const isLifetime=(currentPeriod==='lifetime'||currentPeriod==='year');
   let redepRate=0, prevRedepRate=0;
-  let periodDepositors=0; // jogadores únicos que depositaram no período
   if(typeof CRM_X!=='undefined'&&CRM_X.funnel&&CRM_X.funnel.length>=2){
-    const funnelFTD=CRM_X.funnel[0].p; // 9552 jogadores com 1+ dep
-    const funnelRedep=CRM_X.funnel[1].p; // 3465 jogadores com 2+ dep
-    if(isLifetime){
-      redepRate=funnelFTD>0?(funnelRedep/funnelFTD*100):0;
-      periodDepositors=funnelFTD;
-    } else {
-      // Filtra CLI: jogadores cuja última atividade de depósito (ld) cai no período
-      if(typeof CLI!=='undefined'&&CLI.length>0){
-        const cliInPeriod=CLI.filter(c=>c.ld>=periodStart&&c.ld<=periodEnd);
-        const cliRedep=cliInPeriod.filter(c=>c.dc>1);
-        periodDepositors=cliInPeriod.length;
-        redepRate=cliInPeriod.length>0?(cliRedep.length/cliInPeriod.length*100):0;
-      }
-    }
+    redepRate=CRM_X.funnel[0].p>0?(CRM_X.funnel[1].p/CRM_X.funnel[0].p*100):0;
+    prevRedepRate=redepRate; // métrica estrutural do funil, estável entre períodos
   }
-  // Previous period redeposit (aproximação via CLI)
-  if(!isLifetime&&typeof CLI!=='undefined'&&CLI.length>0){
-    const prevDates=prevData.map(d=>d.date);
-    const prevStart=prevDates.length>0?prevDates[0]:'';
-    const prevEnd=prevDates.length>0?prevDates[prevDates.length-1]:'';
-    if(prevStart){
-      const prevCliInPeriod=CLI.filter(c=>c.ld>=prevStart&&c.ld<=prevEnd);
-      const prevCliRedep=prevCliInPeriod.filter(c=>c.dc>1);
-      prevRedepRate=prevCliInPeriod.length>0?(prevCliRedep.length/prevCliInPeriod.length*100):0;
-    }
-  }
-  // Dep/Player Médio — usa depositantes únicos reais
-  // Lifetime: CRM_X.funnel[0].p = total de jogadores que depositaram
-  // Períodos: CLI filtrado por ld no período (jogadores com última dep no range)
+  // ═══ Dep/Player Médio — depósitos por depositante único ═══
+  // Lifetime: CRM_X.funnel[0].p = 9.552 depositantes únicos
+  // Períodos: estima depositantes únicos via frequência média de depósitos
+  const funnelTotalDep=(typeof CRM_X!=='undefined'&&CRM_X.funnel&&CRM_X.funnel.length>0)?CRM_X.funnel[0].p:0;
+  const totalNdAll=D.reduce((a,d)=>a+(d.nd||0),0);
+  const avgDepsPerPlayer=funnelTotalDep>0?totalNdAll/funnelTotalDep:1;
   let depPlayerDenom=0;
-  if(isLifetime&&typeof CRM_X!=='undefined'&&CRM_X.funnel&&CRM_X.funnel.length>0){
-    depPlayerDenom=CRM_X.funnel[0].p; // 9552 depositantes únicos lifetime
-  } else if(periodDepositors>0){
-    depPlayerDenom=periodDepositors;
+  let depPlayerLabel='';
+  if(isLifetime&&funnelTotalDep>0){
+    depPlayerDenom=funnelTotalDep;
+    depPlayerLabel=`${fN(funnelTotalDep)} depositantes únicos`;
   } else {
-    // Fallback: usa ld do CLI se disponível, senão nd como proxy
-    if(typeof CLI!=='undefined'&&CLI.length>0){
-      depPlayerDenom=CLI.filter(c=>c.ld>=periodStart&&c.ld<=periodEnd).length;
-    }
-    if(depPlayerDenom===0) depPlayerDenom=k.nd>0?k.nd:1;
+    // Estimar únicos no período: proporção dos depósitos do período vs total
+    // Se o período tem X% dos depósitos totais, ~X% dos depositantes estiveram ativos
+    const estUnique=totalNdAll>0?Math.round(funnelTotalDep*(k.nd/totalNdAll)):k.nd;
+    depPlayerDenom=estUnique>0?estUnique:(k.nd>0?k.nd:1);
+    depPlayerLabel=`~${fN(depPlayerDenom)} depositantes est.`;
   }
   const depPerPlayer=depPlayerDenom>0?k.ds/depPlayerDenom:0;
   const marginCasino=k.c_to>0?(k.cg/k.c_to*100):0;
@@ -3000,8 +2976,8 @@ function renderOverview(){
     hold_pct:{i:svgI('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'),l:'Hold % (GGR/TO)',v:fP(holdPct),s:`GGR ${fR(k.cg+k.sg)} / TO ${fR(totalVol)}`,c:holdPct>5?'green':holdPct>2?'gold':'red',raw:holdPct,dlt:_d(holdPct,prevHoldPct)},
     bonus:{i:svgI('<path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><rect x="2" y="7" width="20" height="5" rx="2"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'),l:'Bônus Concedidos',v:fR(0),s:'bonus total',c:'purple',raw:0,dlt:''},
     uap:{i:svgI('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),l:'Jogadores Ativos (UAP)',v:fN(k.uap),s:`${fN(cliActive)} ativos ≤7d de ${fN(totalCli)}`,c:'blue',raw:k.uap,dlt:_d(k.uap,pk.uap)},
-    redep_rate:{i:svgI('<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36M20.49 15a9 9 0 0 1-14.85 3.36"/>'),l:'Redeposit Rate',v:fP(redepRate),s:isLifetime?`${fN(typeof CRM_X!=='undefined'&&CRM_X.funnel?CRM_X.funnel[1].p:0)} de ${fN(typeof CRM_X!=='undefined'&&CRM_X.funnel?CRM_X.funnel[0].p:0)} jogadores redepositaram`:`${fN(periodDepositors)} depositantes no período`,c:redepRate>30?'green':redepRate>15?'gold':'red',raw:redepRate,dlt:_d(redepRate,prevRedepRate)},
-    dep_player:{i:svgI('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),l:'Dep/Player Médio',v:fR(depPerPlayer),s:`${fN(depPlayerDenom)} depositantes únicos`,c:'gold',raw:depPerPlayer,dlt:_d(depPerPlayer,prevDepPerPlayer)},
+    redep_rate:{i:svgI('<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36M20.49 15a9 9 0 0 1-14.85 3.36"/>'),l:'Redeposit Rate',v:fP(redepRate),s:`${fN(funnelTotalDep>0?CRM_X.funnel[1].p:0)} de ${fN(funnelTotalDep)} jogadores redepositaram`,c:redepRate>30?'green':redepRate>15?'gold':'red',raw:redepRate,dlt:''},
+    dep_player:{i:svgI('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'),l:'Dep/Player Médio',v:fR(depPerPlayer),s:depPlayerLabel,c:'gold',raw:depPerPlayer,dlt:_d(depPerPlayer,prevDepPerPlayer)},
     margin_casino:{i:svgI('<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'),l:'Margem Casino %',v:fP(marginCasino),s:`GGR ${fR(k.cg)} / TO ${fR(k.c_to)}`,c:marginCasino>5?'green':marginCasino>2?'gold':'red',raw:marginCasino,dlt:_d(marginCasino,prevMarginCasino)},
     first_dep_avg:{i:svgI('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'),l:'1º Depósito Médio',v:fR(firstDepAvg),s:`${fN(k.ftd)} FTDs`,c:'green',raw:firstDepAvg,dlt:_d(firstDepAvg,prevFirstDepAvg)},
     saq_dep_ratio:{i:svgI('<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>'),l:'Saque/Depósito Ratio',v:(saqDepRatio).toFixed(2)+'x',s:saqDepRatio<0.8?'Saudável':saqDepRatio<1?'Atenção':'Crítico',c:saqDepRatio<0.8?'green':saqDepRatio<1?'gold':'red',raw:saqDepRatio,dlt:_d(saqDepRatio,prevSaqDepRatio,true)},
@@ -3958,37 +3934,69 @@ function rCRM(){
   ].map(k=>'<div class="crm-stat"><div class="lbl">'+k.l+'</div><div class="val" style="color:'+k.cl+'">'+k.v+'</div><div class="sub">'+k.s+'</div></div>').join('');
 
   // 1. Deposit Funnel Bar Chart — period-aware
-  var funnelLabels, funnelData, funnelColors;
+  var funnelLabels, funnelData, funnelColors, funnelMode;
   if(currentPeriod==='lifetime'){
+    funnelMode='lifetime';
     funnelLabels=fn.map(f=>'Dep #'+f.n);
     funnelData=fn.map(f=>f.p);
+    funnelColors=funnelLabels.map(function(l,i){return i===0?'rgba(14,165,90,.7)':i===1?'rgba(255,215,64,.7)':'rgba(68,136,255,.5)'});
   } else {
-    var depCounts={};
-    cliData.forEach(function(c){ var d=c.dc; depCounts[d]=(depCounts[d]||0)+1; });
-    var maxDep=Math.max.apply(null,Object.keys(depCounts).map(Number));
-    if(maxDep>22) maxDep=22;
-    funnelLabels=[]; funnelData=[];
-    for(var d=1;d<=maxDep;d++){ funnelLabels.push('Dep #'+d); funnelData.push(depCounts[d]||0); }
+    // FIX: c.dc é LIFETIME — usar D array (dados diários) com ftd/nd/nr reais do período
+    funnelMode='period';
+    var pData2=filteredData||[];
+    var pNR2=pData2.reduce(function(a,d){return a+(d.nr||0)},0);
+    var pFTD2=pData2.reduce(function(a,d){return a+(d.ftd||0)},0);
+    var pND2=pData2.reduce(function(a,d){return a+(d.nd||0)},0);
+    var pRedep2=pND2-pFTD2; if(pRedep2<0) pRedep2=0;
+    funnelLabels=['Registros','1\u00ba Dep\u00f3sito (FTD)','Deps Recorrentes','Total Dep\u00f3sitos'];
+    funnelData=[pNR2,pFTD2,pRedep2,pND2];
+    funnelColors=['rgba(68,136,255,.6)','rgba(14,165,90,.7)','rgba(255,215,64,.7)','rgba(187,134,252,.6)'];
   }
-  funnelColors=funnelLabels.map(function(l,i){return i===0?'rgba(14,165,90,.7)':i===1?'rgba(255,215,64,.7)':'rgba(68,136,255,.5)'});
   var funnelChart=mc('c-crm-funnel',{type:'bar',data:{labels:funnelLabels,datasets:[
-    {label:'Jogadores',data:funnelData,backgroundColor:funnelColors,borderRadius:5}
+    {label:funnelMode==='lifetime'?'Jogadores':'Quantidade',data:funnelData,backgroundColor:funnelColors,borderRadius:5}
   ]},options:{...CD,onClick:function(evt,items){
-    if(items.length>0){var idx=items[0].index;var depN=fn[idx].n;
-      var matches=(_cliFiltered||CLI).filter(function(c){return c.dc>=depN&&(depN===fn.length||c.dc<fn[Math.min(idx+1,fn.length-1)].n+1)});
-      if(depN<=fn.length){matches=(_cliFiltered||CLI).filter(function(c){return c.dc===depN});}
+    if(items.length>0){var idx=items[0].index;
+    if(funnelMode==='lifetime'){
+      var depN=fn[idx].n;
+      var matches=(_cliFiltered||CLI).filter(function(c){return c.dc===depN;});
       var html='<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center" onclick="this.remove()"><div style="background:#111;border:1px solid #1a1a1a;border-radius:12px;padding:24px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:800;color:#0EA55A">Jogadores com Dep #'+depN+' ('+matches.length+')</span><span style="cursor:pointer;color:#888;font-size:18px" onclick="this.closest(\'div[style*=fixed]\').remove()">✕</span></div><table style="width:100%;font-size:11px"><thead><tr><th style="text-align:left">Nome</th><th style="text-align:right">Dep Total</th><th style="text-align:right">NGR</th><th>Status</th></tr></thead><tbody>'+matches.sort(function(a,b){return b.dt-a.dt}).slice(0,100).map(function(c){return '<tr><td style="font-weight:600"><a href="https://bo365.work/clients?projectId=176&search='+encodeURIComponent(c.n.split(' ')[0])+'" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.2)" onmouseover="this.style.color=\'#FFD740\'" onmouseout="this.style.color=\'inherit\'">'+c.n+'</a></td><td style="text-align:right;color:#0EA55A">'+fR(c.dt)+'</td><td style="text-align:right;color:'+(c.ngr>=0?'#0EA55A':'#FF4444')+'">'+fR(c.ngr)+'</td><td style="font-size:10px">'+c.st2+'</td></tr>'}).join('')+'</tbody></table></div></div>';
       document.body.insertAdjacentHTML('beforeend',html);
-    }
+    } else {
+      var barLabel=funnelLabels[idx];var barVal=funnelData[idx];var detailRows='';
+      var pDts2=(filteredData||[]).map(function(d){return d.date}).sort();var pS2=pDts2[0]||'';var pE2=pDts2[pDts2.length-1]||'';
+      if(idx===0){detailRows='<div style="padding:20px;text-align:center;color:var(--text3)">'+fN(barVal)+' registros no período<br><span style="font-size:10px">Dados agregados diários — drill-down individual indisponível</span></div>';}
+      else if(idx===1){var newCli2=(_cliFiltered||CLI).filter(function(c){return c.fd>=pS2&&c.fd<=pE2});detailRows='<div style="margin-bottom:8px;font-size:11px;color:var(--text3)">'+fN(barVal)+' FTDs no período · '+newCli2.length+' no top '+CLI.length+'</div><table style="width:100%;font-size:11px"><thead><tr><th style="text-align:left">Nome</th><th style="text-align:right">Dep Total</th><th style="text-align:right">NGR</th><th>1º Dep</th></tr></thead><tbody>'+newCli2.sort(function(a,b){return b.dt-a.dt}).slice(0,100).map(function(c){return '<tr><td style="font-weight:600"><a href="https://bo365.work/clients?projectId=176&search='+encodeURIComponent(c.n.split(' ')[0])+'" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.2)" onmouseover="this.style.color=\'#FFD740\'" onmouseout="this.style.color=\'inherit\'">'+c.n+'</a></td><td style="text-align:right;color:#0EA55A">'+fR(c.dt)+'</td><td style="text-align:right;color:'+(c.ngr>=0?'#0EA55A':'#FF4444')+'">'+fR(c.ngr)+'</td><td style="font-size:10px;color:var(--text3)">'+c.fd+'</td></tr>'}).join('')+'</tbody></table>';}
+      else if(idx===2){var retCli2=(_cliFiltered||CLI).filter(function(c){return c.fd<pS2&&c.ld>=pS2&&c.dc>1});detailRows='<div style="margin-bottom:8px;font-size:11px;color:var(--text3)">'+fN(barVal)+' deps recorrentes · '+retCli2.length+' retornaram (top '+CLI.length+')</div><table style="width:100%;font-size:11px"><thead><tr><th style="text-align:left">Nome</th><th style="text-align:right">Dep Total</th><th style="text-align:right">NGR</th><th>Deps Life</th></tr></thead><tbody>'+retCli2.sort(function(a,b){return b.dt-a.dt}).slice(0,100).map(function(c){return '<tr><td style="font-weight:600"><a href="https://bo365.work/clients?projectId=176&search='+encodeURIComponent(c.n.split(' ')[0])+'" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.2)" onmouseover="this.style.color=\'#FFD740\'" onmouseout="this.style.color=\'inherit\'">'+c.n+'</a></td><td style="text-align:right;color:#0EA55A">'+fR(c.dt)+'</td><td style="text-align:right;color:'+(c.ngr>=0?'#0EA55A':'#FF4444')+'">'+fR(c.ngr)+'</td><td style="text-align:center;font-weight:700;color:var(--gold)">'+c.dc+'</td></tr>'}).join('')+'</tbody></table>';}
+      else{detailRows='<div style="padding:20px;text-align:center;color:var(--text3)">'+fN(barVal)+' depósitos totais no período<br><span style="font-size:10px">= '+fN(funnelData[1])+' FTDs + '+fN(funnelData[2])+' recorrentes</span></div>';}
+      var html='<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center" onclick="this.remove()"><div style="background:#111;border:1px solid #1a1a1a;border-radius:12px;padding:24px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:800;color:#0EA55A">'+barLabel+' — '+fN(barVal)+'</span><span style="cursor:pointer;color:#888;font-size:18px" onclick="this.closest(\'div[style*=fixed]\').remove()">✕</span></div>'+detailRows+'</div></div>';
+      document.body.insertAdjacentHTML('beforeend',html);
+    }}
   },plugins:{...CD.plugins,tooltip:{callbacks:{afterLabel:function(ctx){
-    if(ctx.dataIndex>0){var prev=funnelData[ctx.dataIndex-1];return 'Conv: '+(prev>0?Math.round(ctx.raw/prev*100):0)+'%';}return '';
+    if(funnelMode==='lifetime'&&ctx.dataIndex>0){var prev=funnelData[ctx.dataIndex-1];return 'Conv: '+(prev>0?Math.round(ctx.raw/prev*100):0)+'%';}
+    if(funnelMode==='period'){if(ctx.dataIndex===1&&funnelData[0]>0)return 'Conv NR→FTD: '+Math.round(ctx.raw/funnelData[0]*100)+'%';if(ctx.dataIndex===2&&funnelData[1]>0)return 'Taxa recorrência: '+Math.round(ctx.raw/(ctx.raw+funnelData[1])*100)+'%';}
+    return '';
   }}}},scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fN(v)}}}}});
 
-  // 2. Deposit Segmentation Doughnut
+  // 2. Deposit Segmentation Doughnut — period-aware
+  var doughLabels, doughData, doughColors;
+  if(currentPeriod==='lifetime'){
+    doughLabels=['1 depósito ('+fN(oneDep.length)+')','2 depósitos ('+fN(twoDep.length)+')','3-5 depósitos ('+fN(threePlus.length)+')','6+ depósitos ('+fN(sixPlus.length)+')'];
+    doughData=[oneDep.length,twoDep.length,threePlus.length,sixPlus.length];
+    doughColors=['rgba(255,68,68,.6)','rgba(255,215,64,.6)','rgba(68,136,255,.5)','rgba(14,165,90,.7)'];
+  } else {
+    // Período: mostrar Novos vs Recorrentes (c.dc é lifetime, não serve para segmentar por período)
+    var dpDts=filteredData?filteredData.map(function(d){return d.date}).sort():[];
+    var dpS=dpDts[0]||'';var dpE=dpDts[dpDts.length-1]||'';
+    var dNovos=cliData.filter(function(c){return c.fd>=dpS&&c.fd<=dpE});
+    var dRetornaram=cliData.filter(function(c){return c.fd<dpS&&c.ld>=dpS});
+    doughLabels=['Novos no período ('+fN(dNovos.length)+')','Retornaram no período ('+fN(dRetornaram.length)+')'];
+    doughData=[dNovos.length,dRetornaram.length];
+    doughColors=['rgba(14,165,90,.7)','rgba(68,136,255,.6)'];
+  }
   mc('c-crm-dep-seg',{type:'doughnut',data:{
-    labels:['1 depósito ('+fN(oneDep.length)+')','2 depósitos ('+fN(twoDep.length)+')','3-5 depósitos ('+fN(threePlus.length)+')','6+ depósitos ('+fN(sixPlus.length)+')'],
-    datasets:[{data:[oneDep.length,twoDep.length,threePlus.length,sixPlus.length],
-      backgroundColor:['rgba(255,68,68,.6)','rgba(255,215,64,.6)','rgba(68,136,255,.5)','rgba(14,165,90,.7)'],borderWidth:2}]},
+    labels:doughLabels,
+    datasets:[{data:doughData,
+      backgroundColor:doughColors,borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'#888',usePointStyle:true,font:{size:11}}}}}});
 
   // 3. Redeposit Opportunities — use REDEP (full DigiToPay dataset, 500 top leads)
