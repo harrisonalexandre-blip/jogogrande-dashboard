@@ -3535,8 +3535,10 @@ function rCRM(){
     periodTag='Total';
   } else {
     var pData=filteredData||[];
+    // FTDs from daily data
     pFTD=pData.reduce(function(a,d){return a+(d.ftd||0)},0);
-    pRedep=pData.reduce(function(a,d){return a+(d.fda||0)},0);
+    // Redepositors = clients with 2+ deposits active in the period
+    pRedep=cliData.filter(function(c){return c.dc>=2}).length;
     periodTag='No Período';
   }
   pConv=pFTD>0?Math.round(pRedep/pFTD*100):0;
