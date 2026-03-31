@@ -1037,10 +1037,12 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
     <a class="sheets-btn" href="https://docs.google.com/spreadsheets/d/1ccyDzg1dGVwXkhZWN04eXVBrAobq0JvBNAH9Xp8fyhg/edit" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>Google Sheets</a>
     <div class="sheets-btn" onclick="toggleBacklog()" style="cursor:pointer;position:relative"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px;vertical-align:text-bottom"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path d="M9 7h6M9 11h6M9 15h6"></path></svg>Backlog <span id="bk-count" style="background:var(--green);color:#000;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:800;margin-left:2px">0</span></div>
     <span class="upd" id="upd"></span>
+    <div id="sync-status" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"></div>
     <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema claro/escuro">
       <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
     </button>
+    <div style="flex:1"></div>
     <div class="user-badge" id="user-badge" onclick="doLogout()" title="Clique para sair" style="display:none">
       <span id="user-name-badge">—</span>
       <span class="role-chip" id="user-role-badge">—</span>
@@ -1821,7 +1823,10 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 
 <!-- Header com timestamp e KPIs de topo -->
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-  <p class="sec" style="margin:0">Google Analytics · JogoGrande</p>
+  <div style="display:flex;align-items:center;gap:10px">
+    <p class="sec" style="margin:0">Google Analytics · JogoGrande</p>
+    <span id="ga-period-badge" style="font-size:10px;font-weight:700;color:var(--gold);background:rgba(255,215,64,.12);border:1px solid rgba(255,215,64,.3);border-radius:12px;padding:2px 10px;white-space:nowrap">Período</span>
+  </div>
   <span style="font-size:10px;color:var(--text3)">Att: 27/03/2026 <span id="ga-updated"></span></span>
 </div>
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="ga-top-kpis"></div>
@@ -4070,36 +4075,34 @@ function renderCrmGameRankings(){
 
 
 function rAnalytics(){
-  // ── Timestamp ──
+  // ── Timestamp + Badge de período ──
   var upd=document.getElementById('ga-updated');
   if(upd)upd.textContent=new Date(GA.updated).toLocaleDateString('pt-BR')+' '+new Date(GA.updated).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  var badge=document.getElementById('ga-period-badge');
+  if(badge)badge.textContent='📅 '+getPeriodLabel(currentPeriod);
 
-  // ── Calcular Phoenix 28d para funil ──
-  var today=new Date();
-  var cutoff28=new Date(today-28*864e5);
-  var d28=D.filter(function(d){return new Date(d.date)>=cutoff28;});
-  var p28Regs=d28.reduce(function(a,d){return a+(d.nr||0);},0);
-  var p28FTD=d28.reduce(function(a,d){return a+(d.ftd||0);},0);
-  // Redeposit: jogadores únicos que fizeram 2º+ depósito
-  // nd = total deposit transactions; uap = unique active players que depositaram
-  // Taxa de redeposit = (nd - ftd) / nd para quem voltou
-  var p28NdTotal=d28.reduce(function(a,d){return a+(d.nd||0);},0);
-  var p28Uap=d28.reduce(function(a,d){return a+(d.uap||0);},0);
-  // Jogadores recorrentes = uap - ftd (quem depositou mas não era FTD = já havia depositado antes)
-  // Usamos taxa média dos dados: redeposit players ≈ nd_total - ftd (transações secundárias)
-  // Para mostrar no funil como "depositantes recorrentes únicos": estimamos ~63% dos FTDs voltam
+  // ── Calcular Phoenix para período selecionado ──
+  var dPeriod=filteredData; // usa dados do período global (atualizado por setTime())
+  var nDays=Math.max(1,dPeriod.length);
+  var pPeriodLabel=getPeriodLabel(currentPeriod);
+  var p28Regs=dPeriod.reduce(function(a,d){return a+(d.nr||0);},0);
+  var p28FTD=dPeriod.reduce(function(a,d){return a+(d.ftd||0);},0);
+  var p28NdTotal=dPeriod.reduce(function(a,d){return a+(d.nd||0);},0);
+  var p28Uap=dPeriod.reduce(function(a,d){return a+(d.uap||0);},0);
   var p28Redep=Math.round(p28FTD*0.63);
-  // Verificação pelo nd: se nd >> ftd, ajustar para max realista
   if(p28NdTotal>0&&p28FTD>0){var ndRatio=p28NdTotal/p28FTD;if(ndRatio<1.3)p28Redep=Math.round(p28FTD*0.3);}
-  // GA 28d sessions estimate (GA.ov.users = usuários únicos 28d)
-  var gaUsers28=GA.ov.users||32000;
-  var gaSess28=Math.round(gaUsers28*1.42); // sessions ~ 1.42x users (from 90d ratio: 152736/~107k)
+  // GA4: escalar proporcionalmente ao período (GA.ov.users é base 28d)
+  var gaUsersBase=GA.ov.users||32000;
+  var gaUsers28=(currentPeriod==='lifetime'||currentPeriod==='year')
+    ?Math.round(gaUsersBase*D.length/28)
+    :Math.round(gaUsersBase*nDays/28);
+  var gaSess28=Math.round(gaUsers28*1.42);
 
   // ── TOP KPIs (4 cards compactos) ──
   var topKpis=[
-    {icon:'👁️',v:fN(gaUsers28),l:'Usuários Únicos (28d)',s:(GA.summary30d.activeUsersGrowth>0?'▲':'▼')+Math.abs(GA.summary30d.activeUsersGrowth)+'% vs mês anterior',c:GA.summary30d.activeUsersGrowth>=0?'var(--green)':'var(--red)'},
+    {icon:'👁️',v:fN(gaUsers28),l:'Usuários Únicos · '+pPeriodLabel,s:(GA.summary30d.activeUsersGrowth>0?'▲':'▼')+Math.abs(GA.summary30d.activeUsersGrowth)+'% vs mês anterior (GA4)',c:GA.summary30d.activeUsersGrowth>=0?'var(--green)':'var(--red)'},
     {icon:'🔗',v:GA.ov.engTime,l:'Tempo Médio Sessão',s:'Engajamento por sessão: '+GA.trafficTotal.avgSec+'s',c:'var(--cyan)'},
-    {icon:'💰',v:'R$ '+fN(Math.round(GA.ov.revenue/1000))+'k',l:'Receita Atribuída (28d)',s:'R$ '+fN(Math.round(GA.trafficTotal.rev/1000))+'k nos 90d',c:'var(--green)'},
+    {icon:'💰',v:'R$ '+fN(Math.round(GA.ov.revenue/1000))+'k',l:'Receita Atribuída (GA4 28d)',s:'Receita acumulada 90d: R$ '+fN(Math.round(GA.trafficTotal.rev/1000))+'k',c:'var(--green)'},
     {icon:'🛒',v:GA.buyer.rate+'%',l:'Taxa Comprador (7d)',s:(GA.buyer.rateGrowth>0?'▲':'▼')+Math.abs(GA.buyer.rateGrowth)+'% vs anterior · '+fN(GA.summary30d.purchases)+' compras (30d)',c:GA.buyer.rateGrowth>=0?'var(--green)':'var(--gold)'}
   ];
   document.getElementById('ga-top-kpis').innerHTML=topKpis.map(function(k){
@@ -4108,10 +4111,10 @@ function rAnalytics(){
 
   // ── FUNIL PRINCIPAL ──
   var funnelSteps=[
-    {label:'SESSÕES',sub:'Usuários únicos · 28d (GA4)',v:gaUsers28,icon:'👁️',color:'#3B82F6'},
-    {label:'CADASTROS',sub:'Novos registros · Phoenix 28d',v:p28Regs,icon:'📋',color:'#10B981'},
-    {label:'FTDs',sub:'1º Depósito · Phoenix 28d',v:p28FTD,icon:'💳',color:'#F59E0B'},
-    {label:'REDEPOSITS',sub:'Redeposit estimado · 28d',v:p28Redep,icon:'🔄',color:'#8B5CF6'}
+    {label:'SESSÕES',sub:'Usuários únicos · '+pPeriodLabel+' (GA4 estimado)',v:gaUsers28,icon:'👁️',color:'#3B82F6'},
+    {label:'CADASTROS',sub:'Novos registros · Phoenix · '+pPeriodLabel,v:p28Regs,icon:'📋',color:'#10B981'},
+    {label:'FTDs',sub:'1º Depósito · Phoenix · '+pPeriodLabel,v:p28FTD,icon:'💳',color:'#F59E0B'},
+    {label:'REDEPOSITS',sub:'Redeposit estimado · '+pPeriodLabel,v:p28Redep,icon:'🔄',color:'#8B5CF6'}
   ];
   var maxV=funnelSteps[0].v||1;
   for(var i=1;i<funnelSteps.length;i++){
