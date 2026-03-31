@@ -3532,22 +3532,23 @@ function rCRM(){
   if(currentPeriod==='lifetime'){
     pFTD=fn1?fn1.p:0;
     pRedep=fn2?fn2.p:0;
+    pConv=pFTD>0?Math.round(pRedep/pFTD*100):0;
     periodTag='Total';
   } else {
     var pData=filteredData||[];
-    // FTDs from daily data
     pFTD=pData.reduce(function(a,d){return a+(d.ftd||0)},0);
-    // Redepositors = clients with 2+ deposits active in the period
-    pRedep=cliData.filter(function(c){return c.dc>=2}).length;
+    var pND=pData.reduce(function(a,d){return a+(d.nd||0)},0);
+    pRedep=pND-pFTD;
+    if(pRedep<0) pRedep=0;
+    pConv=pND>0?Math.round(pRedep/pND*100):0;
     periodTag='No Período';
   }
-  pConv=pFTD>0?Math.round(pRedep/pFTD*100):0;
 
   // KPIs
   document.getElementById('crm-kpis').innerHTML=[
-    {v:fN(pFTD),l:'1º Depósito',s:periodTag+' de FTDs',cl:'var(--green)'},
-    {v:fN(pRedep),l:'2º Depósito',s:pConv+'% redeposit rate',cl:'var(--gold)'},
-    {v:pConv+'%',l:'Taxa Redepósito',s:fN(pRedep)+' de '+fN(pFTD)+' voltaram',cl:pConv>=30?'var(--green)':'var(--gold)'},
+    {v:fN(pFTD),l:'1º Depósito (FTD)',s:periodTag+(currentPeriod==='lifetime'?' · todos os dados':' · novos jogadores'),cl:'var(--green)'},
+    {v:fN(pRedep),l:'Dep. Recorrentes',s:currentPeriod==='lifetime'?(pConv+'% redeposit rate'):(fN(pRedep)+' de '+(pRedep+pFTD)+' deps totais'),cl:'var(--gold)'},
+    {v:pConv+'%',l:'Taxa Recorrência',s:currentPeriod==='lifetime'?(fN(pRedep)+' de '+fN(pFTD)+' voltaram'):(fN(pFTD)+' novos + '+fN(pRedep)+' recorrentes'),cl:pConv>=30?'var(--green)':'var(--gold)'},
     {v:fN(hots.length),l:'Ativos (≤7d)',s:fP(hots.length/CLI.length*100)+' engajados',cl:'var(--green)'},
     {v:fR(totalNGR),l:'NGR Total ('+cliLabel+')',s:'Ticket médio: '+fR(cliData.reduce((a,c)=>a+c.dt,0)/(cliData.reduce((a,c)=>a+c.dc,0)||1)),cl:'var(--cyan)'},
     {v:fN(vips.length)+' VIP · '+fN(highs.length)+' High',l:'Tiers Premium · '+cliData.length+' clientes',s:fR(vips.reduce((a,c)=>a+c.dt,0))+' em dep VIP',cl:'var(--purple)'},
