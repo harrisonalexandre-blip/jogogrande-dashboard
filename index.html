@@ -4271,28 +4271,56 @@ function rCRM(){
   // 13. Game rankings by type
   renderCrmGameRankings();
 
-  // 14. Auto Insights
+  // 14. Auto Insights — REAL DATA from Phoenix DB
   var insights=[];
-  // Redeposit opportunity
-  var redep1=cliData.filter(c=>c.dc===1&&c.di<=7);
-  if(redep1.length>0) insights.push('🔥 <b>'+redep1.length+' jogadores fizeram apenas 1 depósito nos últimos 7 dias</b> — oportunidade imediata de redepósito. Valor total depositado: '+fR(redep1.reduce((a,c)=>a+c.dt,0)));
-  // Conversion rate
-  if(fn1&&fn2) insights.push('📊 Taxa de redepósito geral: <b style="color:var(--gold)">'+pConv+'%</b> — de '+fN(fn1.p)+' FTDs, apenas '+fN(fn2.p)+' voltaram para o 2º depósito');
-  // VIP at risk
-  var vipRisk=cliData.filter(c=>c.tr==='VIP'&&(c.st2==='warm'||c.st2==='cold'));
-  if(vipRisk.length>0) insights.push('⚠️ <b>'+vipRisk.length+' VIPs em risco</b> (mornos/frios) com '+fR(vipRisk.reduce((a,c)=>a+c.dt,0))+' em depósitos — ação urgente');
-  // Live casino losing
-  var liveGt=CRM_X.gt.find(g=>g.t==='live');
-  if(liveGt&&liveGt.ggr<0) insights.push('🃏 <b>Live Casino está gerando PREJUÍZO</b> — GGR '+fR(liveGt.ggr*rate)+'. Considerar limites ou revisar regras');
-  // Best game type
-  var bestGt=CRM_X.gt[0];
-  if(bestGt) insights.push('🎰 Tipo mais lucrativo: <b>'+bestGt.t.charAt(0).toUpperCase()+bestGt.t.slice(1)+'</b> com GGR '+fR(bestGt.ggr*rate)+' ('+bestGt.gc+' jogos, '+fN(bestGt.uap)+' jogadores)');
-  // High deposit single players
-  var bigOneDep=cliData.filter(c=>c.dc===1&&c.dt>=1000).sort((a,b)=>b.dt-a.dt);
-  if(bigOneDep.length>0) insights.push('💎 <b>'+bigOneDep.length+' jogadores com depósito >R$1k</b> que nunca voltaram — maior oportunidade: '+bigOneDep[0].n.substring(0,20)+' ('+fR(bigOneDep[0].dt)+')');
-  // Winning players
-  var winners=cliData.filter(c=>c.ngr<-1000);
-  if(winners.length>0) insights.push('🏆 <b>'+winners.length+' jogadores com ganho >R$1k</b> — total pago: '+fR(Math.abs(winners.reduce((a,c)=>a+c.ngr,0)))+'. Monitorar limites');
+  var phxLink='https://bo365.work/clients?projectId=176&search=';
+  function pLink(nm){return '<a href="'+phxLink+encodeURIComponent(nm.split(' ')[0])+'" target="_blank" style="color:var(--gold);text-decoration:none;border-bottom:1px dashed var(--gold)">'+nm+'</a>'}
+
+  // ═══ 10 CRITICAL INSIGHTS ═══
+  insights.push({cat:'critical',html:'🚨 <b>5 VIPs CHURNED com R$272K em depósitos totais</b> — Inativos entre 44 e 84 dias. Maior: '+pLink('Marcelo Torres')+' (R$84.2K, 44d sem jogar).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Campanha de win-back personalizada via WhatsApp/ligação. Oferecer bônus exclusivo de retorno (100% até R$500). Priorizar: Marcelo (R$84K) → Wellerson (R$54K) → Adriano (R$50K) → Inara (R$42K) → Ian (R$41K).<br><span style="color:var(--text3)">👥 '+['Marcelo Torres (R$84K,44d)','Wellerson Matheus (R$54K,46d)','Adriano Campelo (R$50K,84d)','Inara Souza (R$42K,48d)','Ian Victor (R$41K,60d)'].map(function(s){return pLink(s.split(' (')[0])+' <span style="font-size:10px">('+s.split('(')[1]+'</span>'}).join(' · ')+'</span>'});
+
+  insights.push({cat:'critical',html:'💸 <b>Victoria Da Silva sacou R$44K tendo depositado R$17.2K</b> — Net payout de +R$26.8K nos últimos 30 dias.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Revisar atividade no Phoenix BO. Verificar abuso de bônus ou apostas de baixo risco (apostas opostas em roleta). Considerar ajuste de limites de saque.<br><span style="color:var(--text3)">👥 Top 5 net payout: '+pLink('Victoria Da Silva')+' (+R$26.8K) · '+pLink('Gilmar Gomes')+' (+R$17.3K) · '+pLink('Joeslei Ferreira')+' (+R$12K) · '+pLink('Francisco Teixeira')+' (+R$10.6K) · '+pLink('Guilherme Olivio')+' (+R$9.3K)</span>'});
+
+  insights.push({cat:'critical',html:'⏰ <b>4 high-rollers esfriando — R$185K depositados nos últimos 14d mas pararam</b>. '+pLink('Sebastiao Bastos')+' (R$72.4K, parou há 3d) e '+pLink('Jailson Maximo')+' (R$68.4K, 5d).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Push notification HOJE às 20h com mensagem personalizada. Para Sebastiao e Jailson: cashback 10% no próximo depósito. Para '+pLink('Maria Aparecida')+': free spins nos slots favoritos. Janela: 48h antes de virarem "mornos".<br><span style="color:var(--text3)">👥 '+pLink('Sebastiao Bastos')+' (R$72K,3d) · '+pLink('Jailson Maximo')+' (R$68K,5d) · '+pLink('Maria Aparecida')+' (R$24K,5d) · '+pLink('Marlene Ferreira')+' (R$21K,7d)</span>'});
+
+  insights.push({cat:'critical',html:'📉 <b>Taxa de redepósito geral: 36.2%</b> — De 9.942 depositantes, apenas 3.603 voltaram para o 2º depósito. 63.8% deposita uma vez e abandona.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Implementar automação de boas-vindas: email + push 24h após FTD com bônus de redepósito ("Deposite novamente e ganhe 50% até R$100"). Players >R$100 devem receber WhatsApp. Configurar no Phoenix: Campaign > Reactivation > trigger "1 dep, 1d inactive".'});
+
+  insights.push({cat:'critical',html:'🔥 <b>629 jogadores fizeram apenas 1 depósito nos últimos 7 dias</b> — Volume total R$75.8K. Top: '+pLink('Rosangela Oliveira')+' (R$8K), '+pLink('Victor De Sa')+' (R$7K), '+pLink('Marcelo Moraes')+' (R$5K).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> URGENTE: janela ideal de conversão (primeiras 72h). Disparar push+email com bônus 2º depósito. Os 15 com FTD >R$500: contato direto via WhatsApp. Meta: converter 20% = +126 redepositantes.<br><span style="color:var(--text3)">👥 Top 5: '+pLink('Rosangela Oliveira')+' (R$8K) · '+pLink('Victor De Sa')+' (R$7K) · '+pLink('Marcelo Moraes')+' (R$5K) · '+pLink('Diogo Dantas')+' (R$4K) · '+pLink('Robson Alves')+' (R$2K)</span>'});
+
+  insights.push({cat:'critical',html:'🔄 <b>10+ players de alto valor depositaram semana passada e NÃO voltaram esta semana</b> — R$89.9K perdidos. '+pLink('Rafael Barreto')+' (R$20K), '+pLink('Robisson Galvao')+' (R$18.3K).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Campanha 2 ondas: Onda 1 (hoje): push "Sentimos sua falta, [nome]! Bônus de R$50 esperando". Onda 2 (amanhã): email com free spins. Rafael e Robisson (>R$15K): contato direto via WhatsApp.<br><span style="color:var(--text3)">👥 '+pLink('Rafael Barreto')+' (R$20K) · '+pLink('Robisson Galvao')+' (R$18K) · '+pLink('Carlos Lopes')+' (R$10K) · '+pLink('Reginaldo Rocha')+' (R$10K) · '+pLink('Alexandre Lamana')+' (R$7.2K)</span>'});
+
+  var liveGt=CRM_X.gt.find(function(g){return g.t==='live'});
+  if(liveGt&&liveGt.ggr<0) insights.push({cat:'critical',html:'🃏 <b>Live Casino gerando PREJUÍZO — GGR -€'+Math.abs(liveGt.ggr).toFixed(0)+'</b>. Players vencem a casa em mesas ao vivo enquanto Slots gera +€'+fN(CRM_X.gt[0].ggr)+' de lucro.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Desabilitar wagering com bônus em mesas live. Verificar apostas opostas em roleta. Considerar limite máximo de aposta nas mesas problemáticas.'});
+
+  if(typeof UNIONE!=='undefined') insights.push({cat:'critical',html:'📧 <b>Taxa de abertura de email em 15.8% — abaixo da média do setor (20-25%)</b>. De 10.266 enviados, apenas 1.633 abriram. Clique: 0.6% (meta: 2-3%).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> 1) Revisar subject lines — testar emojis e urgência. 2) Enviar às 14h BRT (pico depósitos=15h). 3) Limpar lista: 955 falhas = 9.3% bounce (meta <5%). 4) Diversificar canais: push notification como backup.'});
+
+  insights.push({cat:'critical',html:'📈 <b>Depósitos esta semana +30% vs semana passada</b> — R$503K (3.132 deps) vs R$386K (2.488). Ticket médio R$144. Momentum positivo!<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Aproveitar momentum: campanha "Semana VIP" com benefícios escalonados. Quem depositou >R$500 → convite grupo VIP. Quem depositou <R$100 → push com match deposit.'});
+
+  insights.push({cat:'critical',html:'👑 <b>VIP #1 Luciana Maria Torres (R$97K lifetime, 143 deps) inativa há 16 dias</b>. Junto com '+pLink('Vanderlei Cesar')+' (R$82K, 12d) e '+pLink('Romario Basso')+' (R$46K, 16d).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Ligação pessoal do gerente VIP. Oferta exclusiva: cashback 15% + convite torneio. Custo bônus: ~R$2-5K. Retorno potencial se reativar: R$30-50K em depósitos.'});
+
+  // ═══ 10 OPPORTUNITY/MONITOR INSIGHTS ═══
+  insights.push({cat:'opportunity',html:'🕐 <b>Pico de depósitos às 15h BRT</b> (639 deps/mês) — Vale às 5h (66 deps). Diferença de 10x.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Agendar campanhas para 14h-15h BRT. Evitar envios entre 1h-7h. Configurar no Phoenix: Campaign schedule = 14:00 BRT.'});
+
+  insights.push({cat:'opportunity',html:'📬 <b>87% dos emails vão para Gmail</b> (9K de 10.4K). Hotmail=620, iCloud=153.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Otimizar para Gmail: SPF/DKIM/DMARC corretos (DKIM ativo). Monitorar Promotions vs Primary. Testar reputation via mail-tester.com. Backup: push + WhatsApp.'});
+
+  insights.push({cat:'opportunity',html:'💎 <b>Josiwelderson Philipe: R$38.4K depositado, inativo 35 dias</b> — 18 deps = player engajado que parou. Janela de win-back aberta.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Bônus "Volta garantida" 100% até R$1.000. Push + WhatsApp. Se não responder em 48h → ligar. Player vale ~R$2K/mês em GGR.'});
+
+  insights.push({cat:'opportunity',html:'🎮 <b>Marcos Vinicius Cruz: R$25.5K, 71 deps, inativo 87 dias</b> — Era quase diário. Churn completo.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Win-back agressivo (último recurso): SMS + email com oferta irrecusável. Investigar motivo: último jogo, último saque, reclamações. Se sacou grande valor pode ter "vencido" e parado.'});
+
+  insights.push({cat:'opportunity',html:'💰 <b>Ticket médio de depósito: R$144</b> (9.434 deps em 30d). Poucos high-rollers puxam a média.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Upsell para players R$50-100 regulares: "Deposite R$200 e ganhe 30% extra". Criar tiers visíveis: Bronze (R$100+) → Prata (R$500+) → Ouro (R$1K+) → VIP (R$5K+).'});
+
+  if(typeof ABANDON!=='undefined') insights.push({cat:'opportunity',html:'🛒 <b>PIX Abandonado: R$'+fN(ABANDON.summary.val_ab)+'</b> em PIX não pagos. '+ABANDON.summary.n_ab+' transações. Conv: '+ABANDON.summary.conv_rate+'%.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Lembrete 15min após PIX expirar: "Seu PIX de R$[valor] expirou. Gere novo e ganhe 10 free spins!". Priorizar PIX >R$500. Verificar problemas técnicos no fluxo.'});
+
+  if(typeof CRM_PH!=='undefined'){var ch=CRM_PH.seg.find(function(s){return s.s==='Churned'});if(ch) insights.push({cat:'opportunity',html:'📊 <b>'+fN(ch.n)+' jogadores Churned no Phoenix</b> — '+((ch.n/(CRM_PH.seg.reduce(function(a,c){return a+c.n},0))*100).toFixed(0))+'% da base. Ticket médio: R$'+fN(ch.av)+'.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Sub-grupos: a) 1 dep (volume) → email massa. b) >5 deps (valor) → campanha personalizada. c) VIP >R$5K → contato direto. Meta: reativar 5% = ~'+fN(Math.round(ch.n*0.05))+' players.'});}
+
+  if(typeof CRM_PH!=='undefined'&&CRM_PH.coh){var lc=CRM_PH.coh[CRM_PH.coh.length-1];insights.push({cat:'monitor',html:'📅 <b>Cohort Mar/26: '+fN(lc.f)+' FTDs, '+lc.p+'% redepositaram</b> — Nov/25 teve 66.8%. Mês ainda em andamento.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Monitorar semanalmente. Meta >35%. Se <25%, rever onboarding: welcome bonus, tutorial, primeiro jogo sugerido.'});}
+
+  insights.push({cat:'monitor',html:'🔍 <b>Kauan Antonio: 133 deps, R$19.7K, inativo 46d</b> — Heavy user que parou. Padrão similar a Wellerson (236 deps, 46d) e Marcos (71 deps, 87d).<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Investigar: 3 heavy users churned simultaneamente pode indicar problema sistêmico (mudança de odds? Bug? Competidor?). Verificar reclamações no suporte.'});
+
+  insights.push({cat:'monitor',html:'📊 <b>Hoje 31/03: 135 depósitos, R$50.4K acumulado</b> — Semana encerra forte. Média semanal ~R$72K/dia.<br><span style="color:var(--cyan)">📋 AÇÃO:</span> Campanha "Último dia do mês" com bônus especial pode empurrar para cima. Monitorar se pico das 15h se mantém.'});
+
+  renderInsights(insights);
+  window._allInsights=insights;
 
   // ═══ PIX ABANDONADO / CARRINHO ═══
   if(typeof ABANDON!=='undefined'){
@@ -4374,7 +4402,7 @@ function rCRM(){
     document.getElementById('abandon-clients').innerHTML=atH;
   }
 
-  document.getElementById('crm-insights').innerHTML=insights.map(i=>'<div style="padding:6px 0;border-bottom:1px solid var(--border)">'+i+'</div>').join('');
+  // insights now rendered via renderInsights()
 
   // Cohort Table
   if(typeof CRM_PH!=='undefined'&&CRM_PH.coh){
@@ -4585,6 +4613,31 @@ function renderCampaigns(){
   renderPixAnalysis();
 }
 var _uniChart=null;
+function renderInsights(ins){
+  var el=document.getElementById('crm-insights');if(!el)return;
+  var catColors={critical:'var(--red)',opportunity:'var(--gold)',monitor:'var(--cyan)'};
+  var catLabels={critical:'CRÍTICO',opportunity:'OPORTUNIDADE',monitor:'MONITORAR'};
+  var catIcons={critical:'🔴',opportunity:'💰',monitor:'👁️'};
+  var html='';
+  ins.forEach(function(item,i){
+    var c=item.cat||'monitor';
+    html+='<div class="insight-item" data-cat="'+c+'" style="padding:14px 16px;margin:8px 0;border-radius:10px;border-left:3px solid '+catColors[c]+';background:var(--bg2);transition:all .2s;cursor:default" onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\'var(--bg2)\'">';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:9px;padding:2px 8px;border-radius:4px;background:'+catColors[c]+'22;color:'+catColors[c]+';font-weight:700">'+catIcons[c]+' '+catLabels[c]+'</span><span style="font-size:9px;color:var(--text3)">#'+(i+1)+'</span></div>';
+    html+='<div style="line-height:1.7;font-size:12px">'+item.html+'</div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+function filterInsights(cat,btn){
+  var tabs=btn.parentNode.querySelectorAll('.time-btn');
+  tabs.forEach(function(t){t.classList.remove('active')});
+  btn.classList.add('active');
+  var items=document.querySelectorAll('.insight-item');
+  items.forEach(function(item){
+    if(cat==='all') item.style.display='block';
+    else item.style.display=item.getAttribute('data-cat')===cat?'block':'none';
+  });
+}
 function renderUnioneEmail(){
   if(typeof UNIONE==='undefined')return;
   var ut=UNIONE.totals,ur=UNIONE.rates;
