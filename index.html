@@ -5,13 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jogo Grande — Dashboard BI</title>
 <!-- Microsoft Clarity -->
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "w4jbyjsybg");
-</script>
+<!-- Clarity tag removida do BI — deve ser instalada em www.jogogrand.com -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -32,7 +26,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .logo-area{display:flex;align-items:center;gap:12px}
 .logo-text h1{font-size:20px;font-weight:900;color:var(--green);letter-spacing:2px}
 .logo-text span{font-size:10px;color:var(--text2);letter-spacing:3px;text-transform:uppercase}
-.hdr-r{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hdr-r{display:flex;align-items:center;gap:14px;flex-wrap:wrap;flex:1}
 .rate-badge{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px}
 .rate-badge .cur{color:var(--green);font-weight:800}
 .sheets-btn{background:var(--greenA);border:1px solid rgba(14,165,90,.3);color:var(--green);padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;transition:.2s;cursor:pointer}
@@ -7185,6 +7179,51 @@ function bootDashboard(){
   applyRoleAccess(CURRENT_USER.role);
   const n=new Date();
   document.getElementById('upd').textContent=n.toLocaleDateString('pt-BR')+' '+n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  // Sync status por fonte
+  (function(){
+    var ss=document.getElementById('sync-status');
+    if(!ss)return;
+    function fmtSync(isoOrDate){
+      if(!isoOrDate)return '—';
+      var d=new Date(isoOrDate);
+      if(isNaN(d))return isoOrDate;
+      return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    }
+    function ago(isoOrDate){
+      if(!isoOrDate)return '';
+      var d=new Date(isoOrDate);
+      if(isNaN(d))return '';
+      var diff=Math.floor((Date.now()-d.getTime())/60000);
+      if(diff<1)return 'agora';
+      if(diff<60)return diff+'min';
+      if(diff<1440)return Math.floor(diff/60)+'h';
+      return Math.floor(diff/1440)+'d';
+    }
+    function pill(label,color,ts){
+      var a=ago(ts);
+      var dotColor=a&&(a==='agora'||a.endsWith('min')||a.endsWith('h')&&parseInt(a)<6)?color:'#f59e0b';
+      if(a.endsWith('d'))dotColor='#ef4444';
+      return '<div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:3px 8px;border-radius:6px;font-size:10px;color:var(--text3)" title="'+label+': '+fmtSync(ts)+'">'
+        +'<span style="width:6px;height:6px;border-radius:50%;background:'+dotColor+'"></span>'
+        +label+' <span style="color:var(--text2);font-weight:600">'+a+'</span></div>';
+    }
+    // Smartico (AFF.syncAt)
+    var smSync=(typeof AFF!=='undefined'&&AFF.syncAt)?AFF.syncAt:null;
+    // Phoenix (D array — last date entry)
+    var phSync=null;
+    if(typeof D!=='undefined'&&D.length>0){
+      var lastD=D[D.length-1];
+      phSync=lastD.date+'T23:59:00';
+    }
+    // DigiToPay (RECON — last date entry)
+    var dtpSync=null;
+    if(typeof RECON!=='undefined'&&RECON.length>0){
+      var maxRd='';
+      for(var i=0;i<RECON.length;i++){if(RECON[i].d>maxRd)maxRd=RECON[i].d;}
+      if(maxRd)dtpSync=maxRd+'T23:59:00';
+    }
+    ss.innerHTML=pill('Smartico','#0ea55a',smSync)+pill('Phoenix','#3b82f6',phSync)+pill('DTP','#a855f7',dtpSync);
+  })();
   if(CURRENT_USER.role==='crm'){
     RD['crm']=true; rCRM();
   } else {
