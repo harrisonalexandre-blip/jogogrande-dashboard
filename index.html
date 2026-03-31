@@ -93,6 +93,9 @@ body.sb-open .hdr{margin-left:0}
 .time-btn{padding:5px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text2);transition:.2s;letter-spacing:.3px;white-space:nowrap}
 .time-btn:hover{border-color:rgba(14,165,90,.3);color:var(--text)}
 .time-btn.active{background:var(--greenA);border-color:var(--green);color:var(--green)}
+#period-select:hover{border-color:rgba(14,165,90,.5);color:var(--text)}
+#period-select:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(14,165,90,.15);outline:none}
+#period-select option{background:var(--bg2);color:var(--text);font-weight:600}
 /* KPIs */
 .kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;transition:.2s;text-align:center}
@@ -1013,15 +1016,18 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
     <img src="https://d1nxk8io3iz4ej.cloudfront.net/cms/icons/f8836d75-7a52-4ccf-ab9e-06795d794282-81.svg" alt="Jogo Grande" height="40" style="margin-right:4px">
     <span style="font-size:10px;color:var(--text2);letter-spacing:3px;text-transform:uppercase">Business Intelligence Dashboard</span>
   </div>
-  <div class="time-bar" id="global-time-bar">
-    <div class="time-btn active" onclick="setTime('today',this)">Hoje</div>
-    <div class="time-btn" onclick="setTime('yesterday',this)">Ontem</div>
-    <div class="time-btn" onclick="setTime('week',this)">Esta Semana</div>
-    <div class="time-btn" onclick="setTime('month',this)">Este Mês</div>
-    <div class="time-btn" onclick="setTime('year',this)">2026</div>
-    <div class="time-btn" onclick="setTime('lifetime',this)">Life Time</div>
-    <div class="time-btn" onclick="toggleCustomPeriod(this)" id="btn-custom">📅 Personalizado</div>
-    <div id="custom-period" style="display:none;align-items:center;gap:6px;margin-left:4px">
+  <div id="global-time-bar" style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <select id="period-select" onchange="onPeriodSelect(this)"
+      style="background:var(--card);border:1.5px solid var(--border);color:var(--text);padding:6px 30px 6px 12px;border-radius:10px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;min-width:140px;transition:.2s;letter-spacing:.3px">
+      <option value="today">📅 Hoje</option>
+      <option value="yesterday">📅 Ontem</option>
+      <option value="week">📅 Esta Semana</option>
+      <option value="month">📅 Este Mês</option>
+      <option value="year">📅 2026</option>
+      <option value="lifetime">📅 Life Time</option>
+      <option value="custom">📅 Personalizado</option>
+    </select>
+    <div id="custom-period" style="display:none;align-items:center;gap:6px">
       <input type="date" id="date-from" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:11px;font-family:inherit">
       <span style="color:var(--text3);font-size:10px">até</span>
       <input type="date" id="date-to" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:11px;font-family:inherit">
@@ -2564,8 +2570,22 @@ function getPeriodLabel(period){
   }
 }
 
+function onPeriodSelect(sel){
+  var period=sel.value;
+  var cp=document.getElementById('custom-period');
+  if(period==='custom'){
+    if(cp){cp.style.display='flex';}
+  } else {
+    if(cp)cp.style.display='none';
+    setTime(period,null);
+  }
+}
 function setTime(period,el){
   currentPeriod=period;
+  // Sync select element
+  var ps=document.getElementById('period-select');
+  if(ps&&ps.value!==period)ps.value=period;
+  // Legacy: keep .active on any remaining time-btn elements
   document.querySelectorAll('.time-btn').forEach(function(b){b.classList.remove('active')});
   if(el)el.classList.add('active');
   // Esconder date picker se outro período
