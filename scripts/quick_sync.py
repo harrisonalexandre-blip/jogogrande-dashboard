@@ -24,8 +24,7 @@ def api(p):
 
 def short(r):
     return {'rg':int(r.get('registration_count',0)),'ftd':int(r.get('ftd_count',0)),
-        'dc':int(r.get('deposit_count',0)),'da':r.get('deposit_total',0),
-        'wa':r.get('withdrawal_total',0),'np':r.get('net_pl',0),
+        'dc':int(r.get('deposit_count',0)),'da':r.get('deposit_total',0),        'wa':r.get('withdrawal_total',0),'np':r.get('net_pl',0),
         'cm':r.get('commissions_total',0),'vol':r.get('volume',0),
         'ops':int(r.get('operations',0)),'vc':int(r.get('visit_count',0))}
 
@@ -54,7 +53,6 @@ def agg(data, kfn):
 
 # ---- MAIN ----
 print(f"=== QUICK SYNC (incremental: {YESTERDAY} → {TODAY}) ===")
-
 # Read existing AFF from index.html
 with open('/tmp/jogogrande-dashboard/index.html','r') as f:
     html = f.read()
@@ -82,7 +80,6 @@ print(f"   → {len(AFF['days'])} days total")
 
 # 2. UPDATE AFFDAYS (only today + yesterday)
 print("2. affDays (today+yesterday)...")
-# Get name mapping from existing affs
 nm = {a.get('n',''): a.get('n','') for a in AFF.get('affs',[])}
 raw = api({'aggregation_period':'DAY','group_by':'affiliate_id','date_from':YESTERDAY,'date_to':TMR})
 tmp = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
@@ -126,7 +123,6 @@ print("4. current week...")
 from datetime import date as dt_date
 iso = dt_date.today().isocalendar()
 cur_week = f"{iso[0]}-W{iso[1]:02d}"
-# Get days of current week
 week_start = dt_date.today() - timedelta(days=dt_date.today().weekday())
 raw = api({'aggregation_period':'DAY','date_from':week_start.isoformat(),'date_to':TMR})
 wa = defaultdict(lambda: defaultdict(float))
@@ -198,58 +194,71 @@ try:
     sm_ftd = int(sm_totals['ftd_count'])
     sm_vol = round(sm_totals['volume'], 2)
 
-    # Find today's entry in D[] and update nr, ftd, c_to (volume as proxy)
-    # Only update if Phoenix hasn't already provided data (cg=0 means no Phoenix yet)
+    sm_ngr = round(sm_totals.get('net_pl', 0), 2)
+    sm_fda = round(sm_totals.get('ftd_total', 0), 2)
+    sm_cg = sm_totals.get('net_pl_casino', 0) or 0
+    sm_sg = sm_totals.get('net_pl_sport', 0) or 0
+    sm_dep = round(sm_totals.get('deposit_total', 0), 2)
+    sm_wa = round(sm_totals.get('withdrawal_total', 0), 2)
     d_match = re.search(r'\{[^}]*"date":\s*"' + re.escape(TODAY) + r'"[^}]*\}', html)
     if d_match:
         d_str = d_match.group()
         d_obj = json.loads(d_str)
-
-        # Only fill if Phoenix/Superset hasn't arrived (c_po=0 means no consolidated data yet)
-        if abs(d_obj.get('c_po', 0)) < 1:
-            d_obj['nr'] = sm_nr
-            d_obj['ftd'] = sm_ftd
-            d_obj['c_to'] = sm_vol  # Smartico volume as casino turnover proxy
-            d_obj['fda'] = round(sm_totals.get('ftd_total', 0), 2)  # FTD Amount
-            # Smartico net_pl = NGR total (casino+sport breakdown not available)
-            sm_ngr = round(sm_totals.get('net_pl', 0), 2)
-            d_obj['ngr'] = sm_ngr
-            # If casino/sport breakdown available use it, otherwise attribute all to casino
-            sm_cg = sm_totals.get('net_pl_casino', 0) or 0
-            sm_sg = sm_totals.get('net_pl_sport', 0) or 0
-            if abs(sm_cg) > 0 or abs(sm_sg) > 0:
-                d_obj['cg'] = round(sm_cg, 2)
-                d_obj['sg'] = round(sm_sg, 2)
-            else:
-                d_obj['cg'] = sm_ngr  # All NGR attributed to casino (main vertical)
-                d_obj['sg'] = 0
-            new_d = json.dumps(d_obj, separators=(',',': '))
-            html = html.replace(d_str, new_d, 1)
-            sm_fda = round(sm_totals.get('ftd_total', 0), 2)
-            print(f"   → D[{TODAY}]: nr={sm_nr}, ftd={sm_ftd}, vol=R${sm_vol:,.2f}, fda=R${sm_fda:,.2f}, ngr=R${sm_ngr:,.2f}")
-        else:
-            print(f"   → D[{TODAY}]: Phoenix/Superset data present (c_po={d_obj.get('c_po',0)}), skipping Smartico fill")
     else:
-        print(f"   → D[{TODAY}]: entry not found in D[]")
+        # Criar entrada nova para hoje baseada no template do último dia
+        d_all = re.search(r'D=(\[.*?\]);\s*\n', html, re.DOTALL)
+        if not d_all: d_all = re.search(r'D=(\[.*?\]);', html, re.DOTALL)
+        D_arr = json.loads(d_all.group(1))
+        last = D_arr[-1]
+        td = datetime.strptime(TODAY, '%Y-%m-%d')
+        d_obj = {k: 0 for k in last.keys()}
+        d_obj['date'] = TODAY
+        d_obj['df'] = td.strftime('%d/%m')
+        d_obj['month'] = td.strftime('%Y-%m')
+        d_obj['wk'] = f"{td.isocalendar()[0]}-W{td.isocalendar()[1]:02d}"
+        d_obj['yr'] = str(td.year)
+        d_obj['ml'] = td.strftime('%b/%y')
+        d_str = None  # flag: nova entrada
+        print(f"   → D[{TODAY}]: criando nova entrada")
+
+    # Only fill if Phoenix/Superset hasn't arrived (c_po=0 means no consolidated data yet)
+    if abs(d_obj.get('c_po', 0)) < 1:
+        d_obj['nr'] = sm_nr
+        d_obj['ftd'] = sm_ftd
+        d_obj['c_to'] = sm_vol
+        d_obj['fda'] = sm_fda
+        d_obj['ngr'] = sm_ngr
+        d_obj['ds'] = sm_dep
+        d_obj['ws'] = sm_wa
+        d_obj['nc'] = round(sm_dep - sm_wa, 2)
+        if abs(sm_cg) > 0 or abs(sm_sg) > 0:
+            d_obj['cg'] = round(sm_cg, 2)
+            d_obj['sg'] = round(sm_sg, 2)
+        else:
+            d_obj['cg'] = sm_ngr
+            d_obj['sg'] = 0
+        new_d = json.dumps(d_obj, separators=(',',': '))
+        if d_str:
+            html = html.replace(d_str, new_d, 1)
+        else:
+            html = re.sub(r'(D=\[.*?)(];)', lambda m: m.group(1) + ',' + new_d + m.group(2), html, count=1, flags=re.DOTALL)
+        print(f"   → D[{TODAY}]: nr={sm_nr}, ftd={sm_ftd}, dep=R${sm_dep:,.2f}, saq=R${sm_wa:,.2f}, vol=R${sm_vol:,.2f}, fda=R${sm_fda:,.2f}, ngr=R${sm_ngr:,.2f}")
+    else:
+        print(f"   → D[{TODAY}]: Phoenix/Superset data present (c_po={d_obj.get('c_po',0)}), skipping Smartico fill")
 except Exception as e:
     print(f"   D[] today skip: {e}")
 
 # === 7. UPDATE HOURLY ===
-# Smartico hourly API tem lag ~12h: dados só disponíveis até hora 11-12 UTC.
-# Estratégia: tenta API HOUR primeiro; se os dados cobrem < hora_atual - 2,
-# redistribui o total diário (Step 6, mais atual) pelas horas completadas.
 print("7. HOURLY (por hora)...")
 try:
-    cur_brt_hour = datetime.now().hour  # hora local BRT
+    cur_brt_hour = datetime.now().hour or 1  # meia-noite → trata como h1 para ter ao menos 1 barra
 
-    # Pega totais diários do Step 6 (mais atuais que a API horária)
     try:
         daily_nr  = sm_nr
         daily_ftd_v = sm_ftd
         daily_vol_v = sm_vol
     except NameError:
         daily_nr = daily_ftd_v = daily_vol_v = 0
-
     # Tenta API horária
     raw_h = api({'aggregation_period':'HOUR','date_from':TODAY,'date_to':TMR})
     hr_regs = [0]*24
@@ -267,25 +276,33 @@ try:
             hr_ftd[hour]  += int(r.get('ftd_count', 0) or 0)
             hr_vol[hour]  += float(r.get('volume', 0) or 0)
 
-    # Detecta lag: última hora com dado vs hora atual
+    # Detecta lag ou dt=all (sem horas reais)
     last_h = max((h for h in range(24) if hr_regs[h] > 0), default=-1)
-    lagged = last_h >= 0 and last_h < cur_brt_hour - 2 and daily_nr > 0 and cur_brt_hour > 0
+    needs_redistribute = daily_nr > 0 and cur_brt_hour > 0 and (
+        last_h == -1 or  # API retornou dt=all sem horas reais
+        (last_h >= 0 and last_h < cur_brt_hour - 2)  # lag detectado
+    )
 
-    if lagged:
-        # Redistribui totais diários proporcionalmente usando shape das horas disponíveis
-        shape = [hr_regs[h] if h <= last_h else hr_regs[h % max(last_h,1)] for h in range(cur_brt_hour)]
-        shape = [max(s, 1) for s in shape]  # garante peso mínimo por hora
-        w_sum = sum(shape)
+    if needs_redistribute:
+        hrs = max(cur_brt_hour, 1)
         hr_regs_new = [0]*24
         hr_ftd_new  = [0]*24
         hr_vol_new  = [0.0]*24
-        for h in range(cur_brt_hour):
+        if last_h >= 0:
+            shape = [hr_regs[h] if h <= last_h else hr_regs[h % max(last_h,1)] for h in range(hrs)]
+            shape = [max(s, 1) for s in shape]
+        else:
+            # Sem dados horários: distribui uniforme
+            shape = [1]*hrs
+        w_sum = sum(shape)
+        for h in range(hrs):
             frac = shape[h] / w_sum
             hr_regs_new[h] = round(daily_nr  * frac)
             hr_ftd_new[h]  = round(daily_ftd_v * frac)
             hr_vol_new[h]  = round(daily_vol_v * frac, 2)
         hr_regs, hr_ftd, hr_vol = hr_regs_new, hr_ftd_new, hr_vol_new
-        print(f"   → HOURLY: lag detectado (dados até h{last_h}, atual h{cur_brt_hour}) — redistribuído {daily_nr} NR por {cur_brt_hour}h")
+        mode = "uniforme" if last_h == -1 else f"proporcional (dados até h{last_h})"
+        print(f"   → HOURLY: redistribuído {daily_nr} NR por {hrs}h ({mode})")
     else:
         hr_vol = [round(v, 2) for v in hr_vol]
         filled = sum(1 for v in hr_regs if v > 0)
