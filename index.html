@@ -3854,12 +3854,17 @@ function renderCampaigns(){
   var types={};
   PHX_CAMPS.forEach(function(c){types[c.type]=(types[c.type]||0)+1});
 
-  document.getElementById('campaign-kpis').innerHTML=[
-    {v:active.length,l:'Campanhas Ativas',s:'On Schedule agora',cl:'var(--green)'},
-    {v:done.length,l:'Campanhas Finalizadas',s:'Concluídas com sucesso',cl:'var(--gold)'},
-    {v:total,l:'Total Campanhas',s:'Phoenix CRM · Projeto 176',cl:'var(--cyan)'},
-    {v:Object.keys(types).length,l:'Tipos Diferentes',s:Object.entries(types).map(function(e){return e[0]+': '+e[1]}).join(', '),cl:'var(--purple)'}
-  ].map(function(k){return '<div class="crm-stat"><div class="lbl">'+k.l+'</div><div class="val" style="color:'+k.cl+'">'+k.v+'</div><div class="sub">'+k.s+'</div></div>'}).join('');
+  var kpis=[
+    {v:active.length,l:'Campanhas Ativas',s:'On Schedule · Phoenix CRM',cl:'var(--green)'},
+    {v:done.length,l:'Finalizadas',s:'Concluídas com sucesso',cl:'var(--gold)'},
+    {v:total,l:'Total Campanhas',s:'Projeto 176 · JogoGrande',cl:'var(--cyan)'}
+  ];
+  if(typeof SMS_STATS!=='undefined'){
+    kpis.push({v:fN(SMS_STATS.attempts),l:'SMS Enviados',s:'MessageWhiz · DLR '+SMS_STATS.dlr+'%',cl:'#89b4fa'});
+    kpis.push({v:fN(SMS_STATS.delivered),l:'SMS Entregues',s:SMS_STATS.dlr+'% taxa de entrega',cl:'var(--green)'});
+    kpis.push({v:'$'+SMS_STATS.balance,l:'Saldo SMS',s:'Custo total: $'+SMS_STATS.cost,cl:SMS_STATS.balance<10?'var(--red)':'var(--gold)'});
+  }
+  document.getElementById('campaign-kpis').innerHTML=kpis.map(function(k){return '<div class="crm-stat"><div class="lbl">'+k.l+'</div><div class="val" style="color:'+k.cl+'">'+k.v+'</div><div class="sub">'+k.s+'</div></div>'}).join('');
 
   // Active campaigns
   var actH='';
