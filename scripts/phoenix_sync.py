@@ -331,9 +331,26 @@ for row in rows:
 
     if dt_str in d_map:
         idx = d_map[dt_str]
-        # Preserve any fields not in our update
-        for k, v in entry.items():
-            D[idx][k] = v
+        existing = D[idx]
+
+        # If Phoenix has NO casino data for this day but existing does,
+        # preserve the original casino fields (Smartico data for NOV-JAN)
+        CASINO_KEYS = {'c_to', 'c_po', 'cg', 'c_uap', 'c_sc', 'c_bon'}
+        phoenix_has_casino = float(c_to) > 0 or float(c_ggr) != 0
+        existing_has_casino = existing.get('cg', 0) != 0 or existing.get('c_to', 0) > 0
+
+        if not phoenix_has_casino and existing_has_casino:
+            # Keep existing casino + ngr, only update non-casino fields
+            for k, v in entry.items():
+                if k not in CASINO_KEYS and k != 'ngr' and k != 'uap':
+                    existing[k] = v
+            # Recalc NGR = existing casino GGR + new sports GGR
+            existing['ngr'] = round(existing.get('cg', 0) + float(sb_ggr), 2)
+            existing['uap'] = existing.get('c_uap', 0) + int(sb_uap)
+        else:
+            for k, v in entry.items():
+                existing[k] = v
+
         updated += 1
     else:
         D.append(entry)
