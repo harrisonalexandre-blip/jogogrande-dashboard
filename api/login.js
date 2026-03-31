@@ -8,7 +8,7 @@ const INITIAL_USERS = [
     email: 'harrisonwash@gmail.com',
     name: 'Harrison',
     role: 'admin',
-    hash: 'b3afe5cde3c9f37be2fdae37f8ddcf11cd7464bda3cdd73d0d2c7645fd3b4551'
+    hash: '4a771bc48602bf916c408cd14ac2db0506acb0e51242417de97c32822a7e0179'
   }
 ];
 
