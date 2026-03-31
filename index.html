@@ -1082,21 +1082,9 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 <!-- DigiToPay Resumo Real-Time (today only) -->
 <div id="ov-hourly" style="display:none">
 <div class="cg cg3h" style="gap:12px">
-  <div class="cb" style="padding:16px">
-    <div class="ct" style="font-size:11px;margin-bottom:10px"><span class="dot g"></span>DigiToPay · Depósitos Hoje <span style="color:var(--text3);font-size:9px;font-weight:400;margin-left:6px">Fonte: DTP (real-time)</span></div>
-    <div id="dtp-today-dep" style="display:flex;align-items:baseline;gap:10px"><span style="font-size:28px;font-weight:900;color:var(--green)" id="dtp-dep-val">—</span><span style="font-size:11px;color:var(--text3)" id="dtp-dep-n"></span></div>
-  </div>
-  <div class="cb" style="padding:16px">
-    <div class="ct" style="font-size:11px;margin-bottom:10px"><span class="dot r"></span>DigiToPay · Saques Hoje <span style="color:var(--text3);font-size:9px;font-weight:400;margin-left:6px">Fonte: DTP (real-time)</span></div>
-    <div id="dtp-today-saq" style="display:flex;align-items:baseline;gap:10px"><span style="font-size:28px;font-weight:900;color:var(--red)" id="dtp-saq-val">—</span><span style="font-size:11px;color:var(--text3)" id="dtp-saq-n"></span></div>
-  </div>
-  <div class="cb" style="padding:16px">
-    <div class="ct" style="font-size:11px;margin-bottom:10px"><span class="dot c"></span>DigiToPay · NetCash Hoje <span style="color:var(--text3);font-size:9px;font-weight:400;margin-left:6px">Dep - Saques</span></div>
-    <div id="dtp-today-nc" style="display:flex;align-items:baseline;gap:10px"><span style="font-size:28px;font-weight:900" id="dtp-nc-val">—</span><span style="font-size:11px;color:var(--text3)" id="dtp-nc-pct"></span></div>
-  </div>
-</div>
-<div style="padding:4px 0 0;display:flex;align-items:center;gap:6px">
-  <span style="font-size:10px;color:var(--text3)">⚠ Smartico fecha dados às 21h BRT · DigiToPay = fonte de verdade financeira · Dados por hora indisponíveis na API Smartico</span>
+  <div class="cb" style="padding:14px 16px"><div class="ct" style="font-size:11px;margin-bottom:10px"><span class="dot b"></span>Cadastros por Hora</div><div class="hourly-chart" id="hc-regs"></div><div class="hourly-labels" id="hl-regs"></div></div>
+  <div class="cb" style="padding:14px 16px"><div class="ct" style="font-size:11px;margin-bottom:10px"><span class="dot g"></span>FTD por Hora</div><div class="hourly-chart" id="hc-ftd"></div><div class="hourly-labels" id="hl-ftd"></div></div>
+  <div class="cb" style="padding:14px 16px"><div class="ct" style="font-size:11px;margin-bottom:10px"><span class="dot gl"></span>Turnover por Hora</div><div class="hourly-chart" id="hc-vol"></div><div class="hourly-labels" id="hl-vol"></div></div>
 </div>
 </div>
 
@@ -2779,45 +2767,45 @@ function renderOrganic(data){
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{stacked:true,ticks:{color:'#888',font:{size:9}}},y:{stacked:true,ticks:{color:'#888',callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
 }
 
-// ═══ DTP FINANCIAL SUMMARY (replaces fake hourly charts) ═══
+// ═══ HOURLY BAR CHARTS (24h breakdown) ═══
 function renderHourlyCharts(){
-  var fd=filteredData&&filteredData.length?filteredData:D.slice(-1);
-  var dates=new Set(fd.map(function(d){return d.date}));
-  var depVal=0,saqVal=0,depN=0,saqN=0,dtpDays=0,phxDays=0;
+  const now=new Date();
+  const curHour=now.getHours();
+  const todayStr=localDateStr(now);
+  const isCurrentDay=(HOURLY.date===todayStr);
 
-  // Aggregate RECON (DTP source of truth) for filtered period
-  if(typeof RECON!=='undefined'&&RECON.length){
-    RECON.forEach(function(r){
-      if(dates.has(r.d)&&(r.dtp_dep>0||r.dtp_saq>0)){
-        depVal+=(r.dtp_dep||0);saqVal+=(r.dtp_saq||0)-(r.dtp_mi||0);
-        depN+=(r.dtp_dep_n||0);saqN+=(r.dtp_saq_n||0);dtpDays++;
-      }
-    });
-  }
-  // For days without DTP data, fill from Phoenix D[]
-  fd.forEach(function(d){
-    var hasRecon=typeof RECON!=='undefined'&&RECON.some(function(r){return r.d===d.date&&(r.dtp_dep>0||r.dtp_saq>0)});
-    if(!hasRecon){
-      depVal+=d.ds;saqVal+=d.ws-(d.mi||0);depN+=(d.nd||0);saqN+=(d.nw||0);phxDays++;
+  function buildBars(containerId, labelId, arr, color, isCurrency){
+    const el=document.getElementById(containerId);
+    const lbl=document.getElementById(labelId);
+    if(!el)return;
+    const maxVal=Math.max(...arr,1);
+    const total=arr.reduce((s,v)=>s+v,0);
+    let bars='';
+    for(let h=0;h<24;h++){
+      const v=arr[h]||0;
+      const pct=maxVal>0?(v/maxVal*100):0;
+      const isFuture=isCurrentDay&&h>curHour;
+      const isEmpty=v===0&&(!isCurrentDay||h<=curHour);
+      const bg=isFuture?'rgba(255,255,255,.05)':isEmpty?'rgba(255,255,255,.08)':color;
+      const ht=pct>0?Math.max(pct,4):2;
+      const tipVal=isCurrency?fR(v):fN(v);
+      const tipLabel=isFuture?'—':tipVal;
+      bars+=`<div class="h-bar" style="height:${ht}%;background:${bg}"><div class="h-tip">${String(h).padStart(2,'0')}h: ${tipLabel}</div></div>`;
     }
-  });
+    el.innerHTML=bars;
+    let labels='';
+    for(let h=0;h<24;h++){
+      labels+=`<span>${h%3===0?String(h).padStart(2,'0'):''}</span>`;
+    }
+    lbl.innerHTML=labels;
+    let totalEl=el.parentNode.querySelector('.hourly-total');
+    if(!totalEl){totalEl=document.createElement('div');totalEl.className='hourly-total';el.parentNode.appendChild(totalEl);}
+    totalEl.textContent='Total: '+(isCurrency?fR(total):fN(total));
+  }
 
-  var nc=depVal-saqVal;
-  var ncPct=depVal>0?((saqVal/depVal)*100):0;
-  var src=dtpDays>0&&phxDays===0?'DigiToPay':dtpDays>0?'DTP+Smartico mix':'Smartico (corte 21h)';
-
-  var el1=document.getElementById('dtp-dep-val');
-  var el2=document.getElementById('dtp-saq-val');
-  var el3=document.getElementById('dtp-nc-val');
-  if(el1)el1.textContent=fR(depVal);
-  if(el2)el2.textContent=fR(saqVal);
-  if(el3){el3.textContent=fR(nc);el3.style.color=nc>=0?'var(--green)':'var(--red)';}
-  var n1=document.getElementById('dtp-dep-n');
-  var n2=document.getElementById('dtp-saq-n');
-  var n3=document.getElementById('dtp-nc-pct');
-  if(n1)n1.textContent=(depN>0?fN(depN)+' transações · ':'')+src;
-  if(n2)n2.textContent=(saqN>0?fN(saqN)+' transações · ':'')+src;
-  if(n3)n3.textContent='Saques = '+fP(ncPct)+' dos depósitos · '+(nc>=0?'Retenção positiva':'Saques > Depósitos');
+  buildBars('hc-regs','hl-regs',HOURLY.regs,'#3B82F6',false);
+  buildBars('hc-ftd','hl-ftd',HOURLY.ftd,'#0EA55A',false);
+  buildBars('hc-vol','hl-vol',HOURLY.vol,'#8B5CF6',true);
 }
 
 function renderOverview(){
@@ -3021,9 +3009,10 @@ function renderOverview(){
   }).join('');
 
   // === Hourly vs Daily/Monthly Charts ===
-  // Today: barras por hora (24h). Todos os outros: gráficos diários/mensais.
+  window._dbgBlock='REACHED period='+currentPeriod;
   const hourlyEl=document.getElementById('ov-hourly');
   const showHourly=(currentPeriod==='today');
+  window._dbgBlock+=' showHourly='+showHourly;
   if(showHourly){
     hourlyEl.style.display='';
     renderHourlyCharts();
