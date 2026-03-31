@@ -887,34 +887,6 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 .kpi-trend{display:flex;align-items:center;gap:4px;margin-top:3px;font-size:10px;font-weight:700}
 .kpi-trend.up{color:var(--green)}.kpi-trend.down{color:var(--red)}.kpi-trend.neutral{color:#888}
 </style>
-<script>
-const DAILY_INSIGHTS = [
-  {
-    "id": "INS-2026-03-31-001",
-    "date": "2026-03-31",
-    "priority": 17,
-    "category": "monitor",
-    "title": "Today's Performance Snapshot",
-    "description": "Daily KPIs: R$0 deposits, 0 unique depositors, avg ticket R$0",
-    "players": [
-      {
-        "id": 0,
-        "name": "Today Summary",
-        "btag_aff": "2026-03-31",
-        "device": "KPI",
-        "game_style": "All",
-        "total_dep": 0,
-        "days_inactive": 0,
-        "dep_count": 0
-      }
-    ],
-    "action": "Daily review and comparison",
-    "how": "1. Review today's deposits vs yesterday\n2. Compare to 7-day average\n3. Check for anomalies\n4. Update team on targets\n5. Prepare tomorrow forecast",
-    "impact": "Day-over-day change: +0.0%",
-    "status": "pending"
-  }
-];
-</script>
 </head>
 <body>
 
@@ -2860,9 +2832,30 @@ function calcOrganic(data){
       tot_vol:(d.c_to||0)+(d.sb_to||0),trk_vol:sm.vol,org_vol:Math.max(0,(d.c_to||0)+(d.sb_to||0)-sm.vol)
     });
   });
-  // Affiliate rankings
-  const topFtd=AFF.affs.filter(a=>a.ftd>0).sort((a,b)=>b.ftd-a.ftd).slice(0,15);
-  const topDep=AFF.affs.filter(a=>a.da>0).sort((a,b)=>b.da-a.da).slice(0,15);
+  // Affiliate rankings — filtered by period dates
+  let periodAffs=AFF.affs; // default: lifetime
+  if(AFF.affDays&&dates.size>0&&dates.size<=31){
+    // Build per-affiliate aggregates for the selected period only
+    const pAffs=[];
+    for(let i=0;i<AFF.affs.length;i++){
+      const a=AFF.affs[i];
+      const ad=AFF.affDays[a.n];
+      if(ad){
+        const fa={n:a.n,ftd:0,da:0,rg:0};
+        for(let j=0;j<ad.length;j++){
+          if(dates.has(ad[j].d)){
+            fa.ftd+=ad[j].ftd||0;
+            fa.da+=ad[j].da||0;
+            fa.rg+=ad[j].rg||0;
+          }
+        }
+        if(fa.ftd>0||fa.da>0)pAffs.push(fa);
+      }
+    }
+    if(pAffs.length>0)periodAffs=pAffs;
+  }
+  const topFtd=periodAffs.filter(a=>a.ftd>0).sort((a,b)=>b.ftd-a.ftd).slice(0,15);
+  const topDep=periodAffs.filter(a=>a.da>0).sort((a,b)=>b.da-a.da).slice(0,15);
   return{tot,trk,org,daily,topFtd,topDep,
     pctOrgDep:tot.ds>0?org.ds/tot.ds*100:0,
     pctTrkDep:tot.ds>0?trk.da/tot.ds*100:0,
