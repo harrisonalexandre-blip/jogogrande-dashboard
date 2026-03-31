@@ -1910,6 +1910,22 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   <table><thead><tr><th>Semana</th><th>Depósitos</th><th>Saques</th><th>Taxas DTP</th><th>Ads</th><th>Despesas</th><th>Lucro</th><th>Status</th></tr></thead>
   <tbody id="cx-hist-tb"></tbody></table>
 </div>
+<!-- Demonstrativo Movimentações Internas (WEB) -->
+<div class="tb" style="margin-top:14px">
+  <div class="th">
+    <h3 style="color:var(--gold)">📋 Demonstrativo de Movimentações Internas (WEB)</h3>
+    <div style="display:flex;gap:12px;align-items:center">
+      <span id="cx-mi-summary" style="font-size:11px;color:var(--text2)"></span>
+    </div>
+  </div>
+  <div id="cx-mi-kpis" class="kg" style="margin:10px 0"></div>
+  <div style="max-height:400px;overflow-y:auto">
+    <table>
+      <thead><tr><th>Data</th><th>Destinatário</th><th>Valor</th><th>Taxa</th><th>Tipo</th></tr></thead>
+      <tbody id="cx-mi-table"></tbody>
+    </table>
+  </div>
+</div>
 </div>
 </div>
 
@@ -3762,7 +3778,7 @@ function rCRM(){
   var redep1=cliData.filter(c=>c.dc===1&&c.di<=7);
   if(redep1.length>0) insights.push('🔥 <b>'+redep1.length+' jogadores fizeram apenas 1 depósito nos últimos 7 dias</b> — oportunidade imediata de redepósito. Valor total depositado: '+fR(redep1.reduce((a,c)=>a+c.dt,0)));
   // Conversion rate
-  if(fn1&&fn2) insights.push('📊 Taxa de redepósito geral: <b style="color:var(--gold)">'+convRate+'%</b> — de '+fN(fn1.p)+' FTDs, apenas '+fN(fn2.p)+' voltaram para o 2º depósito');
+  if(fn1&&fn2) insights.push('📊 Taxa de redepósito geral: <b style="color:var(--gold)">'+pConv+'%</b> — de '+fN(fn1.p)+' FTDs, apenas '+fN(fn2.p)+' voltaram para o 2º depósito');
   // VIP at risk
   var vipRisk=cliData.filter(c=>c.tr==='VIP'&&(c.st2==='warm'||c.st2==='cold'));
   if(vipRisk.length>0) insights.push('⚠️ <b>'+vipRisk.length+' VIPs em risco</b> (mornos/frios) com '+fR(vipRisk.reduce((a,c)=>a+c.dt,0))+' em depósitos — ação urgente');
@@ -4605,24 +4621,40 @@ function saveCxField(wk,field,value){
   renderCaixaWeek();
 }
 
+// ═══ MOVIMENTAÇÕES INTERNAS (WEB) ═══
+const MI_WEB=[{"d":"2026-03-28","dt":"28/03/2026 10:24","n":"TELEMEDIA SERVICOS LTDA","v":10000,"t":140,"o":"PIX"},{"d":"2026-03-26","dt":"26/03/2026 21:40","n":"TELEMEDIA SERVICOS LTDA","v":6000,"t":84,"o":"PIX"},{"d":"2026-03-26","dt":"26/03/2026 15:23","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":9000,"t":180,"o":"CRIPTO"},{"d":"2026-03-26","dt":"26/03/2026 09:46","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":7000,"t":140,"o":"CRIPTO"},{"d":"2026-03-24","dt":"24/03/2026 21:40","n":"TELEMEDIA SERVICOS LTDA","v":6000,"t":84,"o":"PIX"},{"d":"2026-03-24","dt":"24/03/2026 16:12","n":"TELEMEDIA SERVICOS LTDA","v":14999.99,"t":210,"o":"PIX"},{"d":"2026-03-24","dt":"24/03/2026 16:12","n":"TELEMEDIA SERVICOS LTDA","v":15000,"t":210,"o":"PIX"},{"d":"2026-03-24","dt":"24/03/2026 10:57","n":"GREGORIO SOUSA DE MEDEIROS FILHO","v":2187.50,"t":30.63,"o":"PIX"},{"d":"2026-03-24","dt":"24/03/2026 09:12","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":6000,"t":120,"o":"CRIPTO"},{"d":"2026-03-21","dt":"21/03/2026 23:53","n":"TELEMEDIA SERVICOS LTDA","v":10000,"t":140,"o":"PIX"},{"d":"2026-03-21","dt":"21/03/2026 12:07","n":"TELEMEDIA SERVICOS LTDA","v":14999.99,"t":210,"o":"PIX"},{"d":"2026-03-21","dt":"21/03/2026 12:07","n":"TELEMEDIA SERVICOS LTDA","v":15000,"t":210,"o":"PIX"},{"d":"2026-03-20","dt":"20/03/2026 09:15","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":12000,"t":240,"o":"CRIPTO"},{"d":"2026-03-19","dt":"19/03/2026 09:01","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":22000,"t":440,"o":"CRIPTO"},{"d":"2026-03-18","dt":"18/03/2026 09:00","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":65000,"t":1300,"o":"CRIPTO"},{"d":"2026-03-17","dt":"17/03/2026 09:17","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":7000,"t":140,"o":"CRIPTO"},{"d":"2026-03-16","dt":"16/03/2026 09:42","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":20000,"t":400,"o":"CRIPTO"},{"d":"2026-03-13","dt":"13/03/2026 16:12","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":3000,"t":60,"o":"CRIPTO"},{"d":"2026-03-12","dt":"12/03/2026 15:26","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":8900,"t":178,"o":"CRIPTO"},{"d":"2026-03-10","dt":"10/03/2026 09:47","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":5584,"t":111.68,"o":"CRIPTO"},{"d":"2026-03-06","dt":"06/03/2026 12:35","n":"MARIA CLARA NEGREIROS DE ARAUJO","v":2500,"t":35,"o":"PIX"},{"d":"2026-03-05","dt":"05/03/2026 10:28","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":7207.48,"t":144.15,"o":"CRIPTO"},{"d":"2026-03-04","dt":"04/03/2026 09:11","n":"CONVERSÃO CRIPTO--ELEVEX GROUP","v":20000,"t":400,"o":"CRIPTO"},{"d":"2026-03-03","dt":"03/03/2026 15:31","n":"Luiz Felipe Brasileiro Veras","v":2187.50,"t":30.63,"o":"PIX"}];
+
 function rCaixa(){
   fetchTronBalance();
+  // ═══ Usar dados filtrados por período ═══
+  const fd=getFilteredData(currentPeriod);
   const weeks=getWeeklyData();
   if(!weeks.length)return;
   const thisWk=weeks[0];
-  const allDep=D.reduce((s,d)=>s+d.ds,0);
-  const allSaq=D.reduce((s,d)=>s+d.ws,0);
-  const allMi=D.reduce((s,d)=>s+(d.mi||0),0);
+  const pDep=fd.reduce((s,d)=>s+d.ds,0);
+  const pSaq=fd.reduce((s,d)=>s+d.ws,0);
+  const pMi=fd.reduce((s,d)=>s+(d.mi||0),0);
+  const pNc=pDep-pSaq;
   const cats=categorizeTx(RECON);
-  
-  // KPIs
+
+  // Filtrar MI_WEB pelo período
+  const fdDates=new Set(fd.map(d=>d.date));
+  const miFiltered=MI_WEB.filter(m=>fdDates.has(m.d));
+  const miTotal=miFiltered.reduce((s,m)=>s+m.v,0);
+  const miTaxas=miFiltered.reduce((s,m)=>s+m.t,0);
+  const miCripto=miFiltered.filter(m=>m.o==='CRIPTO');
+  const miPix=miFiltered.filter(m=>m.o==='PIX');
+  const miCriptoVal=miCripto.reduce((s,m)=>s+m.v,0);
+  const miPixVal=miPix.reduce((s,m)=>s+m.v,0);
+
+  // KPIs — dados do período selecionado
   document.getElementById('kp-caixa').innerHTML=[
     {l:'WALLET USDT',v:'$ '+cxWalletUSDT.toLocaleString('pt-BR',{maximumFractionDigits:0}),s:'Saldo tempo real',c:'green'},
-    {l:'DEPÓSITOS SEMANA',v:fR(thisWk.ds),s:getWeekLabel(thisWk.key),c:'gold'},
-    {l:'SAQUES SEMANA',v:fR(thisWk.ws),s:fN(thisWk.days.length)+' dias',c:'red'},
-    {l:'NET CASH SEMANA',v:fR(thisWk.ds-thisWk.ws),s:'Dep - Saq',c:thisWk.ds-thisWk.ws>=0?'green':'red'},
-    {l:'CRIPTO (ELEVEX)',v:fR(cats.cripto),s:Math.round(cats.cripto/cats.total*100)+'% dos saques',c:'cyan'},
-    {l:'BANCO (TELEMEDIA)',v:fR(cats.banco),s:Math.round(cats.banco/cats.total*100)+'% dos saques',c:'blue'},
+    {l:'DEPÓSITOS (PERÍODO)',v:fR(pDep),s:fN(fd.length)+' dias',c:'gold'},
+    {l:'SAQUES JOGADORES',v:fR(pSaq),s:'Aplicação API',c:'red'},
+    {l:'NET CASH',v:fR(pNc),s:'Dep - Saq (sem mov. internas)',c:pNc>=0?'green':'red'},
+    {l:'MOV. INTERNAS (WEB)',v:fR(miTotal),s:miFiltered.length+' transações · Taxa: '+fR(miTaxas),c:'gold'},
+    {l:'SALDO LÍQUIDO',v:fR(pNc-miTotal),s:'NetCash - Mov. Internas',c:pNc-miTotal>=0?'green':'red'},
   ].map(x=>'<div class="kpi '+x.c+'"><div class="kpi-l">'+x.l+'</div><div class="kpi-v">'+x.v+'</div><div class="kpi-s">'+x.s+'</div></div>').join('');
 
   // Destination doughnut
@@ -4681,6 +4713,26 @@ function rCaixa(){
       +'<td style="color:'+(lucro>=0?'var(--green)':'var(--red)')+';font-weight:700">'+fR(lucro)+'</td>'
       +'<td>'+(hasClosed?'<span class="bp">Fechado</span>':'<span style="color:var(--text3)">Pendente</span>')+'</td></tr>';
   }).join('');
+
+  // ═══ DEMONSTRATIVO MOVIMENTAÇÕES INTERNAS (WEB) ═══
+  document.getElementById('cx-mi-summary').innerHTML=miFiltered.length+' transações no período · <strong style="color:var(--gold)">'+fR(miTotal)+'</strong> total · Taxas: '+fR(miTaxas);
+  document.getElementById('cx-mi-kpis').innerHTML=[
+    {l:'CRIPTO (ELEVEX)',v:fR(miCriptoVal),s:miCripto.length+' transações',c:'green'},
+    {l:'PIX (BANCO)',v:fR(miPixVal),s:miPix.length+' transações',c:'cyan'},
+    {l:'TAXAS DTP',v:fR(miTaxas),s:miTotal>0?(miTaxas/miTotal*100).toFixed(1)+'% do total':'0%',c:'red'},
+  ].map(x=>'<div class="kpi '+x.c+'"><div class="kpi-l">'+x.l+'</div><div class="kpi-v">'+x.v+'</div><div class="kpi-s">'+x.s+'</div></div>').join('');
+
+  document.getElementById('cx-mi-table').innerHTML=miFiltered.length?miFiltered.map(m=>{
+    const tipoCor=m.o==='CRIPTO'?'color:var(--green)':'color:var(--cyan)';
+    const tipoIcon=m.o==='CRIPTO'?'🔗':'🏦';
+    return '<tr>'
+      +'<td>'+m.dt+'</td>'
+      +'<td>'+m.n+'</td>'
+      +'<td style="color:var(--gold);font-weight:700">'+fR(m.v)+'</td>'
+      +'<td style="color:var(--red)">'+fR(m.t)+'</td>'
+      +'<td style="'+tipoCor+'">'+tipoIcon+' '+m.o+'</td>'
+      +'</tr>';
+  }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px">Nenhuma movimentação interna no período selecionado</td></tr>';
 }
 
 
