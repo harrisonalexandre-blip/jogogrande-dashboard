@@ -3135,7 +3135,8 @@ function renderOverview(){
   const _d=(c,p,inv)=>hasPrev?deltaHTML(c,p,inv):'';
   // Build KPI cards — filter zeros when period is 'today' or 'yesterday'
   const isToday=(currentPeriod==='today'||currentPeriod==='yesterday');
-  const gaRtVal=(typeof GA!=='undefined')?GA.rt.usersNow:'--';
+  // Usa valor ao vivo salvo pela API (window._lastGaRtVal), cai para estático só se ainda não buscou
+  const gaRtVal=window._lastGaRtVal||(typeof GA!=='undefined'?GA.rt.usersNow:'--');
   // Ticket médio dep/saq
   const tkDep=k.nd>0?k.ds/k.nd:0;
   const tkSaq=k.nw>0?(k.ws-k.mi)/k.nw:0;
