@@ -402,7 +402,7 @@ html = re.sub(r'var RECON=\[.*?\];', f'var RECON={recon_json};', html, count=1, 
 
 # Replace HOURLY
 hourly_json = json.dumps(hourly_obj, separators=(',', ':'))
-html = re.sub(r'const HOURLY=\{.*?\};', f'const HOURLY={hourly_json};', html, count=1)
+html = re.sub(r'(const|let) HOURLY=\{.*?\};', f'let HOURLY={hourly_json};', html, count=1)
 
 with open(INDEX, 'w', encoding='utf-8') as f:
     f.write(html)
