@@ -181,7 +181,8 @@ try:
     print(f"   {len(dtp_by_date)} dates in DTP CSV")
     
     # Read current RECON from index.html
-    with open('/tmp/jogogrande-dashboard/index.html', 'r') as f:
+    INDEX_PATH = '/Users/harrison/Documents/Jogo Grande/JOGO GRANDE/index.html'
+    with open(INDEX_PATH, 'r') as f:
         html = f.read()
     
     recon_match = re.search(r'RECON=(\[.*?\]);\s*\n', html, re.DOTALL)
@@ -226,7 +227,8 @@ if err:
     print(f"\n❌ ABORT: {err}")
     sys.exit(1)
 
-with open('/tmp/jogogrande-dashboard/index.html','r') as f:
+INDEX_PATH = '/Users/harrison/Documents/Jogo Grande/JOGO GRANDE/index.html'
+with open(INDEX_PATH,'r') as f:
     html = f.read()
 
 aj = json.dumps(AFF, separators=(',',':'))
@@ -236,7 +238,7 @@ if new_recon:
     rj = json.dumps(new_recon, separators=(',',':'))
     html = re.sub(r'RECON=\[.*?\];', f'RECON={rj};', html, count=1, flags=re.DOTALL)
 
-with open('/tmp/jogogrande-dashboard/index.html','w') as f:
+with open(INDEX_PATH,'w') as f:
     f.write(html)
 
 td = days[-1]
