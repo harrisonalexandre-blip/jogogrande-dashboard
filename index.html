@@ -2264,6 +2264,9 @@ const MRECON=[{"m":"OUT/25","dtp_dep":40.0,"dtp_saq":0,"dtp_taxa":0.83,"phx_dep"
       // Also patch ws to reflect real DTP API withdrawals
       d.ws=dtpSaqAPI;
       d.ds=r.dtp_dep||d.ds; // Use DTP deposits if available
+      // Contagem de transações DTP → Ticket Médio e Redeposit Rate
+      if(r.dtp_dep_n>0) d.nd=r.dtp_dep_n;
+      if(r.dtp_saq_n>0) d.nw=r.dtp_saq_n;
     }
   });
 })();
