@@ -2783,7 +2783,7 @@ function renderOrganic(data){
       +'</div></div>';
   }
 
-  var totDep=oc.org.ds+oc.trk.da;
+  var totDep=oc.tot.ds; // DTP é a fonte da verdade (não org+trk que infla com timezone Smartico)
   var totReg=oc.org.nr+oc.trk.rg;
   var totFtd=oc.org.ftd+oc.trk.ftd;
   var totNPL=oc.org.ngr+oc.trk.np;
