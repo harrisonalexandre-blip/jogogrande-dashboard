@@ -65,7 +65,16 @@ if not aff_match:
     sys.exit(1)
 
 AFF = json.loads(aff_match.group(1))
-print(f"   Existing: {len(AFF.get('days',[]))} days, {len(AFF.get('affs',[]))} affs")
+existing_days_count = len(AFF.get('days',[]))
+print(f"   Existing: {existing_days_count} days, {len(AFF.get('affs',[]))} affs")
+
+# SAFETY: abort if existing days suspiciously low (data corruption protection)
+if existing_days_count < 10:
+    print(f"   ⚠️ SAFETY: AFF.days has only {existing_days_count} records — possible data corruption!")
+    print(f"   ⚠️ Skipping days update to avoid losing historical data.")
+    print(f"   ⚠️ Run full sync (full_sync.py) to restore complete dataset.")
+else:
+    pass  # Proceed normally
 
 # 1. UPDATE DAYS (only today + yesterday)
 print("1. days (today+yesterday)...")
@@ -75,7 +84,12 @@ days_map = {d['d']: d for d in AFF.get('days',[])}
 for d in sorted(da.keys()):
     e = short(da[d]); e['d'] = d
     days_map[d] = e
-AFF['days'] = sorted(days_map.values(), key=lambda x: x['d'])
+new_days = sorted(days_map.values(), key=lambda x: x['d'])
+# SAFETY: never reduce total days count
+if len(new_days) < existing_days_count:
+    print(f"   ⚠️ SAFETY: merge would reduce days from {existing_days_count} to {len(new_days)} — BLOCKED")
+else:
+    AFF['days'] = new_days
 print(f"   → {len(AFF['days'])} days total")
 
 # 2. UPDATE AFFDAYS (only today + yesterday)
@@ -228,9 +242,8 @@ try:
         d_obj['c_to'] = sm_vol
         d_obj['fda'] = sm_fda
         d_obj['ngr'] = sm_ngr
-        d_obj['ds'] = sm_dep
-        d_obj['ws'] = sm_wa
-        d_obj['nc'] = round(sm_dep - sm_wa, 2)
+        # NUNCA preencher ds/ws/nc com Smartico! DTP é a fonte da verdade.
+        # Smartico tem timezone errado (dia vira 21h BRT).
         if abs(sm_cg) > 0 or abs(sm_sg) > 0:
             d_obj['cg'] = round(sm_cg, 2)
             d_obj['sg'] = round(sm_sg, 2)
@@ -242,7 +255,7 @@ try:
             html = html.replace(d_str, new_d, 1)
         else:
             html = re.sub(r'(D=\[.*?)(];)', lambda m: m.group(1) + ',' + new_d + m.group(2), html, count=1, flags=re.DOTALL)
-        print(f"   → D[{TODAY}]: nr={sm_nr}, ftd={sm_ftd}, dep=R${sm_dep:,.2f}, saq=R${sm_wa:,.2f}, vol=R${sm_vol:,.2f}, fda=R${sm_fda:,.2f}, ngr=R${sm_ngr:,.2f}")
+        print(f"   → D[{TODAY}]: nr={sm_nr}, ftd={sm_ftd}, vol=R${sm_vol:,.2f}, fda=R${sm_fda:,.2f}, ngr=R${sm_ngr:,.2f} (ds/ws/nc = DTP only)")
     else:
         print(f"   → D[{TODAY}]: Phoenix/Superset data present (c_po={d_obj.get('c_po',0)}), skipping Smartico fill")
 except Exception as e:
@@ -292,8 +305,9 @@ try:
             shape = [hr_regs[h] if h <= last_h else hr_regs[h % max(last_h,1)] for h in range(hrs)]
             shape = [max(s, 1) for s in shape]
         else:
-            # Sem dados horários: distribui uniforme
-            shape = [1]*hrs
+            # Sem dados horários: distribui com pesos realísticos (pico 19-21h, madrugada baixa)
+            HOURLY_WEIGHTS = [0.8,0.5,0.3,0.2,0.2,0.3,0.5,0.8,1.2,1.5,1.8,2.0,2.2,2.3,2.5,2.8,3.2,3.8,4.5,5.0,4.8,4.2,3.0,1.8]
+            shape = HOURLY_WEIGHTS[:hrs]
         w_sum = sum(shape)
         for h in range(hrs):
             frac = shape[h] / w_sum

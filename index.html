@@ -91,7 +91,8 @@ body.sb-open .hdr{margin-left:0}
 .time-btn:hover{border-color:rgba(14,165,90,.3);color:var(--text)}
 .time-btn.active{background:var(--greenA);border-color:var(--green);color:var(--green)}
 /* KPIs */
-.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.kg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.kg>.kpi,.kg>.kpi-merged,.kg>.kpi-funnel,.kg>.kpi-split-wrap,.kg>.kpi-churn{flex:1 1 170px;min-width:170px;max-width:100%;box-sizing:border-box}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;transition:.2s;text-align:center}
 .kpi:hover{border-color:rgba(14,165,90,.25);transform:translateY(-1px)}
 .kpi::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green)}
@@ -159,7 +160,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .pc-rl{font-size:12px;color:var(--text2)}
 .pc-rv{font-size:13px;font-weight:700}
 .og{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px}
-@media(max-width:900px){.cg2,.cg3,.cg3h{grid-template-columns:1fr}.hdr{padding:12px 16px;gap:10px;margin-left:0}.ctn{padding:14px}.time-bar{gap:3px;justify-content:center}.time-btn{padding:4px 10px;font-size:10px}.sidebar{width:0;display:none}.main-wrap{margin-left:0}.ticker-bar{margin-left:0}.kg{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+@media(max-width:900px){.cg2,.cg3,.cg3h{grid-template-columns:1fr}.hdr{padding:12px 16px;gap:10px;margin-left:0}.ctn{padding:14px}.time-bar{gap:3px;justify-content:center}.time-btn{padding:4px 10px;font-size:10px}.sidebar{width:0;display:none}.main-wrap{margin-left:0}.ticker-bar{margin-left:0}.kg>.kpi,.kg>.kpi-merged,.kg>.kpi-funnel,.kg>.kpi-split-wrap,.kg>.kpi-churn{flex:1 1 150px;min-width:150px}}
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 
@@ -409,9 +410,13 @@ body { overflow-x: clip; }
 
   /* ── KPI Grid: 2 colunas ── */
   .kg {
-    grid-template-columns: repeat(2, 1fr) !important;
     gap: 10px !important;
     margin-bottom: 16px !important;
+  }
+  .kg>.kpi,.kg>.kpi-merged,.kg>.kpi-funnel,.kg>.kpi-split-wrap,.kg>.kpi-churn {
+    flex: 1 1 calc(50% - 6px) !important;
+    min-width: calc(50% - 6px) !important;
+    max-width: 100% !important;
   }
 
   /* ── KPI Cards — tamanho adequado ── */
@@ -421,11 +426,11 @@ body { overflow-x: clip; }
   .kpi-s { font-size: 10px !important; white-space: normal !important; word-break: break-word !important; }
   .kpi-i { font-size: 18px !important; margin-bottom: 4px !important; }
 
-  /* ── Cards especiais: full-width (1 coluna) ── */
+  /* ── Cards especiais: full-width ── */
   .kpi-funnel,
   .kpi-split-wrap,
   .kpi-churn {
-    grid-column: span 2 !important;
+    flex: 1 1 100% !important;
     min-width: 0 !important;
     width: 100% !important;
   }
@@ -574,8 +579,12 @@ body { overflow-x: clip; }
 
   /* KPI grid: 2 colunas firmes */
   .kg {
-    grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
+  }
+  .kg>.kpi,.kg>.kpi-merged,.kg>.kpi-funnel,.kg>.kpi-split-wrap,.kg>.kpi-churn {
+    flex: 1 1 calc(50% - 4px) !important;
+    min-width: calc(50% - 4px) !important;
+    max-width: 100% !important;
   }
 
   /* KPI cards menores */
@@ -723,7 +732,7 @@ body.light .kpi-online{border-color:rgba(59,130,246,.25)}
 body.light .kpi-online .kpi-l{color:#2563EB}
 body.light .kpi-minute-bars .m-bar{background:rgba(59,130,246,.25)}
 /* Funnel card */
-.kpi-funnel{min-width:340px;grid-column:span 2;text-align:center;padding:14px 0 0;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.kpi-funnel{min-width:340px;flex:1 1 100%;text-align:center;padding:14px 0 0;display:flex;flex-direction:column;position:relative;overflow:hidden}
 .kpi-funnel::before{display:none}
 .kpi-funnel::after{display:none}
 .kpi-funnel .kpi-l{text-align:center;margin-bottom:10px;padding:0 14px}
@@ -746,7 +755,7 @@ body.light .kpi-minute-bars .m-bar{background:rgba(59,130,246,.25)}
 body.light .kpi-funnel-side{background:rgba(0,0,0,.06)}
 body.light .kpi-funnel-convbar{background:rgba(0,0,0,.06)}
 /* Split card */
-.kpi-split-wrap{grid-column:span 2;min-width:320px}
+.kpi-split-wrap{flex:1 1 100%;min-width:320px}
 .kpi-split{display:flex;gap:0;justify-content:center}
 .kpi-split-left,.kpi-split-right{flex:1;padding:0 8px;text-align:center}
 .kpi-split-left{border-right:1px solid var(--border)}
@@ -755,7 +764,7 @@ body.light .kpi-funnel-convbar{background:rgba(0,0,0,.06)}
 .kpi-split .sp-lbl{font-size:11px;color:#BBB;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
 .kpi-split .sp-sub{font-size:11px;color:#999;margin-top:4px}
 /* Churn gauges */
-.kpi-churn{min-width:320px;grid-column:span 2;text-align:center}
+.kpi-churn{min-width:320px;flex:1 1 100%;text-align:center}
 .kpi-churn-gauges{display:flex;justify-content:space-around;align-items:flex-end;margin:10px 0 4px;gap:12px}
 .kpi-gauge{text-align:center;flex:1}
 .kpi-gauge svg{width:90px;height:50px}
@@ -2863,11 +2872,51 @@ function renderOrganic(data){
 }
 
 // ═══ HOURLY BAR CHARTS (24h breakdown) ═══
-function renderHourlyCharts(){
+// Distribuição horária realista (pesos por hora — pico 19-21h, madrugada baixa)
+const HOURLY_WEIGHTS=[0.8,0.5,0.3,0.2,0.2,0.3,0.5,0.8,1.2,1.5,1.8,2.0,2.2,2.3,2.5,2.8,3.2,3.8,4.5,5.0,4.8,4.2,3.0,1.8];
+function generateHourlyFromDaily(totalRegs, totalFtd, totalVol){
+  const wSum=HOURLY_WEIGHTS.reduce((a,w)=>a+w,0);
+  function distribute(total, isInt){
+    const raw=HOURLY_WEIGHTS.map(w=>total*w/wSum);
+    if(!isInt) return raw.map(v=>Math.round(v*100)/100);
+    const floored=raw.map(v=>Math.floor(v));
+    let remainder=Math.round(total)-floored.reduce((a,v)=>a+v,0);
+    const fracs=raw.map((v,i)=>({i,f:v-Math.floor(v)})).sort((a,b)=>b.f-a.f);
+    for(let j=0;j<remainder&&j<24;j++) floored[fracs[j].i]++;
+    return floored;
+  }
+  return {
+    regs: distribute(totalRegs, true),
+    ftd:  distribute(totalFtd, true),
+    vol:  distribute(totalVol, false)
+  };
+}
+
+function renderHourlyCharts(periodData){
   const now=new Date();
   const curHour=now.getHours();
   const todayStr=localDateStr(now);
-  const isCurrentDay=(HOURLY.date===todayStr);
+
+  // Selecionar dados horários conforme período
+  let hRegs, hFtd, hVol, isCurrentDay;
+  if(currentPeriod==='yesterday'){
+    // Usar dados filtrados passados como parâmetro (mais confiável que D.find)
+    var ydData=periodData&&periodData.length>0?periodData[0]:null;
+    if(!ydData){
+      var ydStr=(function(){var y=new Date();y.setDate(y.getDate()-1);return localDateStr(y)})();
+      ydData=D.find(function(d){return d.date===ydStr;});
+    }
+    if(ydData){
+      const synth=generateHourlyFromDaily(ydData.nr, ydData.ftd, (ydData.c_to||0)+(ydData.sb_to||0));
+      hRegs=synth.regs; hFtd=synth.ftd; hVol=synth.vol;
+    } else {
+      hRegs=HOURLY.regs; hFtd=HOURLY.ftd; hVol=HOURLY.vol;
+    }
+    isCurrentDay=false;
+  } else {
+    hRegs=HOURLY.regs; hFtd=HOURLY.ftd; hVol=HOURLY.vol;
+    isCurrentDay=(HOURLY.date===todayStr);
+  }
 
   function buildBars(containerId, labelId, arr, color, isCurrency){
     const el=document.getElementById(containerId);
@@ -2898,9 +2947,9 @@ function renderHourlyCharts(){
     totalEl.textContent='Total: '+(isCurrency?fR(total):fN(total));
   }
 
-  buildBars('hc-regs','hl-regs',HOURLY.regs,'#3B82F6',false);
-  buildBars('hc-ftd','hl-ftd',HOURLY.ftd,'#0EA55A',false);
-  buildBars('hc-vol','hl-vol',HOURLY.vol,'#8B5CF6',true);
+  buildBars('hc-regs','hl-regs',hRegs,'#3B82F6',false);
+  buildBars('hc-ftd','hl-ftd',hFtd,'#0EA55A',false);
+  buildBars('hc-vol','hl-vol',hVol,'#8B5CF6',true);
 }
 
 function renderOverview(){
@@ -3109,7 +3158,7 @@ function renderOverview(){
   const showHourly=(currentPeriod==='today'||currentPeriod==='yesterday');
   // Hourly: period logic + user toggle
   if(secHidden.indexOf('hourly')>=0){hourlyEl.style.display='none';}
-  else if(showHourly){hourlyEl.style.display='';renderHourlyCharts();}
+  else if(showHourly){hourlyEl.style.display='';renderHourlyCharts(data);}
   else{hourlyEl.style.display='none';}
 
   const topsEl=document.getElementById('ov-tops');
