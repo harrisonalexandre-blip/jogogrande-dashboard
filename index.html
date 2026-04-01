@@ -1296,7 +1296,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 
 <!-- ROW 2: Segmentação + Oportunidades -->
 <div class="cg cg2" style="margin-bottom:18px">
-  <div class="cb"><div class="ct"><span class="dot gl"></span> Segmentação por Nº de Depósitos</div><div style="height:280px"><canvas id="c-crm-dep-seg"></canvas></div></div>
+  <div class="cb"><div class="ct"><span class="dot gl"></span> Segmentação por Nº de Depósitos <span style="font-size:9px;background:rgba(108,112,134,.15);color:var(--text3);padding:2px 7px;border-radius:4px;margin-left:6px">Dados Lifetime</span></div><div style="height:280px"><canvas id="c-crm-dep-seg"></canvas></div></div>
 
   <div class="cb">
     <div class="ct"><span class="dot r"></span> Oportunidades de Redepósito <span style="background:var(--redA);color:var(--red);font-size:10px;padding:2px 8px;border-radius:4px;margin-left:8px" id="crm-redep-count">0</span></div>
@@ -1307,8 +1307,8 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 
 <!-- ROW 3: Top Games (Lucro) + Piores Games (Prejuízo) -->
 <div class="cg cg2" style="margin-bottom:18px">
-  <div class="cb"><div class="ct"><span class="dot g"></span> Top 10 Jogos · Mais Lucrativos (GGR €)</div><div style="height:300px"><canvas id="c-crm-topgames"></canvas></div></div>
-  <div class="cb"><div class="ct"><span class="dot r"></span> Top 10 Jogos · Maior Prejuízo (GGR €)</div><div style="height:300px"><canvas id="c-crm-worstgames"></canvas></div></div>
+  <div class="cb"><div class="ct"><span class="dot g"></span> Top 10 Jogos · Mais Lucrativos (GGR €) <span style="font-size:9px;background:rgba(108,112,134,.15);color:var(--text3);padding:2px 7px;border-radius:4px;margin-left:6px">Dados Lifetime</span></div><div style="height:300px"><canvas id="c-crm-topgames"></canvas></div></div>
+  <div class="cb"><div class="ct"><span class="dot r"></span> Top 10 Jogos · Maior Prejuízo (GGR €) <span style="font-size:9px;background:rgba(108,112,134,.15);color:var(--text3);padding:2px 7px;border-radius:4px;margin-left:6px">Dados Lifetime</span></div><div style="height:300px"><canvas id="c-crm-worstgames"></canvas></div></div>
 </div>
 
 <!-- ROW 4: Rankings por Tipo -->
@@ -1327,7 +1327,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 
 <!-- ROW 5: Status + Tiers (existing enhanced) -->
 <div class="cg cg2" style="margin-bottom:18px">
-  <div class="cb"><div class="ct"><span class="dot g"></span> Segmentação · Phoenix DB <span style="font-size:9px;color:var(--text3);margin-left:6px">Dados reais · 29K jogadores</span></div><div style="height:260px"><canvas id="c-dist"></canvas></div></div>
+  <div class="cb"><div class="ct"><span class="dot g"></span> Segmentação · Phoenix DB <span style="font-size:9px;background:rgba(108,112,134,.15);color:var(--text3);padding:2px 7px;border-radius:4px;margin-left:6px">Dados Lifetime · 29K jogadores</span></div><div style="height:260px"><canvas id="c-dist"></canvas></div></div>
   <div class="cb"><div class="ct"><span class="dot b"></span> Cohort Retention · FTD Mensal <span style="font-size:9px;color:var(--text3);margin-left:6px">% que redepositou</span></div><div style="height:260px"><canvas id="c-churn"></canvas></div></div>
 </div>
 
@@ -1346,7 +1346,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 <!-- ROW 7: Tiers + Insights -->
 <div class="cg cg2" style="margin-bottom:18px">
   <div class="cb"><div class="ct"><span class="dot c"></span> Distribuição por Tier</div><div style="height:260px"><canvas id="c-tiers"></canvas></div></div>
-  <div class="cb"><div class="ct"><span class="dot p"></span> Jogos Mais Populares (UAP)</div><div style="height:260px"><canvas id="c-crm-popular"></canvas></div></div>
+  <div class="cb"><div class="ct"><span class="dot p"></span> Jogos Mais Populares (UAP) <span style="font-size:9px;background:rgba(108,112,134,.15);color:var(--text3);padding:2px 7px;border-radius:4px;margin-left:6px">Dados Lifetime</span></div><div style="height:260px"><canvas id="c-crm-popular"></canvas></div></div>
 </div>
 
 <!-- ROW 8: Value Matrix -->
@@ -1360,6 +1360,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   <div class="ct" style="border-bottom:1px solid rgba(250,179,135,.15);padding-bottom:10px;margin-bottom:12px">
     <span style="font-size:18px;margin-right:6px">🛒</span> Recuperação de PIX Abandonado
     <span style="background:rgba(250,179,135,.15);color:#fab387;font-size:10px;padding:2px 8px;border-radius:4px;margin-left:8px">OPORTUNIDADE</span>
+    <span style="font-size:9px;background:rgba(108,112,134,.15);color:var(--text3);padding:2px 7px;border-radius:4px;margin-left:6px">Dados Lifetime</span>
   </div>
   <!-- KPIs Row -->
   <div id="abandon-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px"></div>
@@ -4803,9 +4804,38 @@ function renderCampaigns(){
     {v:total,l:'Total Campanhas',s:'Projeto 176 · JogoGrande',cl:'var(--cyan)',drill:'total-camps'}
   ];
   if(typeof SMS_STATS!=='undefined'){
-    kpis.push({v:fN(SMS_STATS.attempts),l:'SMS Enviados',s:'MessageWhiz · DLR '+SMS_STATS.dlr+'%',cl:'#89b4fa',drill:'sms-sent'});
-    kpis.push({v:fN(SMS_STATS.delivered),l:'SMS Entregues',s:SMS_STATS.dlr+'% taxa de entrega',cl:'var(--green)',drill:'sms-delivered'});
-    kpis.push({v:'$'+SMS_STATS.balance,l:'Saldo SMS',s:'Custo total: $'+SMS_STATS.cost,cl:SMS_STATS.balance<10?'var(--red)':'var(--gold)',drill:'sms-balance'});
+    // Period-aware SMS KPIs
+    var smsAll=SMS_STATS.daily||[];
+    var smsPeriod=smsAll;
+    if(typeof currentPeriod!=='undefined'&&currentPeriod!=='lifetime'){
+      var _now=new Date();
+      if(currentPeriod==='today'){
+        var _td=('0'+(_now.getMonth()+1)).slice(-2)+'-'+('0'+_now.getDate()).slice(-2);
+        smsPeriod=smsAll.filter(function(x){return x.d===_td});
+      }else if(currentPeriod==='yesterday'){
+        var _yd=new Date(_now);_yd.setDate(_yd.getDate()-1);
+        var _yds=('0'+(_yd.getMonth()+1)).slice(-2)+'-'+('0'+_yd.getDate()).slice(-2);
+        smsPeriod=smsAll.filter(function(x){return x.d===_yds});
+      }else if(currentPeriod==='week'){
+        var _d7=new Date(_now);_d7.setDate(_d7.getDate()-7);
+        smsPeriod=smsAll.filter(function(x){
+          var p=x.d.split('-');var dd2=new Date(2026,parseInt(p[0])-1,parseInt(p[1]));
+          return dd2>=_d7&&dd2<=_now;
+        });
+      }else if(currentPeriod==='month'){
+        var _cm=('0'+(_now.getMonth()+1)).slice(-2);
+        smsPeriod=smsAll.filter(function(x){return x.d.startsWith(_cm+'-')});
+      }
+    }
+    var _smsSent=smsPeriod.reduce(function(a,d){return a+d.t},0);
+    var _smsFail=smsPeriod.reduce(function(a,d){return a+d.f},0);
+    var _smsDel=_smsSent-_smsFail;
+    var _smsDlr=_smsSent>0?Math.round(_smsDel/_smsSent*1000)/10:0;
+    var _smsCps=SMS_STATS.attempts>0?(SMS_STATS.cost/SMS_STATS.attempts):0;
+    var _smsPCost=_smsSent*_smsCps;
+    kpis.push({v:fN(_smsSent),l:'SMS Enviados',s:'DLR '+_smsDlr+'% · '+smsPeriod.length+'d',cl:'#89b4fa',drill:'sms-sent'});
+    kpis.push({v:fN(_smsDel),l:'SMS Entregues',s:_smsDlr+'% taxa de entrega',cl:'var(--green)',drill:'sms-delivered'});
+    kpis.push({v:'$'+SMS_STATS.balance,l:'Saldo SMS',s:'Custo período: $'+_smsPCost.toFixed(2),cl:SMS_STATS.balance<10?'var(--red)':'var(--gold)',drill:'sms-balance'});
   }
   document.getElementById('campaign-kpis').innerHTML=kpis.map(function(k){var click=k.drill?' clickable" onclick="openDrilldown(\''+k.drill+'\')"':'"';return '<div class="crm-stat'+click+'><div class="lbl">'+k.l+'</div><div class="val" style="color:'+k.cl+'">'+k.v+'</div><div class="sub">'+k.s+'</div></div>'}).join('');
 
@@ -5037,21 +5067,65 @@ function filterInsights(cat, btn) {
 }
 function renderUnioneEmail(){
   if(typeof UNIONE==='undefined')return;
-  var ut=UNIONE.totals,ur=UNIONE.rates;
+  // === PERIOD-AWARE: filter UniOne daily data ===
+  var allDD=UNIONE.daily||[];
+  var dd=allDD;
+  var uniPeriodLabel='Todos os dados';
+  if(typeof currentPeriod!=='undefined'&&currentPeriod!=='lifetime'){
+    var now=new Date();
+    if(currentPeriod==='today'){
+      var td=('0'+now.getDate()).slice(-2)+'/'+('0'+(now.getMonth()+1)).slice(-2);
+      dd=allDD.filter(function(x){return x.d===td});
+      uniPeriodLabel='Hoje';
+    }else if(currentPeriod==='yesterday'){
+      var yd=new Date(now);yd.setDate(yd.getDate()-1);
+      var yds=('0'+yd.getDate()).slice(-2)+'/'+('0'+(yd.getMonth()+1)).slice(-2);
+      dd=allDD.filter(function(x){return x.d===yds});
+      uniPeriodLabel='Ontem';
+    }else if(currentPeriod==='week'){
+      var d7=new Date(now);d7.setDate(d7.getDate()-7);
+      dd=allDD.filter(function(x){
+        var parts=x.d.split('/');var xd=new Date(2026,parseInt(parts[1])-1,parseInt(parts[0]));
+        return xd>=d7&&xd<=now;
+      });
+      uniPeriodLabel='Últimos 7 dias';
+    }else if(currentPeriod==='month'){
+      var cm=('0'+(now.getMonth()+1)).slice(-2);
+      dd=allDD.filter(function(x){return x.d.endsWith('/'+cm)});
+      uniPeriodLabel='Este mês';
+    }else if(currentPeriod==='custom'&&window._affFrom&&window._affTo){
+      var cf=new Date(window._affFrom);var ct=new Date(window._affTo);
+      dd=allDD.filter(function(x){
+        var parts=x.d.split('/');var xd=new Date(2026,parseInt(parts[1])-1,parseInt(parts[0]));
+        return xd>=cf&&xd<=ct;
+      });
+      uniPeriodLabel='Personalizado';
+    }
+  }
+  // Recalculate totals from filtered period
+  var pEnviado=dd.reduce(function(a,d){return a+(d.en||0)},0);
+  var pEntregue=dd.reduce(function(a,d){return a+(d.et||0)},0);
+  var pAberto=dd.reduce(function(a,d){return a+(d.ab||0)},0);
+  var pClicado=dd.reduce(function(a,d){return a+(d.cl||0)},0);
+  var pFalhas=dd.reduce(function(a,d){return a+(d.fl||0)},0);
+  var pAceito=dd.reduce(function(a,d){return a+(d.ac||0)},0);
+  var pEntrega=pEnviado>0?(pEntregue/pEnviado*100).toFixed(1):0;
+  var pAbertura=pEntregue>0?(pAberto/pEntregue*100).toFixed(1):0;
+  var pClique=pEntregue>0?(pClicado/pEntregue*100).toFixed(1):0;
+  var pCtrOpen=pAberto>0?(pClicado/pAberto*100).toFixed(1):0;
   // KPIs
   var kh=[
-    {v:ut.enviado.toLocaleString('pt-BR'),l:'Enviados',s:'Aceitos: '+ut.aceito.toLocaleString('pt-BR'),c:'var(--text)'},
-    {v:ut.entregue.toLocaleString('pt-BR'),l:'Entregues',s:ur.entrega+'% taxa',c:'var(--green)'},
-    {v:ut.aberto.toLocaleString('pt-BR'),l:'Abertos',s:ur.abertura+'% taxa',c:'var(--blue)'},
-    {v:ut.clicado.toLocaleString('pt-BR'),l:'Clicados',s:ur.clique+'% taxa · CTR '+ur.ctr_open+'%',c:'var(--gold)'},
-    {v:ut.falhas.toLocaleString('pt-BR'),l:'Falhas',s:((ut.falhas/ut.enviado)*100).toFixed(1)+'% bounce',c:'var(--red)'}
+    {v:pEnviado.toLocaleString('pt-BR'),l:'Enviados',s:'Aceitos: '+pAceito.toLocaleString('pt-BR')+' · '+uniPeriodLabel,c:'var(--text)'},
+    {v:pEntregue.toLocaleString('pt-BR'),l:'Entregues',s:pEntrega+'% taxa',c:'var(--green)'},
+    {v:pAberto.toLocaleString('pt-BR'),l:'Abertos',s:pAbertura+'% taxa',c:'var(--blue)'},
+    {v:pClicado.toLocaleString('pt-BR'),l:'Clicados',s:pClique+'% taxa · CTR '+pCtrOpen+'%',c:'var(--gold)'},
+    {v:pFalhas.toLocaleString('pt-BR'),l:'Falhas',s:(pEnviado>0?((pFalhas/pEnviado)*100).toFixed(1):0)+'% bounce',c:'var(--red)'}
   ];
   document.getElementById('unione-kpis').innerHTML=kh.map(function(k){return '<div class="crm-stat"><div class="lbl">'+k.l+'</div><div class="val" style="color:'+k.c+'">'+k.v+'</div><div class="sub">'+k.s+'</div></div>'}).join('');
   // Daily Chart
   var ctx=document.getElementById('c-unione-daily');
   if(!ctx)return;
   if(_uniChart){_uniChart.destroy();}
-  var dd=UNIONE.daily;
   _uniChart=new Chart(ctx,{type:'bar',data:{labels:dd.map(function(d){return d.d}),datasets:[
     {label:'Enviados',data:dd.map(function(d){return d.en}),backgroundColor:'rgba(108,112,134,.4)',borderRadius:4,order:2},
     {label:'Entregues',data:dd.map(function(d){return d.et}),backgroundColor:'rgba(14,165,90,.5)',borderRadius:4,order:3},
@@ -7137,8 +7211,10 @@ function buildTicker(){
 // ═══════════════════════════════════════════════════════════
 // LIVE REFRESH — Phoenix DB · Auto-refresh a cada 10 minutos
 // ═══════════════════════════════════════════════════════════
+let _lastRefresh=0;
 async function refreshLive(){
   try{
+    _lastRefresh=Date.now();
     const r=await fetch('/api/live');
     if(!r.ok) return;
     const live=await r.json();
@@ -7202,6 +7278,17 @@ startGaRtPolling();
 // Live refresh: imediato + a cada 10 minutos
 setTimeout(refreshLive,3000);
 setInterval(refreshLive,600000);
+// Ao voltar da tela de bloqueio/sono — atualiza IMEDIATAMENTE
+document.addEventListener('visibilitychange',function(){
+  if(!document.hidden){
+    const now=Date.now();
+    if(now-_lastRefresh>30000){_lastRefresh=now;refreshLive();}
+  }
+});
+window.addEventListener('focus',function(){
+  const now=Date.now();
+  if(now-_lastRefresh>30000){_lastRefresh=now;refreshLive();}
+});
 });
 
 // ═══════════════════════════════════════════════════════════
