@@ -4540,7 +4540,7 @@ function rCRM(){
 
   // 14. Auto Insights — REAL DATA from Phoenix DB
   var phxLink='https://bo365.work/clients?projectId=176&search=';
-  function pLink(nm){return '<a href="'+phxLink+encodeURIComponent(nm.split(' ')[0])+'" target="_blank" style="color:var(--gold);text-decoration:none;border-bottom:1px dashed var(--gold)">'+nm+'</a>'}
+  function pLink(nm,cid){var search=cid||encodeURIComponent(nm.split(' ')[0]);return '<a href="'+phxLink+search+'" target="_blank" style="color:var(--gold);text-decoration:none;border-bottom:1px dashed var(--gold)">'+nm+'</a>'}
 
   // ═══ DAILY INSIGHTS FROM PHOENIX DB ═══
   var missionData = [];
@@ -4558,7 +4558,7 @@ function rCRM(){
         ins.players.forEach(function(p) {
           if(p.name) {
             playerHtml += '<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;background:rgba(255,215,64,.08);border-radius:4px;font-size:10px">';
-            playerHtml += pLink(p.name);
+            playerHtml += pLink(p.name, p.id);
             if(p.total_dep) playerHtml += ' <span style="color:var(--green)">R$' + Math.round(p.total_dep).toLocaleString('pt-BR') + '</span>';
             if(p.days_inactive) playerHtml += ' <span style="color:var(--red)">' + p.days_inactive + 'd</span>';
             if(p.aff_name) playerHtml += ' <span style="color:var(--text3)">via ' + p.aff_name + '</span>';
@@ -5229,19 +5229,70 @@ function renderCRMAnalytics(){
     html+='<div style="padding:20px;text-align:center;color:var(--text3);background:var(--bg3);border-radius:10px">Dados SMS não disponíveis</div>';
     document.getElementById('crm-analytics-body').innerHTML=html;return;
   }
-  var dlr=SMS_STATS.dlr||0,openRate=98,clickRate=5,convRate=2;
-  var sent=SMS_STATS.attempts,del=SMS_STATS.delivered;
+  // === PERIOD-AWARE: filter SMS daily data by currentPeriod ===
+  var allDaily=SMS_STATS.daily||[];
+  var periodDaily=allDaily;
+  var periodLabel='Todos os dados';
+  if(typeof currentPeriod!=='undefined'&&currentPeriod!=='lifetime'){
+    var now=new Date();
+    var startDate=null,endDate=null;
+    if(currentPeriod==='today'){
+      var td=('0'+(now.getMonth()+1)).slice(-2)+'-'+('0'+now.getDate()).slice(-2);
+      periodDaily=allDaily.filter(function(x){return x.d===td});
+      periodLabel='Hoje';
+    }else if(currentPeriod==='yesterday'){
+      var yd=new Date(now);yd.setDate(yd.getDate()-1);
+      var yds=('0'+(yd.getMonth()+1)).slice(-2)+'-'+('0'+yd.getDate()).slice(-2);
+      periodDaily=allDaily.filter(function(x){return x.d===yds});
+      periodLabel='Ontem';
+    }else if(currentPeriod==='week'){
+      var d7=new Date(now);d7.setDate(d7.getDate()-7);
+      periodDaily=allDaily.filter(function(x){
+        var parts=x.d.split('-');var dd=new Date(2026,parseInt(parts[0])-1,parseInt(parts[1]));
+        return dd>=d7&&dd<=now;
+      });
+      periodLabel='Últimos 7 dias';
+    }else if(currentPeriod==='month'){
+      var cm=('0'+(now.getMonth()+1)).slice(-2);
+      periodDaily=allDaily.filter(function(x){return x.d.startsWith(cm+'-')});
+      periodLabel='Este mês';
+    }else if(currentPeriod==='year'){
+      periodDaily=allDaily;
+      periodLabel='2026';
+    }else if(currentPeriod==='custom'&&window._affFrom&&window._affTo){
+      var cf=new Date(window._affFrom);var ct=new Date(window._affTo);
+      periodDaily=allDaily.filter(function(x){
+        var parts=x.d.split('-');var dd=new Date(2026,parseInt(parts[0])-1,parseInt(parts[1]));
+        return dd>=cf&&dd<=ct;
+      });
+      periodLabel=window._affFrom.slice(8)+'/'+window._affFrom.slice(5,7)+' → '+window._affTo.slice(8)+'/'+window._affTo.slice(5,7);
+    }
+  }
+  // Recalculate totals from filtered period
+  var sent=periodDaily.reduce(function(a,d){return a+d.t},0);
+  var failTotal=periodDaily.reduce(function(a,d){return a+d.f},0);
+  var del=sent-failTotal;
+  var dlr=sent>0?Math.round(del/sent*1000)/10:0;
+  var costPerSMS=SMS_STATS.attempts>0?(SMS_STATS.cost/SMS_STATS.attempts):0;
+  var periodCost=sent*costPerSMS;
+  var openRate=98,clickRate=5,convRate=2;
   var estOpened=Math.floor(del*openRate/100),estClicked=Math.floor(del*clickRate/100),estConv=Math.floor(del*convRate/100);
-  var costPerSMS=sent>0?(SMS_STATS.cost/sent):0,costPerConv=estConv>0?(SMS_STATS.cost/estConv):0;
+  var costPerConv=estConv>0?(periodCost/estConv):0;
   var avgDepBRL=85,estRevBRL=estConv*avgDepBRL;
-  var dailyAvg=SMS_STATS.daily.length>0?Math.ceil(sent/SMS_STATS.daily.length):0;
-  var failTotal=sent-del,burnDays=dailyAvg>0&&costPerSMS>0?(SMS_STATS.balance/(costPerSMS*dailyAvg)).toFixed(0):'∞';
+  var dailyAvg=periodDaily.length>0?Math.ceil(sent/periodDaily.length):0;
+  var burnDays=dailyAvg>0&&costPerSMS>0?(SMS_STATS.balance/(costPerSMS*dailyAvg)).toFixed(0):'∞';
+
+  /* Period indicator */
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:8px 14px;background:rgba(137,180,250,.08);border-radius:8px;border:1px solid rgba(137,180,250,.15)">';
+  html+='<div style="font-size:11px;color:#89b4fa;font-weight:600">📊 ANALYTICS AVANÇADO · PERFORMANCE DE CAMPANHAS</div>';
+  html+='<div style="font-size:10px;color:var(--gold);font-weight:600">📅 '+periodLabel+' · '+periodDaily.length+' dias</div>';
+  html+='</div>';
 
   /* KPI Cards */
   html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px">';
-  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid #89b4fa"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Total SMS</div><div style="font-size:26px;font-weight:900;color:#89b4fa;margin:4px 0">'+fN(sent)+'</div><div style="font-size:9px;color:var(--text3)">'+dailyAvg+'/dia · '+SMS_STATS.daily.length+' dias</div></div>';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid #89b4fa"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Total SMS</div><div style="font-size:26px;font-weight:900;color:#89b4fa;margin:4px 0">'+fN(sent)+'</div><div style="font-size:9px;color:var(--text3)">'+dailyAvg+'/dia · '+periodDaily.length+' dias</div></div>';
   html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid var(--green)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">DLR Rate</div><div style="font-size:26px;font-weight:900;color:var(--green);margin:4px 0">'+dlr+'%</div><div style="font-size:9px;color:var(--text3)">'+fN(del)+' entregues · '+failTotal+' falhas</div></div>';
-  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid var(--gold)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Custo Total</div><div style="font-size:26px;font-weight:900;color:var(--gold);margin:4px 0">$'+SMS_STATS.cost.toFixed(2)+'</div><div style="font-size:9px;color:var(--text3)">$'+costPerSMS.toFixed(4)+'/SMS · Saldo $'+SMS_STATS.balance+'</div></div>';
+  html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid var(--gold)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Custo Período</div><div style="font-size:26px;font-weight:900;color:var(--gold);margin:4px 0">$'+periodCost.toFixed(2)+'</div><div style="font-size:9px;color:var(--text3)">$'+costPerSMS.toFixed(4)+'/SMS · Saldo $'+SMS_STATS.balance+'</div></div>';
   html+='<div style="background:var(--bg3);border-radius:10px;padding:14px;border-left:3px solid var(--cyan)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Saldo Restante</div><div style="font-size:26px;font-weight:900;color:var(--cyan);margin:4px 0">~'+burnDays+'d</div><div style="font-size:9px;color:var(--text3)">$'+SMS_STATS.balance+' a '+dailyAvg+' SMS/dia</div></div>';
   html+='</div>';
 
@@ -5254,7 +5305,7 @@ function renderCRMAnalytics(){
     {label:'Convertidos (est.)',value:estConv,color:'#a6e3a1',icon:'💰'}
   ];
   html+='<div style="background:var(--bg3);border-radius:12px;padding:18px;margin-bottom:16px">';
-  html+='<div style="font-weight:700;color:var(--text);margin-bottom:14px;font-size:13px">Funil de Conversão SMS</div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-weight:700;color:var(--text);font-size:13px">Funil de Conversão SMS</div><div style="font-size:9px;color:var(--gold);background:rgba(255,215,64,.1);padding:3px 10px;border-radius:4px">'+periodLabel+'</div></div>';
   html+='<div style="display:flex;flex-direction:column;align-items:center;gap:0">';
   stages.forEach(function(s,i){
     var widthPct=100-i*18;if(widthPct<18)widthPct=18;
@@ -5276,19 +5327,20 @@ function renderCRMAnalytics(){
   html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3)">Taxa Global</div><div style="font-size:15px;font-weight:900;color:var(--green)">'+((estConv/Math.max(1,sent))*100).toFixed(2)+'%</div></div>';
   html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3)">Custo/Conv.</div><div style="font-size:15px;font-weight:900;color:var(--gold)">$'+costPerConv.toFixed(2)+'</div></div>';
   html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3)">Receita Est.</div><div style="font-size:15px;font-weight:900;color:var(--cyan)">R$'+fN(estRevBRL)+'</div></div>';
-  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3)">ROI Est.</div><div style="font-size:15px;font-weight:900;color:'+(estRevBRL>SMS_STATS.cost*5.5?'var(--green)':'var(--red)')+'">'+((estRevBRL/(SMS_STATS.cost*5.5)-1)*100).toFixed(0)+'%</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3)">ROI Est.</div><div style="font-size:15px;font-weight:900;color:'+(estRevBRL>periodCost*5.5?'var(--green)':'var(--red)')+'">'+((periodCost>0?((estRevBRL/(periodCost*5.5)-1)*100):0).toFixed(0))+'%</div></div>';
   html+='</div></div>';
 
-  /* Daily SMS bars */
-  if(SMS_STATS.daily&&SMS_STATS.daily.length>0){
-    var last14=SMS_STATS.daily.slice(-14);
-    var maxD=Math.max.apply(null,last14.map(function(d){return d.t||0}));
-    var totL=last14.reduce(function(a,d){return a+d.t},0);
-    var failL=last14.reduce(function(a,d){return a+d.f},0);
+  /* Daily SMS bars — period-aware */
+  var chartDaily=periodDaily.length>0?periodDaily:SMS_STATS.daily;
+  if(chartDaily&&chartDaily.length>0){
+    var displayDays=chartDaily.length>21?chartDaily.slice(-21):chartDaily;
+    var maxD=Math.max.apply(null,displayDays.map(function(d){return d.t||0}));
+    var totL=displayDays.reduce(function(a,d){return a+d.t},0);
+    var failL=displayDays.reduce(function(a,d){return a+d.f},0);
     html+='<div style="background:var(--bg3);border-radius:12px;padding:18px">';
-    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-weight:700;color:var(--text);font-size:13px">📈 Volume Diário SMS</div><div style="font-size:9px;color:var(--text3)">Média: '+Math.round(totL/last14.length)+'/dia · Falhas: '+failL+' ('+((failL/Math.max(1,totL))*100).toFixed(1)+'%)</div></div>';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-weight:700;color:var(--text);font-size:13px">📈 Volume Diário SMS <span style="font-size:9px;color:var(--gold);font-weight:400;margin-left:6px">'+periodLabel+'</span></div><div style="font-size:9px;color:var(--text3)">Média: '+Math.round(totL/Math.max(1,displayDays.length))+'/dia · Falhas: '+failL+' ('+((failL/Math.max(1,totL))*100).toFixed(1)+'%)</div></div>';
     html+='<div style="display:flex;align-items:flex-end;gap:4px;height:90px">';
-    last14.forEach(function(d){
+    displayDays.forEach(function(d){
       var h=maxD>0?Math.max(6,(d.t/maxD)*78):6;
       var fH=d.f>0&&maxD>0?Math.max(3,(d.f/maxD)*78):0;
       html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center">';
