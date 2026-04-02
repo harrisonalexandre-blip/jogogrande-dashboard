@@ -77,6 +77,8 @@ body.sb-open .ticker-bar{margin-left:200px}
 .ticker-sep{color:var(--border);padding:0 4px;font-size:8px}
 @keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+@keyframes slotIn{0%{transform:translateY(-10px);opacity:0}60%{transform:translateY(2px);opacity:1}100%{transform:translateY(0);opacity:1}}
+.kpi-v.slot-anim{animation:slotIn 0.28s cubic-bezier(.22,1,.36,1) both}
 /* OLD NAV HIDDEN */
 .nav{display:none}
 .tab{display:none}
@@ -7667,6 +7669,97 @@ function buildTicker(){
 }
 
 // ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// SLOT MACHINE ANIMATION + PLIM SOUND
+// ═══════════════════════════════════════════════════════════
+var _plimAudioCtx=null;
+function playPlim(){
+  try{
+    if(!_plimAudioCtx)_plimAudioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    var ctx=_plimAudioCtx;
+    if(ctx.state==='suspended')ctx.resume();
+    // Marimba suave: fundamental C6 + harmônicos para textura quente
+    [[1046.5,0.16,0.50],  // C6  - nota principal
+     [2093.0,0.07,0.22],  // C7  - 2° harmônico (brilho)
+     [1318.5,0.05,0.35],  // E6  - 3° parcial (calor)
+     [1568.0,0.03,0.28]   // G6  - 4° parcial (riqueza)
+    ].forEach(function(t){
+      var osc=ctx.createOscillator();
+      var gain=ctx.createGain();
+      osc.type='sine';
+      osc.frequency.value=t[0];
+      gain.gain.setValueAtTime(t[1],ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+t[2]);
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.start(ctx.currentTime);osc.stop(ctx.currentTime+t[2]+0.05);
+    });
+  }catch(e){}
+}
+
+var _prevKpiVals={};
+
+function slotReveal(el,finalText,delayMs){
+  setTimeout(function(){
+    var nums='0123456789';
+    var FRAMES=14,FRAME_MS=32;
+    var f=0;
+    var digitCount=(finalText.match(/\d/g)||[]).length||1;
+    el.classList.remove('slot-anim');
+    void el.offsetWidth; // reflow para reiniciar animação CSS
+    el.classList.add('slot-anim');
+    function tick(){
+      f++;
+      var ratio=f/FRAMES;
+      var di=0,out='';
+      for(var i=0;i<finalText.length;i++){
+        var ch=finalText[i];
+        if(/\d/.test(ch)){
+          di++;
+          var revealAt=di/(digitCount+1);
+          out+=ratio>=revealAt?ch:nums[Math.floor(Math.random()*10)];
+        }else{
+          out+=ch;
+        }
+      }
+      el.textContent=out;
+      if(f<FRAMES)setTimeout(tick,FRAME_MS);
+      else{el.textContent=finalText;}
+    }
+    tick();
+  },delayMs||0);
+}
+
+function checkAndAnimateKpis(withSound){
+  var changed=[];
+  document.querySelectorAll('.kpi').forEach(function(kpi){
+    var lblEl=kpi.querySelector('.kpi-l');
+    var valEl=kpi.querySelector('.kpi-v');
+    if(!lblEl||!valEl)return;
+    var key=lblEl.textContent.trim();
+    var newVal=valEl.textContent.trim();
+    if(_prevKpiVals[key]!==undefined&&_prevKpiVals[key]!==newVal){
+      changed.push({el:valEl,text:newVal});
+    }
+    _prevKpiVals[key]=newVal;
+  });
+  if(changed.length>0){
+    // Animar cada KPI com leve delay em cascata (máx 6 em paralelo)
+    var stagger=Math.min(80,400/changed.length);
+    changed.forEach(function(c,i){slotReveal(c.el,c.text,i*stagger);});
+    if(withSound)setTimeout(playPlim,80);
+  }
+}
+
+// Inicializar mapa de valores na primeira renderização (sem animar)
+function initKpiBaseline(){
+  document.querySelectorAll('.kpi').forEach(function(kpi){
+    var lblEl=kpi.querySelector('.kpi-l');
+    var valEl=kpi.querySelector('.kpi-v');
+    if(!lblEl||!valEl)return;
+    _prevKpiVals[lblEl.textContent.trim()]=valEl.textContent.trim();
+  });
+}
+
 // LIVE REFRESH — Phoenix DB · Auto-refresh a cada 10 minutos
 // ═══════════════════════════════════════════════════════════
 let _lastRefresh=0;
@@ -7741,10 +7834,41 @@ async function refreshLive(){
         +'Live <span style="color:#0ea55a;font-weight:600">'+hh+':'+mm+'</span>';
     }
     console.log('[Live] ✅',live.date,'Dep:R$'+live.dep_total.toLocaleString('pt-BR'),'NGR:R$'+live.ngr.toLocaleString('pt-BR'));
+    // ── Slot machine + plim nas mudanças de KPI ──
+    setTimeout(function(){checkAndAnimateKpis(true);},180);
   }catch(e){console.warn('[Live] refresh error:',e.message);}
 }
 
 document.addEventListener('DOMContentLoaded',()=>{ initDashboard(); fetchRates();
+// Baseline inicial dos KPIs (sem animação) — precisa de um delay para DOM renderizar
+setTimeout(initKpiBaseline,1500);
+// ── Ativar áudio na primeira interação (restrição browsers) ──
+(function(){
+  var _audioReady=false;
+  var _soundHint=document.createElement('div');
+  _soundHint.id='sound-hint';
+  _soundHint.style.cssText='position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(14,165,90,.12);border:1px solid rgba(14,165,90,.3);color:var(--green);font-size:10px;font-weight:700;padding:5px 14px;border-radius:20px;z-index:9999;cursor:pointer;transition:opacity .5s;letter-spacing:.5px';
+  _soundHint.textContent='🔔 Clique para ativar o som do dashboard';
+  document.body.appendChild(_soundHint);
+  function enableAudio(){
+    if(_audioReady)return;
+    _audioReady=true;
+    if(!_plimAudioCtx)_plimAudioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(_plimAudioCtx.state==='suspended')_plimAudioCtx.resume();
+    // Test plim suave na ativação
+    setTimeout(playPlim,100);
+    _soundHint.style.opacity='0';
+    setTimeout(function(){if(_soundHint.parentNode)_soundHint.parentNode.removeChild(_soundHint);},600);
+    document.removeEventListener('click',enableAudio);
+    document.removeEventListener('touchstart',enableAudio);
+  }
+  document.addEventListener('click',enableAudio);
+  document.addEventListener('touchstart',enableAudio);
+  // Auto-ocultar hint após 8s se não interagir
+  setTimeout(function(){
+    if(!_audioReady){_soundHint.style.opacity='0';setTimeout(function(){if(_soundHint.parentNode)_soundHint.parentNode.removeChild(_soundHint);},600);}
+  },8000);
+})();
 startGaRtPolling();
 // Live refresh: imediato + a cada 10 minutos
 setTimeout(refreshLive,3000);
