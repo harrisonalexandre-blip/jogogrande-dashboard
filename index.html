@@ -318,6 +318,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .ac-role-badge.admin{background:var(--greenA);color:var(--green)}
 .ac-role-badge.crm{background:var(--blueA);color:var(--blue)}
 .ac-role-badge.socio{background:var(--goldA);color:var(--gold)}
+.ac-role-badge.trafego{background:rgba(251,146,60,.15);color:#FB923C}
+.user-badge.trafego .role-chip{background:rgba(251,146,60,.15);color:#FB923C}
 .ac-del{background:none;border:1px solid rgba(255,68,68,.25);color:var(--red);padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0}
 .ac-del:hover{background:var(--redA)}
 .ac-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
@@ -981,15 +983,15 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
       <span class="sb-label">Cohorts</span>
     </div>
     <div class="sb-group-title">Marketing</div>
-    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('traf',this)">
+    <div class="sb-item" data-roles="admin,socio,trafego" onclick="sbNav('traf',this)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/><path d="M2 20h20"/></svg>
       <span class="sb-label">Tráfego Interno</span>
     </div>
-    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('analytics',this)">
+    <div class="sb-item" data-roles="admin,socio,trafego" onclick="sbNav('analytics',this)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
       <span class="sb-label">Analytics</span>
     </div>
-    <div class="sb-item" data-roles="admin,socio" onclick="sbNav('alertas',this)">
+    <div class="sb-item" data-roles="admin,socio,trafego" onclick="sbNav('alertas',this)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="sb-label">Alertas <span id="sb-alert-badge" style="background:var(--red);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;font-weight:800;display:none">0</span></span>
     </div>
@@ -1088,10 +1090,10 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   <div class="tab" data-roles="admin,socio" onclick="sp('afil',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M2 12c0-2.76 1.12-5.26 2.93-7.07S7.24 2 10 2c1.24 0 2.43.2 3.57.58.24.08.48.16.72.25"></path><path d="M22 12c0 2.76-1.12 5.26-2.93 7.07S16.76 22 14 22c-1.24 0-2.43-.2-3.57-.58-.24-.08-.48-.16-.72-.25"></path><path d="M10 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM14 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path><path d="M12 6v12"></path></svg>AFILIADOS</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('recon',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>CONCIL.</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('casino',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/></svg>CASINO DET.</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('alertas',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>ALERTAS <span id="alert-badge" style="background:var(--red);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;margin-left:2px;font-weight:800;display:none">0</span></div>
+  <div class="tab" data-roles="admin,socio,trafego" onclick="sp('alertas',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>ALERTAS <span id="alert-badge" style="background:var(--red);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;margin-left:2px;font-weight:800;display:none">0</span></div>
   <div class="tab" data-roles="admin,socio" onclick="sp('saldos',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="14" r="2"/></svg>SALDOS</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('cohorts',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>COHORTS</div>
-  <div class="tab" data-roles="admin,socio" onclick="sp('traf',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/><path d="M2 20h20"/></svg>TRÁFEGO</div>
+  <div class="tab" data-roles="admin,socio,trafego" onclick="sp('traf',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/><path d="M2 20h20"/></svg>TRÁFEGO</div>
   <div class="tab" data-roles="admin,socio" onclick="sp('caixa',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="3" y="5" width="18" height="14" rx="1" ry="1"></rect><path d="M12 9v6"></path><path d="M9 12h6"></path></svg>CAIXA</div>
   <div class="tab" data-roles="admin" onclick="sp('acessos',this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:3px;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>ACESSOS</div>
 </div>
@@ -2269,6 +2271,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
     <select class="ac-select" id="ac-role">
       <option value="socio"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Sócio — Vê todas as páginas</option>
       <option value="crm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:4px"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="17" x2="22" y2="17"></line><path d="M6 3v4M10 3v4M14 3v4M18 3v4"></path></svg>CRM — Somente página CRM</option>
+      <option value="trafego">📣 Gestão de Tráfego — Marketing: Tráfego, Analytics, Alertas</option>
     </select>
     <button class="ac-submit" onclick="addUser()">Adicionar Usuário</button>
     <div class="ac-msg" id="ac-msg"></div>
@@ -2277,7 +2280,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 <!-- Legenda de níveis -->
 <div class="cb" style="padding:18px 22px">
   <div class="ct" style="margin-bottom:14px"><span class="dot b"></span>NÍVEIS DE ACESSO</div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
     <div style="background:var(--greenA);border:1px solid rgba(14,165,90,.3);border-radius:10px;padding:16px">
       <div style="font-size:12px;font-weight:800;color:var(--green);margin-bottom:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>ADMIN</div>
       <div style="font-size:11px;color:var(--text2);line-height:1.6">Poder máximo. Cria, edita e remove usuários. Vê todas as páginas e o painel de acessos.</div>
@@ -2289,6 +2292,10 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
     <div style="background:var(--blueA);border:1px solid rgba(68,136,255,.3);border-radius:10px;padding:16px">
       <div style="font-size:12px;font-weight:800;color:var(--blue);margin-bottom:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="17" x2="22" y2="17"></line><path d="M6 3v4M10 3v4M14 3v4M18 3v4"></path></svg>CRM</div>
       <div style="font-size:11px;color:var(--text2);line-height:1.6">Acesso restrito: entra diretamente na página CRM. Não vê as demais páginas do dashboard.</div>
+    </div>
+    <div style="background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.3);border-radius:10px;padding:16px">
+      <div style="font-size:12px;font-weight:800;color:#FB923C;margin-bottom:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/><path d="M2 20h20"/></svg>TRÁFEGO</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.6">Acesso Marketing: Tráfego Interno (com form de lançamento), Analytics e Alertas.</div>
     </div>
   </div>
 </div>
@@ -7754,12 +7761,35 @@ function applyRoleAccess(role){
     const crmSb = document.querySelector('.sb-item[data-roles*="crm"]');
     if(crmSb) crmSb.classList.add('active');
   }
+  // ═══ SECURITY: Gestão de Tráfego — acesso somente Marketing ═══
+  if(role==='trafego'){
+    // Ocultar ticker financeiro
+    const ticker = document.getElementById('ticker-bar');
+    if(ticker) ticker.style.display='none';
+    // Ocultar botões admin
+    document.querySelectorAll('.sheets-btn, .btn-edit-kpi, #btn-edit-kpi').forEach(el=>el.style.display='none');
+    // Forçar navegação para Tráfego Interno e abrir painel de input
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.sb-item').forEach(t=>t.classList.remove('active'));
+    const pg = document.getElementById('pg-traf');
+    if(pg) pg.classList.add('active');
+    const trafTab = document.querySelector('.tab[onclick*="traf"]');
+    if(trafTab) trafTab.classList.add('active');
+    const trafSb = document.querySelector('.sb-item[onclick*="traf"]');
+    if(trafSb) trafSb.classList.add('active');
+    // Abrir painel de input automaticamente
+    setTimeout(function(){
+      var body = document.getElementById('traf-input-body');
+      if(body) body.style.display='block';
+    }, 500);
+  }
   // Badge no header
   const badge = document.getElementById('user-badge');
   badge.style.display = 'flex';
-  badge.className = 'user-badge'+(role==='crm'?' crm':role==='socio'?' socio':'');
+  badge.className = 'user-badge'+(role==='crm'?' crm':role==='socio'?' socio':role==='trafego'?' trafego':'');
   document.getElementById('user-name-badge').textContent = CURRENT_USER.name||CURRENT_USER.email;
-  const labels = {admin:'Admin',socio:'Sócio',crm:'CRM'};
+  const labels = {admin:'Admin',socio:'Sócio',crm:'CRM',trafego:'Tráfego'};
   document.getElementById('user-role-badge').textContent = labels[role]||role;
 }
 
