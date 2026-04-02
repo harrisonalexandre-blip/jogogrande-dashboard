@@ -7698,32 +7698,52 @@ function playPlim(){
 
 var _prevKpiVals={};
 
-function slotReveal(el,finalText,delayMs){
+// Extrai só o primeiro nó de texto do elemento (ignora filhos HTML como spans de %)
+function _mainTextNode(el){
+  for(var i=0;i<el.childNodes.length;i++){
+    if(el.childNodes[i].nodeType===3&&el.childNodes[i].textContent.trim()){
+      return el.childNodes[i];
+    }
+  }
+  return null;
+}
+function _mainText(el){
+  var n=_mainTextNode(el);
+  return n?n.textContent.trim():el.textContent.trim();
+}
+
+function slotReveal(el,finalMainText,finalHtml,delayMs){
   setTimeout(function(){
     var nums='0123456789';
     var FRAMES=14,FRAME_MS=32;
     var f=0;
-    var digitCount=(finalText.match(/\d/g)||[]).length||1;
+    var digitCount=(finalMainText.match(/\d/g)||[]).length||1;
     el.classList.remove('slot-anim');
-    void el.offsetWidth; // reflow para reiniciar animação CSS
+    void el.offsetWidth;
     el.classList.add('slot-anim');
+    // Trabalhar APENAS no primeiro nó de texto, preservando spans filhos
+    var textNode=_mainTextNode(el);
     function tick(){
       f++;
       var ratio=f/FRAMES;
       var di=0,out='';
-      for(var i=0;i<finalText.length;i++){
-        var ch=finalText[i];
+      for(var i=0;i<finalMainText.length;i++){
+        var ch=finalMainText[i];
         if(/\d/.test(ch)){
           di++;
-          var revealAt=di/(digitCount+1);
-          out+=ratio>=revealAt?ch:nums[Math.floor(Math.random()*10)];
+          out+=ratio>=di/(digitCount+1)?ch:nums[Math.floor(Math.random()*10)];
         }else{
           out+=ch;
         }
       }
-      el.textContent=out;
+      if(textNode&&textNode.parentNode===el){
+        textNode.textContent=out+(out.endsWith(' ')?'':' ');
+      }
       if(f<FRAMES)setTimeout(tick,FRAME_MS);
-      else{el.textContent=finalText;}
+      else{
+        // Restaurar HTML completo incluindo spans de % e setas
+        el.innerHTML=finalHtml;
+      }
     }
     tick();
   },delayMs||0);
@@ -7736,16 +7756,16 @@ function checkAndAnimateKpis(withSound){
     var valEl=kpi.querySelector('.kpi-v');
     if(!lblEl||!valEl)return;
     var key=lblEl.textContent.trim();
-    var newVal=valEl.textContent.trim();
-    if(_prevKpiVals[key]!==undefined&&_prevKpiVals[key]!==newVal){
-      changed.push({el:valEl,text:newVal});
+    var newMain=_mainText(valEl);
+    var newHtml=valEl.innerHTML;
+    if(_prevKpiVals[key]!==undefined&&_prevKpiVals[key]!==newMain){
+      changed.push({el:valEl,mainText:newMain,html:newHtml});
     }
-    _prevKpiVals[key]=newVal;
+    _prevKpiVals[key]=newMain;
   });
   if(changed.length>0){
-    // Animar cada KPI com leve delay em cascata (máx 6 em paralelo)
     var stagger=Math.min(80,400/changed.length);
-    changed.forEach(function(c,i){slotReveal(c.el,c.text,i*stagger);});
+    changed.forEach(function(c,i){slotReveal(c.el,c.mainText,c.html,i*stagger);});
     if(withSound)setTimeout(playPlim,80);
   }
 }
@@ -7756,7 +7776,7 @@ function initKpiBaseline(){
     var lblEl=kpi.querySelector('.kpi-l');
     var valEl=kpi.querySelector('.kpi-v');
     if(!lblEl||!valEl)return;
-    _prevKpiVals[lblEl.textContent.trim()]=valEl.textContent.trim();
+    _prevKpiVals[lblEl.textContent.trim()]=_mainText(valEl);
   });
 }
 
