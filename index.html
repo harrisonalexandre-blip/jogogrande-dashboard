@@ -99,6 +99,13 @@ body.sb-open .hdr{margin-left:0}
 #period-select:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(14,165,90,.15);outline:none}
 #period-select option{background:var(--bg2);color:var(--text);font-weight:600}
 /* ── Tráfego Input Form ── */
+/* New entry row inputs (spreadsheet style) */
+#traf-entry-row input{background:#1e1e2e!important;border:1.5px solid rgba(255,255,255,.18)!important;color:var(--text)!important;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;transition:.15s;-webkit-appearance:none}
+#traf-entry-row input:focus{border-color:var(--gold)!important;outline:none;background:rgba(245,158,11,.06)!important}
+#traf-entry-row input[id="te-inv"]{border-color:rgba(239,68,68,.7)!important}
+#traf-entry-row input[id="te-inv"]:focus{border-color:#ef4444!important}
+#traf-entry-row input[id="te-cad"],#traf-entry-row input[id="te-ftd"],#traf-entry-row input[id="te-netPL"]{background:rgba(245,158,11,.10)!important;border-color:rgba(245,158,11,.75)!important}
+#traf-entry-row input[id="te-cad"]:focus,#traf-entry-row input[id="te-ftd"]:focus,#traf-entry-row input[id="te-netPL"]:focus{background:rgba(245,158,11,.15)!important;border-color:var(--gold)!important}
 .traf-field{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .traf-field label{font-size:10px;color:var(--text3);white-space:nowrap;min-width:110px}
 .traf-field input{background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:5px 8px;border-radius:6px;font-size:12px;font-family:inherit;font-weight:700;width:100%;transition:.15s;text-align:right}
@@ -2141,48 +2148,48 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
     </div>
   </div>
   <!-- Linha de entrada — como preencher uma linha de planilha -->
-  <div id="traf-entry-row" style="padding:12px 18px 10px;display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
+  <div id="traf-entry-row" style="padding:12px 18px 10px;display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;background:rgba(255,255,255,.025);min-height:64px">
 
     <!-- DATA -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:110px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">DATA</label>
-      <input type="date" id="te-date" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700" onchange="trafBtagLoad(this.value)">
+      <input type="date" id="te-date" style="background:#1e1e2e;border:1.5px solid rgba(255,255,255,.2);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700" onchange="trafBtagLoad(this.value)">
     </div>
 
     <!-- INVESTIMENTO -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:90px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:#ef4444">INV R$</label>
-      <input type="number" id="te-inv" placeholder="0,00" step="0.01" style="background:var(--bg3);border:1.5px solid rgba(239,68,68,.4);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+      <input type="number" id="te-inv" placeholder="0,00" step="0.01" style="background:#1e1e2e;border:1.5px solid rgba(239,68,68,.7);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
     <!-- IMPRESSÕES -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:80px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">IMPR.</label>
-      <input type="number" id="te-imp" placeholder="0" step="1" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+      <input type="number" id="te-imp" placeholder="0" step="1" style="background:#1e1e2e;border:1.5px solid rgba(255,255,255,.18);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
     <!-- ALCANCE -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:80px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">ALCANCE</label>
-      <input type="number" id="te-alc" placeholder="0" step="1" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+      <input type="number" id="te-alc" placeholder="0" step="1" style="background:#1e1e2e;border:1.5px solid rgba(255,255,255,.18);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
     <!-- CLICKS -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:72px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">CLICKS</label>
-      <input type="number" id="te-clk" placeholder="0" step="1" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+      <input type="number" id="te-clk" placeholder="0" step="1" style="background:#1e1e2e;border:1.5px solid rgba(255,255,255,.18);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
     <!-- CONV BM -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:72px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">CONV BM</label>
-      <input type="number" id="te-conv" placeholder="0" step="1" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+      <input type="number" id="te-conv" placeholder="0" step="1" style="background:#1e1e2e;border:1.5px solid rgba(255,255,255,.18);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
     <!-- FREQ -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:64px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">FREQ</label>
-      <input type="number" id="te-freq" placeholder="0,0" step="0.01" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+      <input type="number" id="te-freq" placeholder="0,0" step="0.01" style="background:#1e1e2e;border:1.5px solid rgba(255,255,255,.18);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
     <!-- divider -->
@@ -2191,19 +2198,19 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
     <!-- CAD META -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:72px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">CAD META</label>
-      <input type="number" id="te-cad" placeholder="0" step="1" style="background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.4);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+      <input type="number" id="te-cad" placeholder="0" step="1" style="background:rgba(245,158,11,.10);border:1.5px solid rgba(245,158,11,.75);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
     <!-- FTD META -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:72px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">FTD META</label>
-      <input type="number" id="te-ftd" placeholder="0" step="1" style="background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.4);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+      <input type="number" id="te-ftd" placeholder="0" step="1" style="background:rgba(245,158,11,.10);border:1.5px solid rgba(245,158,11,.75);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
     <!-- NET P&L META -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:90px">
       <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">NET P&amp;L META R$</label>
-      <input type="number" id="te-netPL" placeholder="0,00" step="0.01" style="background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.4);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+      <input type="number" id="te-netPL" placeholder="0,00" step="0.01" style="background:rgba(245,158,11,.10);border:1.5px solid rgba(245,158,11,.75);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
     <!-- BOTÃO ADD -->
@@ -2214,7 +2221,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   </div>
 
   <!-- Phoenix BTAG auto-data para a data selecionada -->
-  <div id="traf-btag-row" style="padding:6px 18px 10px;border-top:1px solid rgba(14,165,90,.15);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+  <div id="traf-btag-row" style="padding:6px 18px 10px;border-top:1px solid rgba(14,165,90,.15);display:none;align-items:center;gap:16px;flex-wrap:wrap">
     <span style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--green)">🟢 PHOENIX BTAG</span>
     <span id="tb-cad" style="font-size:11px;color:var(--text2)">CAD: —</span>
     <span id="tb-ftd" style="font-size:11px;color:var(--text2)">FTD: —</span>
