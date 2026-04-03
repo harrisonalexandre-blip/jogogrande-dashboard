@@ -87,7 +87,7 @@ module.exports = async function handler(req, res) {
       if (!newEmail || !newPassword || !newName) {
         return res.status(400).json({ error: 'E-mail, nome e senha obrigatorios' });
       }
-      const validRoles = ['admin', 'socio', 'crm'];
+      const validRoles = ['admin', 'socio', 'crm', 'trafego'];
       if (!validRoles.includes(newRole)) {
         return res.status(400).json({ error: 'Role invalido' });
       }

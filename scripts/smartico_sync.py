@@ -26,7 +26,7 @@ except ImportError:
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX_HTML = os.path.join(REPO_DIR, 'index.html')
 API_HOST = "https://boapi3.smartico.ai"
-API_KEY = "ed91f910-2897-11f1-8250-027e66b7665d-12447"
+API_KEY = "13d4a8d4-2e2e-11f1-8319-027e66b7665d-12447"
 HEADERS = {"authorization": API_KEY}
 
 NUMERIC_FIELDS = [
@@ -163,16 +163,53 @@ def main():
         print(f"    ERROR fetching months: {e}. Keeping current.")
         new_months = current_aff.get('months', [])
 
+    # ----- FETCH PER-AFFILIATE DAILY DATA (last 14 days) -----
+    print("  Fetching per-affiliate daily data (affDays)...")
+    aff_days_updated = current_aff.get('affDays', {})
+    try:
+        aff_from = (datetime.now() - timedelta(days=14)).strftime('%Y-%m-%d')
+        aff_raw = api_get({'aggregation_period': 'DAY', 'date_from': aff_from,
+                           'date_to': tomorrow, 'group_by': 'affiliate_id'})
+        if isinstance(aff_raw, list) and len(aff_raw) > 0:
+            # Build {affiliate_name: {date: row}} from API
+            aff_by_name = {}
+            for r in aff_raw:
+                name = r.get('affiliate_name') or r.get('affiliate_id', '')
+                if not name:
+                    continue
+                d = r.get('dt', '')[:10]
+                if not d:
+                    continue
+                if name not in aff_by_name:
+                    aff_by_name[name] = {}
+                aff_by_name[name][d] = {
+                    'd': d,
+                    'ftd': int(r.get('ftd_count', 0) or 0),
+                    'da': float(r.get('deposit_total', 0) or 0),
+                    'rg': int(r.get('registration_count', 0) or 0),
+                    'wa': float(r.get('withdrawal_total', 0) or 0),
+                    'np': float(r.get('net_pl', 0) or 0),
+                    'vol': float(r.get('volume', 0) or 0),
+                }
+            # Merge into existing affDays (overwrite recent dates, keep old history)
+            for name, day_dict in aff_by_name.items():
+                existing = {e['d']: e for e in aff_days_updated.get(name, [])}
+                existing.update(day_dict)  # overwrite recent dates
+                aff_days_updated[name] = sorted(existing.values(), key=lambda x: x['d'])
+            print(f"    {len(aff_by_name)} afiliados × últimos 14 dias atualizados")
+        else:
+            print(f"    Sem dados per-afiliado. Preservando atual.")
+    except Exception as e:
+        print(f"    ERROR fetching affDays: {e}. Preservando atual.")
+
     # ----- BUILD FINAL AFF -----
-    # CRITICAL: affs, affDays, affMonths are PRESERVED (they have affiliate names)
-    # Only days, months, weeks are updated from API (aggregate data, no names needed)
     final_aff = {
         'affs': current_aff.get('affs', []),         # PRESERVE (has names)
         'months': new_months,                          # UPDATE
         'weeks': current_aff.get('weeks', []),         # PRESERVE (complex)
         'days': new_days if len(new_days) >= 100 else current_aff.get('days', []),  # UPDATE with guard
         'affMonths': current_aff.get('affMonths', {}), # PRESERVE (keyed by name)
-        'affDays': current_aff.get('affDays', {}),     # PRESERVE (keyed by name)
+        'affDays': aff_days_updated,                   # UPDATE (últimos 14 dias + histórico)
         'syncAt': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
     }
 
