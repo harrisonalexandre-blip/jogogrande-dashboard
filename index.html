@@ -2207,9 +2207,27 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
       <input type="number" id="te-ftd" placeholder="0" step="1" style="background:rgba(245,158,11,.10);border:1.5px solid rgba(245,158,11,.75);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
+    <!-- FTD AMOUNT META -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:90px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">FTD AMT R$</label>
+      <input type="number" id="te-ftdAmt" placeholder="0,00" step="0.01" style="background:rgba(245,158,11,.10);border:1.5px solid rgba(245,158,11,.75);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- DEP AMOUNT META -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:90px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">DEP AMT R$</label>
+      <input type="number" id="te-depAmt" placeholder="0,00" step="0.01" style="background:rgba(245,158,11,.10);border:1.5px solid rgba(245,158,11,.75);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- NET DEPOSIT META -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:90px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">NET DEP R$</label>
+      <input type="number" id="te-netDep" placeholder="0,00" step="0.01" style="background:rgba(245,158,11,.10);border:1.5px solid rgba(245,158,11,.75);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
     <!-- NET P&L META -->
     <div style="display:flex;flex-direction:column;gap:3px;min-width:90px">
-      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">NET P&amp;L META R$</label>
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">NET P&amp;L R$</label>
       <input type="number" id="te-netPL" placeholder="0,00" step="0.01" style="background:rgba(245,158,11,.10);border:1.5px solid rgba(245,158,11,.75);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
 
@@ -2225,9 +2243,10 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
     <span style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--green)">🟢 PHOENIX BTAG</span>
     <span id="tb-cad" style="font-size:11px;color:var(--text2)">CAD: —</span>
     <span id="tb-ftd" style="font-size:11px;color:var(--text2)">FTD: —</span>
+    <span id="tb-ftdAmt" style="font-size:11px;color:var(--text2)">FTD Amt: —</span>
     <span id="tb-dep" style="font-size:11px;color:var(--text2)">Dep: —</span>
     <span id="tb-wd"  style="font-size:11px;color:var(--text2)">Saq: —</span>
-    <span id="tb-net" style="font-size:11px;color:var(--text2)">Net: —</span>
+    <span id="tb-net" style="font-size:11px;color:var(--text2)">Net Dep: —</span>
   </div>
 
   <!-- Mensagem de feedback -->
@@ -2244,9 +2263,9 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
     <table>
       <thead><tr>
         <th>Data</th><th>Inv R$</th><th>Impr.</th><th>Alcance</th><th>CPM</th><th>CTR%</th><th>CPC</th><th>Clicks</th><th>Conv BM</th>
-        <th style="background:rgba(245,158,11,.08)">Cad Meta</th><th style="background:rgba(245,158,11,.08)">FTD Meta</th><th style="background:rgba(245,158,11,.08)">CAC Meta</th><th style="background:rgba(245,158,11,.08)">CAFD Meta</th>
-        <th style="background:rgba(14,165,90,.08)">Cad BTAG</th><th style="background:rgba(14,165,90,.08)">FTD BTAG</th><th style="background:rgba(14,165,90,.08)">Net BTAG</th>
-        <th>ROAS</th><th>Entradas</th>
+        <th style="background:rgba(245,158,11,.08)">Cad</th><th style="background:rgba(245,158,11,.08)">FTD</th><th style="background:rgba(245,158,11,.08)">FTD Amt</th><th style="background:rgba(245,158,11,.08)">Dep Amt</th><th style="background:rgba(245,158,11,.08)">Net Dep</th><th style="background:rgba(245,158,11,.08)">Net P&amp;L</th><th style="background:rgba(245,158,11,.08)">CAC</th><th style="background:rgba(245,158,11,.08)">CAFD</th>
+        <th style="background:rgba(14,165,90,.08)">Cad BTAG</th><th style="background:rgba(14,165,90,.08)">FTD BTAG</th><th style="background:rgba(14,165,90,.08)">FTD Amt BTAG</th><th style="background:rgba(14,165,90,.08)">Dep BTAG</th><th style="background:rgba(14,165,90,.08)">Net BTAG</th>
+        <th>ROAS</th><th>Ent.</th>
       </tr></thead>
       <tbody id="traf-table"></tbody>
       <tfoot id="traf-table-foot"></tfoot>
@@ -6438,12 +6457,15 @@ function aggregateTrafByDate(logs) {
     // Phoenix BTAG (se em cache)
     var btag = _trafBtagCache[r.d];
     if (btag) {
-      r.cad_btag  = btag.cadastros || 0;
-      r.ftd_btag  = btag.ftds      || 0;
-      r.net_btag  = btag.netDep    || 0;
+      r.cad_btag    = btag.cadastros || 0;
+      r.ftd_btag    = btag.ftds      || 0;
+      r.ftdAmt_btag = btag.ftdAmt    || 0;
+      r.dep_btag    = btag.depAmt    || 0;
+      r.net_btag    = btag.netDep    || 0;
       // Se Meta não preencheu, usar BTAG como fallback
-      if (!r.cad_meta && r.cad_btag) { r.cad = r.cad_btag; r.ftd = r.ftd_btag; }
-      if (!r.netPL_meta && r.net_btag) { r.netPL = r.net_btag; }
+      if (!r.cad_meta && r.cad_btag)   { r.cad = r.cad_btag; r.ftd = r.ftd_btag; }
+      if (!r.depAmt_meta && r.dep_btag) { r.depAmt = r.dep_btag; r.netDep = r.net_btag; }
+      if (!r.netPL_meta && r.net_btag)  { r.netPL = r.net_btag; }
     }
   });
   return Object.values(byDate).sort(function(a,b){ return a.d.localeCompare(b.d); });
@@ -6468,9 +6490,9 @@ async function addTrafEntry() {
     freq:  getV('te-freq'),
     cad_meta:    getV('te-cad'),
     ftd_meta:    getV('te-ftd'),
-    ftdAmt_meta: 0,
-    depAmt_meta: 0,
-    netDep_meta: 0,
+    ftdAmt_meta: getV('te-ftdAmt'),
+    depAmt_meta: getV('te-depAmt'),
+    netDep_meta: getV('te-netDep'),
     netPL_meta:  getV('te-netPL'),
   };
 
@@ -6485,7 +6507,7 @@ async function addTrafEntry() {
   _updateTrafEntryStatus();
 
   // 2. Limpa inputs numéricos (mantém data)
-  ['te-inv','te-imp','te-alc','te-clk','te-conv','te-freq','te-cad','te-ftd','te-netPL'].forEach(function(id) {
+  ['te-inv','te-imp','te-alc','te-clk','te-conv','te-freq','te-cad','te-ftd','te-ftdAmt','te-depAmt','te-netDep','te-netPL'].forEach(function(id) {
     var el = document.getElementById(id); if (el) el.value = '';
   });
 
@@ -6545,11 +6567,12 @@ function _renderBtagRow(d) {
   if (!btagRow) return;
   btagRow.style.display = 'flex';
   function fmtR(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2}); }
-  var cadEl = document.getElementById('tb-cad'); if (cadEl) cadEl.textContent = 'CAD: ' + (d.cadastros||0);
-  var ftdEl = document.getElementById('tb-ftd'); if (ftdEl) ftdEl.textContent = 'FTD: ' + (d.ftds||0);
-  var depEl = document.getElementById('tb-dep'); if (depEl) depEl.textContent = 'Dep: ' + fmtR(d.depAmt);
-  var wdEl  = document.getElementById('tb-wd');  if (wdEl)  wdEl.textContent  = 'Saq: ' + fmtR(d.wdAmt);
-  var netEl = document.getElementById('tb-net'); if (netEl) netEl.textContent = 'Net: ' + fmtR(d.netDep);
+  var cadEl = document.getElementById('tb-cad');    if (cadEl) cadEl.textContent = 'CAD: ' + (d.cadastros||0);
+  var ftdEl = document.getElementById('tb-ftd');    if (ftdEl) ftdEl.textContent = 'FTD: ' + (d.ftds||0);
+  var ftdAmtEl = document.getElementById('tb-ftdAmt'); if (ftdAmtEl) ftdAmtEl.textContent = 'FTD Amt: ' + fmtR(d.ftdAmt);
+  var depEl = document.getElementById('tb-dep');    if (depEl) depEl.textContent = 'Dep: ' + fmtR(d.depAmt);
+  var wdEl  = document.getElementById('tb-wd');     if (wdEl)  wdEl.textContent  = 'Saq: ' + fmtR(d.wdAmt);
+  var netEl = document.getElementById('tb-net');    if (netEl) netEl.textContent = 'Net Dep: ' + fmtR(d.netDep);
 }
 
 
@@ -6604,12 +6627,12 @@ function rTraf(){
 
   // ── Totais ────────────────────────────────────────────────────
   const totInv    = tData.reduce(function(s,r){return s+(r.inv||0);},0);
-  const totCad    = tData.reduce(function(s,r){return s+(r.cad||r.cad_meta||0);},0);
-  const totFtd    = tData.reduce(function(s,r){return s+(r.ftd||r.ftd_meta||0);},0);
-  const totFtdAmt = tData.reduce(function(s,r){return s+(r.ftdAmt||r.ftdAmt_meta||0);},0);
-  const totDepAmt = tData.reduce(function(s,r){return s+(r.depAmt||r.depAmt_meta||0);},0);
-  const totNetDep = tData.reduce(function(s,r){return s+(r.netDep||r.netDep_meta||0);},0);
-  const totNetPL  = tData.reduce(function(s,r){return s+(r.netPL||r.netPL_meta||0);},0);
+  const totCad    = tData.reduce(function(s,r){return s+(r.cad_meta||r.cad||0);},0);
+  const totFtd    = tData.reduce(function(s,r){return s+(r.ftd_meta||r.ftd||0);},0);
+  const totFtdAmt = tData.reduce(function(s,r){return s+(r.ftdAmt_meta||r.ftdAmt||0);},0);
+  const totDepAmt = tData.reduce(function(s,r){return s+(r.depAmt_meta||r.depAmt||0);},0);
+  const totNetDep = tData.reduce(function(s,r){return s+(r.netDep_meta||r.netDep||0);},0);
+  const totNetPL  = tData.reduce(function(s,r){return s+(r.netPL_meta||r.netPL||0);},0);
   const custoCad  = totCad>0 ? totInv/totCad : 0;
   const custoFtd  = totFtd>0 ? totInv/totFtd : 0;
   const roas      = totInv>0 ? totNetPL/totInv : 0;
@@ -6694,19 +6717,31 @@ function rTraf(){
   tData.forEach(function(r){
     const dd=r.d.split('-');
     const inv=r.inv||0;
-    const cadMeta=r.cad_meta||0;
-    const ftdMeta=r.ftd_meta||0;
-    const cadBtag=r.cad_btag||0;
-    const ftdBtag=r.ftd_btag||0;
-    const netBtag=r.net_btag||0;
-    const netPL=r.netPL||r.netPL_meta||0;
-    const cacMeta=cadMeta>0?inv/cadMeta:0;
-    const cafdMeta=ftdMeta>0?inv/ftdMeta:0;
-    const roasD=inv>0?netPL/inv:0;
-    const isLog=logDates.has(r.d);
-    const cnt=r.count||0;
-    html+=`<tr style="${isLog?'border-left:2px solid var(--gold)':''}">
-      <td style="white-space:nowrap">${dd[2]}/${dd[1]}${isLog?'<span style="font-size:8px;color:var(--gold);margin-left:4px">✏️'+cnt+'</span>':''}</td>
+    // Meta (gestor input)
+    const cadMeta   = r.cad_meta   || r.cad    || 0;
+    const ftdMeta   = r.ftd_meta   || r.ftd    || 0;
+    const ftdAmtMeta= r.ftdAmt_meta|| r.ftdAmt || 0;
+    const depAmtMeta= r.depAmt_meta|| r.depAmt || 0;
+    const netDepMeta= r.netDep_meta|| r.netDep || 0;
+    const netPLMeta = r.netPL_meta || r.netPL  || 0;
+    // BTAG Phoenix
+    const cadBtag    = r.cad_btag    || 0;
+    const ftdBtag    = r.ftd_btag    || 0;
+    const ftdAmtBtag = r.ftdAmt_btag || 0;
+    const depBtag    = r.dep_btag    || 0;
+    const netBtag    = r.net_btag    || 0;
+    // Computed
+    const cacMeta  = cadMeta>0  ? inv/cadMeta  : 0;
+    const cafdMeta = ftdMeta>0  ? inv/ftdMeta  : 0;
+    const roasD    = inv>0      ? netPLMeta/inv : 0;
+    const isLog    = logDates.has(r.d);
+    const cnt      = r.count || 0;
+    // Color helpers
+    const posClr   = v => v>=0 ? 'var(--green)' : '#ef4444';
+    const goldBg   = 'background:rgba(245,158,11,.04)';
+    const greenBg  = 'background:rgba(14,165,90,.04)';
+    html+=`<tr style="${isLog?'border-left:2px solid rgba(245,158,11,.6)':''}">
+      <td style="white-space:nowrap;font-weight:700">${dd[2]}/${dd[1]}${isLog?'<span style="font-size:8px;color:var(--gold);margin-left:4px">✏️${cnt}</span>':''}</td>
       <td style="color:#ef4444;font-weight:700">${fmt(inv)}</td>
       <td style="color:var(--text3)">${r.imp?fN(r.imp):'-'}</td>
       <td style="color:var(--text3)">${r.alc?fN(r.alc):'-'}</td>
@@ -6715,42 +6750,58 @@ function rTraf(){
       <td style="color:var(--text3)">${r.cpc?fmt(r.cpc):'-'}</td>
       <td style="color:var(--text3)">${r.clk?fN(r.clk):'-'}</td>
       <td style="color:var(--text3)">${r.conv?fN(r.conv):'-'}</td>
-      <td style="background:rgba(245,158,11,.04)">${cadMeta||'-'}</td>
-      <td style="background:rgba(245,158,11,.04)">${ftdMeta||'-'}</td>
-      <td style="background:rgba(245,158,11,.04);color:var(--gold)">${cacMeta>0?fmt(cacMeta):'-'}</td>
-      <td style="background:rgba(245,158,11,.04);color:var(--gold)">${cafdMeta>0?fmt(cafdMeta):'-'}</td>
-      <td style="background:rgba(14,165,90,.04)">${cadBtag||'-'}</td>
-      <td style="background:rgba(14,165,90,.04)">${ftdBtag||'-'}</td>
-      <td style="background:rgba(14,165,90,.04);color:${netBtag>=0?'var(--green)':'#ef4444'}">${netBtag?fmt(netBtag):'-'}</td>
-      <td style="color:${roasD>=1?'var(--green)':'#ef4444'}"><b>${roasD>0?roasD.toFixed(2)+'x':'-'}</b></td>
+      <td style="${goldBg}">${cadMeta||'-'}</td>
+      <td style="${goldBg}">${ftdMeta||'-'}</td>
+      <td style="${goldBg};color:var(--cyan)">${ftdAmtMeta?fmt(ftdAmtMeta):'-'}</td>
+      <td style="${goldBg};color:var(--cyan)">${depAmtMeta?fmt(depAmtMeta):'-'}</td>
+      <td style="${goldBg};color:${posClr(netDepMeta)}">${netDepMeta?fmt(netDepMeta):'-'}</td>
+      <td style="${goldBg};color:${posClr(netPLMeta)}">${netPLMeta?fmt(netPLMeta):'-'}</td>
+      <td style="${goldBg};color:var(--gold)">${cacMeta>0?fmt(cacMeta):'-'}</td>
+      <td style="${goldBg};color:var(--gold)">${cafdMeta>0?fmt(cafdMeta):'-'}</td>
+      <td style="${greenBg}">${cadBtag||'-'}</td>
+      <td style="${greenBg}">${ftdBtag||'-'}</td>
+      <td style="${greenBg};color:var(--cyan)">${ftdAmtBtag?fmt(ftdAmtBtag):'-'}</td>
+      <td style="${greenBg};color:var(--cyan)">${depBtag?fmt(depBtag):'-'}</td>
+      <td style="${greenBg};color:${posClr(netBtag)}">${netBtag?fmt(netBtag):'-'}</td>
+      <td style="color:${roasD>=1?'var(--green)':'#ef4444'}">${roasD>0?roasD.toFixed(2)+'x':'-'}</td>
       <td style="color:var(--text3);font-size:10px">${cnt||'-'}</td>
     </tr>`;
   });
   document.getElementById('traf-table').innerHTML=html;
 
   // ── Rodapé totais ──────────────────────────────────────────────
-  const totImp=tData.reduce(function(s,r){return s+(r.imp||0);},0);
-  const totAlc=tData.reduce(function(s,r){return s+(r.alc||0);},0);
-  const totClk=tData.reduce(function(s,r){return s+(r.clk||0);},0);
-  const totConv=tData.reduce(function(s,r){return s+(r.conv||0);},0);
-  const totCadMeta=tData.reduce(function(s,r){return s+(r.cad_meta||0);},0);
-  const totFtdMeta=tData.reduce(function(s,r){return s+(r.ftd_meta||0);},0);
-  const roasT=totInv>0?totNetPL/totInv:0;
+  const totImp      = tData.reduce(function(s,r){return s+(r.imp||0);},0);
+  const totAlc      = tData.reduce(function(s,r){return s+(r.alc||0);},0);
+  const totClk      = tData.reduce(function(s,r){return s+(r.clk||0);},0);
+  const totConv     = tData.reduce(function(s,r){return s+(r.conv||0);},0);
+  const totCadMeta  = tData.reduce(function(s,r){return s+(r.cad_meta||r.cad||0);},0);
+  const totFtdMeta  = tData.reduce(function(s,r){return s+(r.ftd_meta||r.ftd||0);},0);
+  const totFtdAmt   = tData.reduce(function(s,r){return s+(r.ftdAmt_meta||r.ftdAmt||0);},0);
+  const totDepAmt2  = tData.reduce(function(s,r){return s+(r.depAmt_meta||r.depAmt||0);},0);
+  const totNetDep2  = tData.reduce(function(s,r){return s+(r.netDep_meta||r.netDep||0);},0);
+  const totNetPL2   = tData.reduce(function(s,r){return s+(r.netPL_meta||r.netPL||0);},0);
+  const roasT       = totInv>0?totNetPL2/totInv:0;
+  const gBg = 'background:rgba(245,158,11,.08)';
+  const bBg = 'background:rgba(14,165,90,.08)';
   document.getElementById('traf-table-foot').innerHTML=`<tr style="font-weight:800;background:rgba(255,215,0,0.08)">
     <td>TOTAL</td>
     <td style="color:#ef4444">${fmt(totInv)}</td>
     <td>${totImp?fN(totImp):'-'}</td><td>${totAlc?fN(totAlc):'-'}</td>
     <td>—</td><td>—</td><td>—</td>
     <td>${totClk?fN(totClk):'-'}</td><td>${totConv?fN(totConv):'-'}</td>
-    <td style="background:rgba(245,158,11,.06)">${totCadMeta||'-'}</td>
-    <td style="background:rgba(245,158,11,.06)">${totFtdMeta||'-'}</td>
-    <td style="background:rgba(245,158,11,.06);color:var(--gold)">${totCadMeta>0?fmt(totInv/totCadMeta):'-'}</td>
-    <td style="background:rgba(245,158,11,.06);color:var(--gold)">${totFtdMeta>0?fmt(totInv/totFtdMeta):'-'}</td>
-    <td style="background:rgba(14,165,90,.06)">—</td><td style="background:rgba(14,165,90,.06)">—</td><td style="background:rgba(14,165,90,.06)">—</td>
-    <td style="color:${roasT>=1?'var(--green)':'#ef4444'}"><b>${roasT.toFixed(2)}x</b></td>
+    <td style="${gBg}">${totCadMeta||'-'}</td>
+    <td style="${gBg}">${totFtdMeta||'-'}</td>
+    <td style="${gBg};color:var(--cyan)">${fmt(totFtdAmt)}</td>
+    <td style="${gBg};color:var(--cyan)">${fmt(totDepAmt2)}</td>
+    <td style="${gBg};color:${totNetDep2>=0?'var(--green)':'#ef4444'}">${fmt(totNetDep2)}</td>
+    <td style="${gBg};color:${totNetPL2>=0?'var(--green)':'#ef4444'}">${fmt(totNetPL2)}</td>
+    <td style="${gBg};color:var(--gold)">${totCadMeta>0?fmt(totInv/totCadMeta):'-'}</td>
+    <td style="${gBg};color:var(--gold)">${totFtdMeta>0?fmt(totInv/totFtdMeta):'-'}</td>
+    <td style="${bBg}">—</td><td style="${bBg}">—</td><td style="${bBg}">—</td><td style="${bBg}">—</td><td style="${bBg}">—</td>
+    <td style="color:${roasT>=1?'var(--green)':'#ef4444'}">${roasT.toFixed(2)}x</td>
     <td>—</td>
   </tr>`;
-  document.getElementById('traf-table-summary').textContent=tData.length+' dias · '+_trafLogs.length+' entradas salvas';
+  document.getElementById('traf-table-summary').textContent=tData.length+' dias · '+_trafLogs.length+' entradas · Inv total: '+fmt(totInv);
 }
 
 // Net PL matrix: cada safra → quanto Net PL gerou em Week 0, Week 1, Week 2...
