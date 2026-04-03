@@ -1,11 +1,20 @@
+/**
+ * api/trafego-ads.js
+ * Modelo APPEND-ONLY: cada envio é um log com timestamp único.
+ * Os totais diários são calculados no front somando todas as entradas do dia.
+ *
+ * Redis key: jg-trafego-logs-v3 → array de { id, d, ts, inv, imp, alc, clk, conv, freq, cad_meta, ftd_meta, ftdAmt_meta, depAmt_meta, netDep_meta, netPL_meta }
+ * Sheets tab: "Tráfego Logs" (append permanente — nunca apaga)
+ */
+
 const Redis = require('ioredis');
 const { google } = require('googleapis');
 
-const REDIS_KEY = 'jg-trafego-ads-v2';
-const SHEET_ID = '1ccyDzg1dGVwXkhZWN04eXVBrAobq0JvBNAH9Xp8fyhg';
-const SHEET_TAB = 'Tráfego Pago';
+const REDIS_KEY  = 'jg-trafego-logs-v3';
+const SHEET_ID   = '1ccyDzg1dGVwXkhZWN04eXVBrAobq0JvBNAH9Xp8fyhg';
+const SHEET_TAB  = 'Tráfego Logs';
 
-// ── Redis ──────────────────────────────────────────────────────────────
+// ── Redis ──────────────────────────────────────────────────────────────────
 let _redis = null;
 function getRedis() {
   if (!_redis) {
@@ -29,17 +38,17 @@ async function redisGet() {
   const raw = await withTimeout(redis.get(REDIS_KEY), 2000);
   return raw ? JSON.parse(raw) : [];
 }
-async function redisSave(items) {
+async function redisSave(logs) {
   if (!process.env.REDIS_URL) return false;
   const redis = getRedis();
   await withTimeout(redis.connect().catch(() => {}), 2000);
   if (redis.status !== 'ready') return false;
-  await withTimeout(redis.set(REDIS_KEY, JSON.stringify(items)), 2000);
+  await withTimeout(redis.set(REDIS_KEY, JSON.stringify(logs)), 2000);
   return true;
 }
 
-// ── Google Sheets Sync ────────────────────────────────────────────────
-async function syncToSheets(items) {
+// ── Google Sheets — append uma linha (nunca apaga) ────────────────────────
+async function appendToSheets(entry) {
   if (!process.env.GOOGLE_CREDENTIALS) return { ok: false, reason: 'no credentials' };
   try {
     const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS);
@@ -49,7 +58,7 @@ async function syncToSheets(items) {
     });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Ensure tab exists
+    // Garante que a aba existe
     const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
     const tabExists = meta.data.sheets.some(s => s.properties.title === SHEET_TAB);
     if (!tabExists) {
@@ -57,88 +66,87 @@ async function syncToSheets(items) {
         spreadsheetId: SHEET_ID,
         requestBody: { requests: [{ addSheet: { properties: { title: SHEET_TAB } } }] }
       });
+      // Cria cabeçalho na aba nova
+      const header = ['ID','Data','Timestamp','Investimento','Impressões','Alcance','Clicks','Conv BM','Frequência','Cadastros Meta','FTDs Meta','FTD Amount Meta','Dep Amount Meta','Net Dep Meta','Net P&L Meta'];
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_ID,
+        range: `${SHEET_TAB}!A1`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [header] }
+      });
     }
 
-    // Build rows
-    const header = ['Data','Investimento','Impressões','Alcance','CPM','CTR%','CPC','Clicks','Conv BM','Frequência','CPR','Cadastros','FTDs','FTD Amount','Dep Amount','Net Deposit','Net P&L','Custo CAD','Custo FTD','ROAS','Atualizado'];
-    const rows = items.sort((a,b) => a.d.localeCompare(b.d)).map(r => [
-      r.d, r.inv||0, r.imp||0, r.alc||0, r.cpm||0, r.ctr||0, r.cpc||0,
-      r.clk||0, r.conv||0, r.freq||0, r.cpr||0,
-      r.cad||0, r.ftd||0, r.ftdAmt||0, r.depAmt||0, r.netDep||0, r.netPL||0,
-      r.cad>0?(r.inv/r.cad).toFixed(2):0,
-      r.ftd>0?(r.inv/r.ftd).toFixed(2):0,
-      r.inv>0?(r.netPL/r.inv).toFixed(3):0,
-      r.savedAt||''
-    ]);
-
-    // Clear and rewrite
-    await sheets.spreadsheets.values.clear({
+    // Append apenas a nova linha
+    const row = [
+      entry.id, entry.d, entry.ts,
+      entry.inv || 0, entry.imp || 0, entry.alc || 0,
+      entry.clk || 0, entry.conv || 0, entry.freq || 0,
+      entry.cad_meta || 0, entry.ftd_meta || 0, entry.ftdAmt_meta || 0,
+      entry.depAmt_meta || 0, entry.netDep_meta || 0, entry.netPL_meta || 0
+    ];
+    await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: `${SHEET_TAB}!A:U`
-    });
-    await sheets.spreadsheets.values.update({
-      spreadsheetId: SHEET_ID,
-      range: `${SHEET_TAB}!A1`,
+      range: `${SHEET_TAB}!A:O`,
       valueInputOption: 'USER_ENTERED',
-      requestBody: { values: [header, ...rows] }
+      requestBody: { values: [row] }
     });
-    return { ok: true, rows: rows.length };
+    return { ok: true };
   } catch (e) {
-    console.error('Sheets sync error:', e.message);
+    console.error('Sheets append error:', e.message);
     return { ok: false, reason: e.message };
   }
 }
 
-// ── Handler ───────────────────────────────────────────────────────────
+// ── Handler ────────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // GET — retorna todos os registros
+  // GET — retorna todos os logs
   if (req.method === 'GET') {
     try {
-      const items = await redisGet();
-      return res.status(200).json({ ok: true, items });
+      const logs = await redisGet();
+      return res.status(200).json({ ok: true, logs: logs.sort((a, b) => a.ts.localeCompare(b.ts)) });
     } catch (e) {
       return res.status(500).json({ error: e.message });
     }
   }
 
-  // POST — salva/atualiza um dia + sync Sheets
+  // POST — adiciona entrada nova (APPEND, nunca substitui)
   if (req.method === 'POST') {
     try {
       const entry = req.body;
       if (!entry || !entry.d) return res.status(400).json({ error: 'Campo d (data) obrigatório' });
-      entry.savedAt = new Date().toISOString();
 
-      let items = await redisGet();
-      const idx = items.findIndex(i => i.d === entry.d);
-      if (idx >= 0) items[idx] = { ...items[idx], ...entry }; // merge (preserva campos existentes)
-      else items.push(entry);
-      items.sort((a, b) => a.d.localeCompare(b.d));
+      // Garante ID único e timestamp
+      entry.id  = entry.id  || (Date.now() + '-' + Math.random().toString(36).slice(2, 7));
+      entry.ts  = entry.ts  || new Date().toISOString();
 
-      await redisSave(items);
+      const logs = await redisGet();
+      logs.push(entry);
 
-      // Sync to Google Sheets (async, não bloqueia resposta)
-      const sheetResult = await syncToSheets(items).catch(e => ({ ok: false, reason: e.message }));
+      await redisSave(logs);
 
-      return res.status(200).json({ ok: true, count: items.length, sheets: sheetResult });
+      // Append assíncrono no Sheets (não bloqueia resposta)
+      const sheetResult = await appendToSheets(entry).catch(e => ({ ok: false, reason: e.message }));
+
+      return res.status(200).json({ ok: true, id: entry.id, count: logs.length, sheets: sheetResult });
     } catch (e) {
       return res.status(500).json({ error: e.message });
     }
   }
 
-  // DELETE — remove um dia
+  // DELETE — remove entrada por ID
   if (req.method === 'DELETE') {
     try {
-      const { d } = req.body || {};
-      if (!d) return res.status(400).json({ error: 'Campo d obrigatório' });
-      let items = await redisGet();
-      items = items.filter(i => i.d !== d);
-      await redisSave(items);
-      return res.status(200).json({ ok: true, count: items.length });
+      const { id } = req.body || {};
+      if (!id) return res.status(400).json({ error: 'Campo id obrigatório' });
+      let logs = await redisGet();
+      logs = logs.filter(l => l.id !== id);
+      await redisSave(logs);
+      return res.status(200).json({ ok: true, count: logs.length });
     } catch (e) {
       return res.status(500).json({ error: e.message });
     }

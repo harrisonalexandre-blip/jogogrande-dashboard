@@ -2140,97 +2140,110 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
       <span id="traf-entry-status" style="font-size:10px;color:var(--text3)">—</span>
     </div>
   </div>
-  <!-- Corpo do form -->
-  <div id="traf-input-body" style="display:none;padding:18px 18px 14px">
-    <!-- Seletor de data + botão de navegação -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <label style="font-size:11px;color:var(--text3);font-weight:700">DATA</label>
-      <input type="date" id="traf-input-date"
-        style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 10px;border-radius:8px;font-size:12px;font-family:inherit;font-weight:700"
-        onchange="loadTrafInputForDate(this.value)">
-      <div id="traf-prod-badge" style="font-size:10px;background:rgba(14,165,90,.12);border:1px solid rgba(14,165,90,.3);color:var(--green);padding:3px 10px;border-radius:10px;display:none">
-        ✅ Dados Phoenix disponíveis
-      </div>
-      <div id="traf-existing-badge" style="font-size:10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--gold);padding:3px 10px;border-radius:10px;display:none">
-        ✏️ Editando lançamento existente
-      </div>
+  <!-- Linha de entrada — como preencher uma linha de planilha -->
+  <div id="traf-entry-row" style="padding:12px 18px 10px;display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
+
+    <!-- DATA -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:110px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">DATA</label>
+      <input type="date" id="te-date" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700" onchange="trafBtagLoad(this.value)">
     </div>
 
-    <!-- Grid principal: 3 colunas -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-
-      <!-- Col 1: Meta Ads (manual) -->
-      <div style="background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px">
-        <div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#ef4444;margin-bottom:12px">📣 META ADS · PREENCHER</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div class="traf-field"><label>Investimento (R$)</label><input type="number" id="ti-inv" placeholder="0,00" step="0.01" oninput="calcTrafMetrics()"></div>
-          <div class="traf-field"><label>Impressões</label><input type="number" id="ti-imp" placeholder="0" step="1"></div>
-          <div class="traf-field"><label>Alcance</label><input type="number" id="ti-alc" placeholder="0" step="1"></div>
-          <div class="traf-field"><label>CPM (R$)</label><input type="number" id="ti-cpm" placeholder="0,00" step="0.01"></div>
-          <div class="traf-field"><label>CTR (%)</label><input type="number" id="ti-ctr" placeholder="0,00" step="0.01"></div>
-          <div class="traf-field"><label>CPC (R$)</label><input type="number" id="ti-cpc" placeholder="0,00" step="0.01"></div>
-          <div class="traf-field"><label>Clicks</label><input type="number" id="ti-clk" placeholder="0" step="1"></div>
-          <div class="traf-field"><label>Conversões (BM)</label><input type="number" id="ti-conv" placeholder="0" step="1"></div>
-          <div class="traf-field"><label>Frequência</label><input type="number" id="ti-freq" placeholder="0,00" step="0.01"></div>
-          <div class="traf-field"><label>CPR (R$)</label><input type="number" id="ti-cpr" placeholder="0,00" step="0.01"></div>
-          <!-- Divider: Produção reportada pelo Meta -->
-          <div style="border-top:1px solid rgba(239,68,68,.25);margin:8px 0 6px;padding-top:8px">
-            <div style="font-size:9px;font-weight:800;letter-spacing:.8px;color:rgba(239,68,68,.7);margin-bottom:8px">📊 PRODUÇÃO · REPORTADA META BM</div>
-          </div>
-          <div class="traf-field"><label>Cadastros (Meta)</label><input type="number" id="ti-cad" placeholder="0" step="1" oninput="calcTrafMetrics()"></div>
-          <div class="traf-field"><label>FTDs (Meta)</label><input type="number" id="ti-ftd" placeholder="0" step="1" oninput="calcTrafMetrics()"></div>
-          <div class="traf-field"><label>FTD Amount (R$)</label><input type="number" id="ti-ftdAmt" placeholder="0,00" step="0.01"></div>
-          <div class="traf-field"><label>Deposit Amount (R$)</label><input type="number" id="ti-depAmt" placeholder="0,00" step="0.01" oninput="calcTrafMetrics()"></div>
-          <div class="traf-field"><label>Net Deposit (R$)</label><input type="number" id="ti-netDep" placeholder="0,00" step="0.01" oninput="calcTrafMetrics()"></div>
-          <div class="traf-field"><label>Net P&amp;L (R$)</label><input type="number" id="ti-netPL" placeholder="0,00" step="0.01" oninput="calcTrafMetrics()"></div>
-        </div>
-      </div>
-
-      <!-- Col 2: Phoenix (auto) -->
-      <div style="background:rgba(14,165,90,.04);border:1px solid rgba(14,165,90,.2);border-radius:10px;padding:14px">
-        <div style="font-size:10px;font-weight:800;letter-spacing:1px;color:var(--green);margin-bottom:4px">🟢 PHOENIX · AUTOMÁTICO</div>
-        <div style="font-size:9px;color:var(--text3);margin-bottom:10px;font-weight:600">BTAG: Trafego Direto - Meta ads</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div class="traf-field traf-auto"><label>Cadastros</label><div class="traf-auto-val" id="ta-cad">—</div></div>
-          <div class="traf-field traf-auto"><label>FTDs</label><div class="traf-auto-val" id="ta-ftd">—</div></div>
-          <div class="traf-field traf-auto"><label>FTD Amount (R$)</label><div class="traf-auto-val" id="ta-ftdAmt">—</div></div>
-          <div class="traf-field traf-auto"><label>Deposit Amount (R$)</label><div class="traf-auto-val" id="ta-depAmt">—</div></div>
-          <div class="traf-field traf-auto"><label>Net Deposit (R$)</label><div class="traf-auto-val" id="ta-netDep">—</div></div>
-          <div class="traf-field traf-auto"><label>Saques (R$)</label><div class="traf-auto-val" id="ta-ws">—</div></div>
-          <div class="traf-field traf-auto"><label>Net P&L (R$)</label><div class="traf-auto-val" id="ta-netPL">—</div></div>
-          <div class="traf-field traf-auto"><label>NGR (R$)</label><div class="traf-auto-val" id="ta-ngr">—</div></div>
-        </div>
-      </div>
-
-      <!-- Col 3: Calculado -->
-      <div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.2);border-radius:10px;padding:14px">
-        <div style="font-size:10px;font-weight:800;letter-spacing:1px;color:#8b5cf6;margin-bottom:12px">📊 CALCULADO</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div class="traf-field traf-auto"><label>Custo / Cadastro</label><div class="traf-auto-val" id="tc-custoCad" style="color:var(--gold)">—</div></div>
-          <div class="traf-field traf-auto"><label>Custo / FTD</label><div class="traf-auto-val" id="tc-custoFtd" style="color:#ef4444">—</div></div>
-          <div class="traf-field traf-auto"><label>ROAS</label><div class="traf-auto-val" id="tc-roas" style="font-size:18px;font-weight:900">—</div></div>
-          <div class="traf-field traf-auto"><label>ROAS Net Dep</label><div class="traf-auto-val" id="tc-roasNet" style="color:var(--cyan)">—</div></div>
-          <div class="traf-field traf-auto"><label>Conv. CAD→FTD</label><div class="traf-auto-val" id="tc-conv" style="color:var(--green)">—</div></div>
-          <div class="traf-field traf-auto"><label>Custo por Click</label><div class="traf-auto-val" id="tc-cpc2">—</div></div>
-          <div style="border-top:1px solid rgba(139,92,246,.2);margin:8px 0 6px;padding-top:8px">
-            <div style="font-size:9px;font-weight:800;letter-spacing:.8px;color:rgba(139,92,246,.7);margin-bottom:8px">⚖️ META vs PHOENIX (BTAG)</div>
-          </div>
-          <div class="traf-field traf-auto"><label>Δ Cadastros</label><div class="traf-auto-val" id="tc-delta-cad">—</div></div>
-          <div class="traf-field traf-auto"><label>Δ FTDs</label><div class="traf-auto-val" id="tc-delta-ftd">—</div></div>
-          <div class="traf-field traf-auto"><label>Δ Net P&amp;L</label><div class="traf-auto-val" id="tc-delta-pl">—</div></div>
-        </div>
-        <!-- Botões -->
-        <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px">
-          <button onclick="saveTrafEntry()" style="background:var(--green);color:#000;border:none;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;width:100%;transition:.2s" id="traf-save-btn">
-            💾 Salvar Lançamento
-          </button>
-          <button onclick="deleteTrafEntry()" style="background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);padding:7px 16px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;width:100%;display:none" id="traf-del-btn">
-            🗑️ Excluir este dia
-          </button>
-          <div id="traf-save-msg" style="font-size:10px;text-align:center;min-height:14px;color:var(--green)"></div>
-        </div>
-      </div>
+    <!-- INVESTIMENTO -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:90px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:#ef4444">INV R$</label>
+      <input type="number" id="te-inv" placeholder="0,00" step="0.01" style="background:var(--bg3);border:1.5px solid rgba(239,68,68,.4);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
     </div>
+
+    <!-- IMPRESSÕES -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:80px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">IMPR.</label>
+      <input type="number" id="te-imp" placeholder="0" step="1" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- ALCANCE -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:80px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">ALCANCE</label>
+      <input type="number" id="te-alc" placeholder="0" step="1" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- CLICKS -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:72px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">CLICKS</label>
+      <input type="number" id="te-clk" placeholder="0" step="1" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- CONV BM -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:72px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">CONV BM</label>
+      <input type="number" id="te-conv" placeholder="0" step="1" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- FREQ -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:64px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--text3)">FREQ</label>
+      <input type="number" id="te-freq" placeholder="0,0" step="0.01" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- divider -->
+    <div style="width:1px;height:38px;background:rgba(245,158,11,.25);align-self:flex-end;margin:0 2px"></div>
+
+    <!-- CAD META -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:72px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">CAD META</label>
+      <input type="number" id="te-cad" placeholder="0" step="1" style="background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.4);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- FTD META -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:72px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">FTD META</label>
+      <input type="number" id="te-ftd" placeholder="0" step="1" style="background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.4);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- NET P&L META -->
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:90px">
+      <label style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--gold)">NET P&amp;L META R$</label>
+      <input type="number" id="te-netPL" placeholder="0,00" step="0.01" style="background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.4);color:var(--text);padding:6px 8px;border-radius:7px;font-size:12px;font-family:inherit;font-weight:700;width:100%">
+    </div>
+
+    <!-- BOTÃO ADD -->
+    <button onclick="addTrafEntry()" id="te-add-btn"
+      style="background:var(--green);color:#000;border:none;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;transition:.15s;white-space:nowrap;align-self:flex-end">
+      + ADD
+    </button>
+  </div>
+
+  <!-- Phoenix BTAG auto-data para a data selecionada -->
+  <div id="traf-btag-row" style="padding:6px 18px 10px;border-top:1px solid rgba(14,165,90,.15);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <span style="font-size:9px;font-weight:800;letter-spacing:.8px;color:var(--green)">🟢 PHOENIX BTAG</span>
+    <span id="tb-cad" style="font-size:11px;color:var(--text2)">CAD: —</span>
+    <span id="tb-ftd" style="font-size:11px;color:var(--text2)">FTD: —</span>
+    <span id="tb-dep" style="font-size:11px;color:var(--text2)">Dep: —</span>
+    <span id="tb-wd"  style="font-size:11px;color:var(--text2)">Saq: —</span>
+    <span id="tb-net" style="font-size:11px;color:var(--text2)">Net: —</span>
+  </div>
+
+  <!-- Mensagem de feedback -->
+  <div id="te-msg" style="padding:0 18px 8px;font-size:11px;font-weight:700;color:var(--green);min-height:20px"></div>
+</div>
+
+<!-- ═══ TABELA DIÁRIA (topo) ═══ -->
+<div class="tb" style="margin-bottom:20px">
+  <div class="th">
+    <h3 style="color:var(--gold)">📊 Detalhamento Diário · Tráfego Pago</h3>
+    <span id="traf-table-summary" style="font-size:11px;color:var(--text2)"></span>
+  </div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Data</th><th>Inv R$</th><th>Impr.</th><th>Alcance</th><th>CPM</th><th>CTR%</th><th>CPC</th><th>Clicks</th><th>Conv BM</th>
+        <th style="background:rgba(245,158,11,.08)">Cad Meta</th><th style="background:rgba(245,158,11,.08)">FTD Meta</th><th style="background:rgba(245,158,11,.08)">CAC Meta</th><th style="background:rgba(245,158,11,.08)">CAFD Meta</th>
+        <th style="background:rgba(14,165,90,.08)">Cad BTAG</th><th style="background:rgba(14,165,90,.08)">FTD BTAG</th><th style="background:rgba(14,165,90,.08)">Net BTAG</th>
+        <th>ROAS</th><th>Entradas</th>
+      </tr></thead>
+      <tbody id="traf-table"></tbody>
+      <tfoot id="traf-table-foot"></tfoot>
+    </table>
   </div>
 </div>
 
@@ -2250,24 +2263,6 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 <div class="cg cg2">
   <div class="cb"><div class="ct"><span class="dot g"></span>Depósitos vs Net Deposit (R$)</div><canvas id="c-traf-dep"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot b"></span>Conversão: Custo CAD vs Custo FTD (R$)</div><canvas id="c-traf-custos"></canvas></div>
-</div>
-<!-- Daily table -->
-<div class="tb">
-  <div class="th">
-    <h3 style="color:var(--gold)">📊 Detalhamento Diário · Tráfego Pago</h3>
-    <span id="traf-table-summary" style="font-size:11px;color:var(--text2)"></span>
-  </div>
-  <div style="overflow-x:auto">
-    <table>
-      <thead><tr>
-        <th>Data</th><th>Investimento</th><th>Impr.</th><th>Alcance</th><th>CPM</th><th>CTR%</th><th>CPC</th><th>Clicks</th><th>Conv BM</th>
-        <th>Cadastros</th><th>Custo CAD</th><th>FTDs</th><th>Custo FTD</th>
-        <th>FTD Amount</th><th>Deposit Amount</th><th>Net Deposit</th><th>Net P&L</th><th>ROAS</th>
-      </tr></thead>
-      <tbody id="traf-table"></tbody>
-      <tfoot id="traf-table-foot"></tfoot>
-    </table>
-  </div>
 </div>
 </div>
 
@@ -2727,7 +2722,7 @@ function setTime(period,el){
   if(ap){const id=ap.id.replace('pg-','');RD[id]=true;
     if(id==='ov')renderOverview();else if(id==='perf')rPerf();
     else if(id==='hist')rHist();else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='afil')rAfil();else if(id==='crm')rCRM();else if(id==='recon')rRecon();
-    else if(id==='casino')rCasino();else if(id==='alertas')rAlertas();else if(id==='btag')rBtag();else if(id==='saldos')rSaldos();else if(id==='cohorts')rCohorts();else if(id==='traf')rTraf();else if(id==='analytics')rAnalytics();}
+    else if(id==='casino')rCasino();else if(id==='alertas')rAlertas();else if(id==='btag')rBtag();else if(id==='saldos')rSaldos();else if(id==='cohorts')rCohorts();else if(id==='traf'){if(!_trafLogsLoaded)initTrafLogs();else rTraf();}else if(id==='analytics')rAnalytics();}
 }
 
 function calcKPIs(data,period){
@@ -6323,210 +6318,273 @@ const TRAF_DATA=[
 ];
 
 // ═══════════════════════════════════════════════════════════════════
-// TRÁFEGO ADS — Input Form Logic
+// TRÁFEGO INTERNO — localStorage-first, Append-Only, Phoenix BTAG
 // ═══════════════════════════════════════════════════════════════════
-var _trafAdsData=[];   // entries loaded from /api/trafego-ads
-var _trafInputOpen=false;
 
-function toggleTrafInput(){
-  _trafInputOpen=!_trafInputOpen;
-  var body=document.getElementById('traf-input-body');
-  var chevron=document.getElementById('traf-input-chevron');
-  if(body)body.style.display=_trafInputOpen?'block':'none';
-  if(chevron)chevron.style.transform=_trafInputOpen?'rotate(180deg)':'';
-  if(_trafInputOpen&&!_trafAdsLoaded)loadTrafAds();
-}
-var _trafAdsLoaded=false;
-async function loadTrafAds(){
-  try{
-    var r=await fetch('/api/trafego-ads');
-    var d=await r.json();
-    if(d.items&&Array.isArray(d.items)){_trafAdsData=d.items;_trafAdsLoaded=true;}
-  }catch(e){console.warn('Traf ads load error:',e);}
-  // Set default date to today
-  var dateEl=document.getElementById('traf-input-date');
-  if(dateEl){
-    var today=new Date();
-    dateEl.value=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-    loadTrafInputForDate(dateEl.value);
-  }
-  updateTrafStatus();
-}
-function updateTrafStatus(){
-  var el=document.getElementById('traf-input-status');
-  if(el)el.textContent=_trafAdsData.length+' lançamentos salvos';
-}
-function fmtR(v){return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function fmtN(v){return Number(v||0).toLocaleString('pt-BR');}
+var _trafLogs = [];          // todas as entradas (append-only)
+var _trafBtagCache = {};     // cache { "YYYY-MM-DD": { cadastros, ftds, ... } }
+var _trafLogsLoaded = false;
 
-function loadTrafInputForDate(dateStr){
-  if(!dateStr)return;
-  // 1. Load existing entry from API data
-  var existing=_trafAdsData.find(function(e){return e.d===dateStr;});
-  // 2. Auto-populate Phoenix production data
-  var phoenixDay=D.find(function(d){return d.date===dateStr;});
-  // 3. Fill form fields
-  function setVal(id,v){var el=document.getElementById(id);if(el)el.value=v||'';}
-  if(existing){
-    setVal('ti-inv',existing.inv||'');setVal('ti-imp',existing.imp||'');setVal('ti-alc',existing.alc||'');
-    setVal('ti-cpm',existing.cpm||'');setVal('ti-ctr',existing.ctr||'');setVal('ti-cpc',existing.cpc||'');
-    setVal('ti-clk',existing.clk||'');setVal('ti-conv',existing.conv||'');
-    setVal('ti-freq',existing.freq||'');setVal('ti-cpr',existing.cpr||'');
-    var ex=document.getElementById('traf-existing-badge');if(ex)ex.style.display='';
-    var db=document.getElementById('traf-del-btn');if(db)db.style.display='';
-  } else {
-    ['ti-inv','ti-imp','ti-alc','ti-cpm','ti-ctr','ti-cpc','ti-clk','ti-conv','ti-freq','ti-cpr'].forEach(function(id){setVal(id,'');});
-    var ex=document.getElementById('traf-existing-badge');if(ex)ex.style.display='none';
-    var db=document.getElementById('traf-del-btn');if(db)db.style.display='none';
-  }
-  // Phoenix auto-fill
-  function setAuto(id,v,fmt){
-    var el=document.getElementById(id);
-    if(el)el.textContent=(v!==undefined&&v!==null)?(fmt?fmt(v):v):'—';
-    if(el)el.style.opacity=(v!==undefined&&v!==null)?'1':'0.35';
-  }
-  if(phoenixDay){
-    var ws=phoenixDay.ws||0,ds=phoenixDay.ds||0,mi=phoenixDay.mi||0;
-    var netDep=ds-(ws-mi);
-    setAuto('ta-cad',phoenixDay.nr,fmtN);
-    setAuto('ta-ftd',phoenixDay.ftd,fmtN);
-    setAuto('ta-ftdAmt',phoenixDay.fda,fmtR);
-    setAuto('ta-depAmt',ds,fmtR);
-    setAuto('ta-netDep',netDep,fmtR);
-    setAuto('ta-ws',ws,fmtR);
-    setAuto('ta-netPL',phoenixDay.ngr,fmtR);
-    setAuto('ta-ngr',phoenixDay.ngr,fmtR);
-    var pb=document.getElementById('traf-prod-badge');if(pb)pb.style.display='';
-  } else {
-    // Use TRAF_DATA historical for this date
-    var hist=TRAF_DATA.find(function(t){return t.d===dateStr;});
-    if(hist){
-      setAuto('ta-cad',hist.cad,fmtN);setAuto('ta-ftd',hist.ftd,fmtN);
-      setAuto('ta-ftdAmt',hist.ftdAmt,fmtR);setAuto('ta-depAmt',hist.depAmt,fmtR);
-      setAuto('ta-netDep',hist.netDep,fmtR);setAuto('ta-ws',null);setAuto('ta-netPL',hist.netPL,fmtR);setAuto('ta-ngr',hist.netPL,fmtR);
-      var pb=document.getElementById('traf-prod-badge');if(pb)pb.style.display='';
-    } else {
-      ['ta-cad','ta-ftd','ta-ftdAmt','ta-depAmt','ta-netDep','ta-ws','ta-netPL','ta-ngr'].forEach(function(id){setAuto(id,null);});
-      var pb=document.getElementById('traf-prod-badge');if(pb)pb.style.display='none';
+// ── Inicialização: localStorage primeiro, Redis em background ─────
+function initTrafLogs() {
+  // 1. Lê localStorage de forma síncrona (instantâneo, nunca perde dados)
+  try {
+    var stored = localStorage.getItem('jg_traf_logs_v1');
+    if (stored) _trafLogs = JSON.parse(stored);
+  } catch(e) { console.warn('localStorage read error', e); }
+
+  _updateTrafEntryStatus();
+  _setDefaultTrafDate();
+
+  // 2. Sincroniza com Redis em background (não bloqueia UI)
+  _syncTrafLogsFromRedis();
+}
+
+function _setDefaultTrafDate() {
+  var el = document.getElementById('te-date');
+  if (!el) return;
+  var today = new Date();
+  el.value = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  trafBtagLoad(el.value);
+}
+
+async function _syncTrafLogsFromRedis() {
+  try {
+    var r = await fetch('/api/trafego-ads');
+    if (!r.ok) return;
+    var d = await r.json();
+    if (!d.logs || !Array.isArray(d.logs)) return;
+
+    // Merge: união por ID, Redis tem prioridade (foi salvo com sucesso)
+    var localIds = new Set(_trafLogs.map(function(l){ return l.id; }));
+    var redisIds  = new Set(d.logs.map(function(l){ return l.id; }));
+
+    // Add Redis entries missing from local
+    d.logs.forEach(function(entry) {
+      if (!localIds.has(entry.id)) _trafLogs.push(entry);
+    });
+    // Sort by ts
+    _trafLogs.sort(function(a, b){ return a.ts.localeCompare(b.ts); });
+
+    _saveTrafToLocalStorage();
+    _trafLogsLoaded = true;
+    _updateTrafEntryStatus();
+    rTraf();
+  } catch(e) { console.warn('Redis sync error:', e); }
+}
+
+function _saveTrafToLocalStorage() {
+  try {
+    localStorage.setItem('jg_traf_logs_v1', JSON.stringify(_trafLogs));
+  } catch(e) { console.warn('localStorage write error', e); }
+}
+
+function _updateTrafEntryStatus() {
+  var el = document.getElementById('traf-entry-status');
+  if (!el) return;
+  var total = _trafLogs.length;
+  var today = new Date();
+  var todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  var todayCount = _trafLogs.filter(function(l){ return l.d === todayStr; }).length;
+  el.textContent = total + ' entradas · ' + todayCount + ' hoje';
+}
+
+// ── Agrega logs por data (soma acumulativa) ────────────────────────
+function aggregateTrafByDate(logs) {
+  var byDate = {};
+  logs.forEach(function(l) {
+    if (!byDate[l.d]) {
+      byDate[l.d] = { d: l.d, inv:0, imp:0, alc:0, clk:0, conv:0, freqN:0, freqImp:0,
+        cad_meta:0, ftd_meta:0, ftdAmt_meta:0, depAmt_meta:0, netDep_meta:0, netPL_meta:0,
+        count:0 };
     }
-  }
-  calcTrafMetrics();
+    var r = byDate[l.d];
+    r.inv    += l.inv    || 0;
+    r.imp    += l.imp    || 0;
+    r.alc    += l.alc    || 0;
+    r.clk    += l.clk    || 0;
+    r.conv   += l.conv   || 0;
+    // freq: média ponderada por impressão
+    r.freqImp += (l.freq || 0) * (l.imp || 1);
+    r.freqN   += l.imp || 1;
+    r.cad_meta    += l.cad_meta    || 0;
+    r.ftd_meta    += l.ftd_meta    || 0;
+    r.ftdAmt_meta += l.ftdAmt_meta || 0;
+    r.depAmt_meta += l.depAmt_meta || 0;
+    r.netDep_meta += l.netDep_meta || 0;
+    r.netPL_meta  += l.netPL_meta  || 0;
+    r.count++;
+  });
+  // Calcular métricas derivadas
+  Object.values(byDate).forEach(function(r) {
+    r.freq  = r.freqN > 0 ? r.freqImp / r.freqN : 0;
+    r.cpm   = r.imp > 0 ? r.inv / r.imp * 1000 : 0;
+    r.ctr   = r.imp > 0 ? r.clk / r.imp * 100 : 0;
+    r.cpc   = r.clk > 0 ? r.inv / r.clk : 0;
+    // Campos de compatibilidade com TRAF_DATA
+    r.cad   = r.cad_meta;
+    r.ftd   = r.ftd_meta;
+    r.ftdAmt   = r.ftdAmt_meta;
+    r.depAmt   = r.depAmt_meta;
+    r.netDep   = r.netDep_meta;
+    r.netPL    = r.netPL_meta;
+    // Phoenix BTAG (se em cache)
+    var btag = _trafBtagCache[r.d];
+    if (btag) {
+      r.cad_btag  = btag.cadastros || 0;
+      r.ftd_btag  = btag.ftds      || 0;
+      r.net_btag  = btag.netDep    || 0;
+      // Se Meta não preencheu, usar BTAG como fallback
+      if (!r.cad_meta && r.cad_btag) { r.cad = r.cad_btag; r.ftd = r.ftd_btag; }
+      if (!r.netPL_meta && r.net_btag) { r.netPL = r.net_btag; }
+    }
+  });
+  return Object.values(byDate).sort(function(a,b){ return a.d.localeCompare(b.d); });
 }
 
-function calcTrafMetrics(){
-  var inv=parseFloat(document.getElementById('ti-inv')&&document.getElementById('ti-inv').value)||0;
-  // Read Phoenix vals from auto fields
-  function autoN(id){var el=document.getElementById(id);if(!el||el.textContent==='—')return 0;return parseFloat(el.textContent.replace(/[^\d,.-]/g,'').replace(',','.'))||0;}
-  var cad=autoN('ta-cad'),ftd=autoN('ta-ftd'),netPL=autoN('ta-netPL'),netDep=autoN('ta-netDep');
-  function setCalc(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
-  setCalc('tc-custoCad',cad>0&&inv>0?fmtR(inv/cad):'—');
-  setCalc('tc-custoFtd',ftd>0&&inv>0?fmtR(inv/ftd):'—');
-  var roas=inv>0?netPL/inv:0;
-  var roasEl=document.getElementById('tc-roas');
-  if(roasEl){roasEl.textContent=inv>0?roas.toFixed(2)+'x':'—';roasEl.style.color=roas>=1?'var(--green)':'#ef4444';}
-  setCalc('tc-roasNet',inv>0?fmtR(netDep/inv*100)+'%':'—');
-  setCalc('tc-conv',cad>0&&ftd>0?(ftd/cad*100).toFixed(1)+'%':'—');
-  var cpc=parseFloat(document.getElementById('ti-cpc')&&document.getElementById('ti-cpc').value)||0;
-  setCalc('tc-cpc2',cpc>0?fmtR(cpc):'—');
-}
+// ── Adicionar entrada ─────────────────────────────────────────────
+async function addTrafEntry() {
+  var dateEl = document.getElementById('te-date');
+  if (!dateEl || !dateEl.value) { alert('Selecione uma data'); return; }
 
-async function saveTrafEntry(){
-  var dateEl=document.getElementById('traf-input-date');
-  if(!dateEl||!dateEl.value){alert('Selecione uma data');return;}
-  var btn=document.getElementById('traf-save-btn');
-  var msg=document.getElementById('traf-save-msg');
-  if(btn)btn.disabled=true;
-  if(msg)msg.textContent='Salvando...';
+  function getV(id) { var el = document.getElementById(id); return el && el.value ? parseFloat(el.value) || 0 : 0; }
 
-  function getVal(id){var el=document.getElementById(id);return el&&el.value?parseFloat(el.value)||0:0;}
-  var dateStr=dateEl.value;
-  // BTAG Phoenix data for this date
-  var btagDays=(typeof AFF!=='undefined'&&AFF.affDays&&AFF.affDays['Trafego Direto - Meta ads'])||[];
-  var btagDay=btagDays.find(function(d){return d.d===dateStr;});
-  var entry={
-    d:dateStr,
-    inv:getVal('ti-inv'),imp:getVal('ti-imp'),alc:getVal('ti-alc'),
-    cpm:getVal('ti-cpm'),ctr:getVal('ti-ctr'),cpc:getVal('ti-cpc'),
-    clk:getVal('ti-clk'),conv:getVal('ti-conv'),freq:getVal('ti-freq'),cpr:getVal('ti-cpr'),
-    // Manual Meta BM production fields
-    cad_meta:getVal('ti-cad'),ftd_meta:getVal('ti-ftd'),
-    ftdAmt_meta:getVal('ti-ftdAmt'),depAmt_meta:getVal('ti-depAmt'),
-    netDep_meta:getVal('ti-netDep'),netPL_meta:getVal('ti-netPL'),
-    // Phoenix BTAG auto snapshot (for reference/charts)
-    cad:btagDay?btagDay.rg||0:0,
-    ftd:btagDay?btagDay.ftd||0:0,
-    ftdAmt:0,
-    depAmt:btagDay?btagDay.da||0:0,
-    ws:btagDay?btagDay.wa||0:0,
-    netDep:btagDay?(btagDay.da||0)-(btagDay.wa||0):0,
-    netPL:btagDay?btagDay.np||0:0
+  var entry = {
+    id:  Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+    d:   dateEl.value,
+    ts:  new Date().toISOString(),
+    inv:   getV('te-inv'),
+    imp:   getV('te-imp'),
+    alc:   getV('te-alc'),
+    clk:   getV('te-clk'),
+    conv:  getV('te-conv'),
+    freq:  getV('te-freq'),
+    cad_meta:    getV('te-cad'),
+    ftd_meta:    getV('te-ftd'),
+    ftdAmt_meta: 0,
+    depAmt_meta: 0,
+    netDep_meta: 0,
+    netPL_meta:  getV('te-netPL'),
   };
 
-  try{
-    var r=await fetch('/api/trafego-ads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});
-    var res=await r.json();
-    if(res.ok){
-      // Update local cache
-      var idx=_trafAdsData.findIndex(function(e){return e.d===dateStr;});
-      if(idx>=0)_trafAdsData[idx]=entry;else _trafAdsData.push(entry);
-      _trafAdsData.sort(function(a,b){return a.d.localeCompare(b.d);});
-      if(msg)msg.textContent='✅ Salvo!'+(res.sheets&&res.sheets.ok?' · Sheets sincronizado':'');
-      var ex=document.getElementById('traf-existing-badge');if(ex)ex.style.display='';
-      var db=document.getElementById('traf-del-btn');if(db)db.style.display='';
-      updateTrafStatus();
-      rTraf(); // refresh table & charts
+  var btn = document.getElementById('te-add-btn');
+  var msg = document.getElementById('te-msg');
+  if (btn) btn.disabled = true;
+  if (msg) msg.textContent = 'Salvando...';
+
+  // 1. Salva no localStorage PRIMEIRO (garantia de não perder)
+  _trafLogs.push(entry);
+  _saveTrafToLocalStorage();
+  _updateTrafEntryStatus();
+
+  // 2. Limpa inputs numéricos (mantém data)
+  ['te-inv','te-imp','te-alc','te-clk','te-conv','te-freq','te-cad','te-ftd','te-netPL'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+
+  // 3. Refresh table imediatamente (dados já no localStorage)
+  rTraf();
+
+  // 4. Envia para API async (Redis + Sheets)
+  try {
+    var r = await fetch('/api/trafego-ads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry)
+    });
+    var res = await r.json();
+    if (res.ok) {
+      if (msg) msg.textContent = '✅ Salvo! Total hoje: ' + _trafLogs.filter(function(l){ return l.d === entry.d; }).length + ' entradas';
     } else {
-      if(msg)msg.textContent='❌ Erro: '+(res.error||'falha');
+      if (msg) msg.textContent = '⚠️ Salvo local · Redis: ' + (res.error || 'erro');
     }
-  }catch(e){
-    if(msg)msg.textContent='❌ Sem conexão';
+  } catch(e) {
+    if (msg) msg.textContent = '⚠️ Salvo local · Sem conexão';
   }
-  if(btn)btn.disabled=false;
-  setTimeout(function(){if(msg)msg.textContent='';},4000);
+
+  if (btn) btn.disabled = false;
+  setTimeout(function(){ if (msg) msg.textContent = ''; }, 4000);
 }
 
-async function deleteTrafEntry(){
-  var dateEl=document.getElementById('traf-input-date');
-  if(!dateEl||!dateEl.value)return;
-  if(!confirm('Excluir lançamento de '+dateEl.value+'?'))return;
-  try{
-    await fetch('/api/trafego-ads',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({d:dateEl.value})});
-    _trafAdsData=_trafAdsData.filter(function(e){return e.d!==dateEl.value;});
-    loadTrafInputForDate(dateEl.value);
-    updateTrafStatus();rTraf();
-  }catch(e){console.warn(e);}
+// ── Carregar dados Phoenix BTAG para a data ───────────────────────
+async function trafBtagLoad(dateStr) {
+  if (!dateStr) return;
+  var btagRow = document.getElementById('traf-btag-row');
+
+  // Cache hit
+  if (_trafBtagCache[dateStr]) {
+    _renderBtagRow(_trafBtagCache[dateStr]);
+    return;
+  }
+
+  try {
+    var r = await fetch('/api/trafego-btag?date=' + dateStr);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    var d = await r.json();
+    if (d.ok) {
+      _trafBtagCache[dateStr] = d;
+      _renderBtagRow(d);
+    } else {
+      if (btagRow) btagRow.style.display = 'none';
+    }
+  } catch(e) {
+    console.warn('trafBtagLoad error:', e.message);
+    if (btagRow) btagRow.style.display = 'none';
+  }
 }
+
+function _renderBtagRow(d) {
+  var btagRow = document.getElementById('traf-btag-row');
+  if (!btagRow) return;
+  btagRow.style.display = 'flex';
+  function fmtR(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2}); }
+  var cadEl = document.getElementById('tb-cad'); if (cadEl) cadEl.textContent = 'CAD: ' + (d.cadastros||0);
+  var ftdEl = document.getElementById('tb-ftd'); if (ftdEl) ftdEl.textContent = 'FTD: ' + (d.ftds||0);
+  var depEl = document.getElementById('tb-dep'); if (depEl) depEl.textContent = 'Dep: ' + fmtR(d.depAmt);
+  var wdEl  = document.getElementById('tb-wd');  if (wdEl)  wdEl.textContent  = 'Saq: ' + fmtR(d.wdAmt);
+  var netEl = document.getElementById('tb-net'); if (netEl) netEl.textContent = 'Net: ' + fmtR(d.netDep);
+}
+
 
 function rTraf(){
-  // Merge TRAF_DATA (historical hardcoded) with _trafAdsData (Redis entries)
-  // _trafAdsData has priority for dates present in both
-  const merged=[];
-  const apiDates=new Set(_trafAdsData.map(e=>e.d));
-  TRAF_DATA.forEach(function(t){if(!apiDates.has(t.d))merged.push(t);});
-  _trafAdsData.forEach(function(e){merged.push(e);});
-  merged.sort(function(a,b){return a.d.localeCompare(b.d);});
-  // Also fill missing production data from Phoenix D[] for API entries
+  // Agrega _trafLogs (localStorage-first) por data e mescla com TRAF_DATA histórico
+  var logAgg = aggregateTrafByDate(_trafLogs);  // entries do gestor (agregados por dia)
+  var logDates = new Set(logAgg.map(function(r){ return r.d; }));
+
+  // TRAF_DATA histórico para datas sem entradas do gestor
+  var merged = [];
+  TRAF_DATA.forEach(function(t){ if(!logDates.has(t.d)) merged.push(t); });
+  logAgg.forEach(function(r){ merged.push(r); });
+  merged.sort(function(a,b){ return a.d.localeCompare(b.d); });
+
+  // Enriquecer TRAF_DATA histórico com dados Phoenix D[] se disponível
   merged.forEach(function(r){
-    if(apiDates.has(r.d)){
-      var pd=D.find(function(d){return d.date===r.d;});
+    if(!logDates.has(r.d)){
+      var pd = D.find(function(d){ return d.date===r.d; });
       if(pd){
-        r.cad=pd.nr||r.cad||0;r.ftd=pd.ftd||r.ftd||0;r.ftdAmt=pd.fda||r.ftdAmt||0;
+        r.cad    = pd.nr  || r.cad    || 0;
+        r.ftd    = pd.ftd || r.ftd    || 0;
+        r.ftdAmt = pd.fda || r.ftdAmt || 0;
         var ws=pd.ws||0,ds=pd.ds||0,mi=pd.mi||0;
-        r.depAmt=ds||r.depAmt||0;r.netDep=(ds-(ws-mi))||r.netDep||0;r.ws=ws;r.netPL=pd.ngr||r.netPL||0;
+        r.depAmt = ds || r.depAmt || 0;
+        r.netDep = (ds-(ws-mi)) || r.netDep || 0;
+        r.netPL  = pd.ngr || r.netPL  || 0;
       }
     }
   });
-  // Filter by period
+
+  // Filtro de período
   const fd=getFilteredData(currentPeriod);
   const pStart=fd.length?fd[0].dt:null;
   const pEnd=fd.length?fd[fd.length-1].dt:null;
   let tData=merged;
   if(pStart&&pEnd){
-    tData=merged.filter(t=>{
+    tData=merged.filter(function(t){
       const td=new Date(t.d+'T12:00:00');
       return td>=pStart&&td<=pEnd;
     });
   }
+
   if(!tData.length){
     document.getElementById('kp-traf').innerHTML='<div style="color:var(--text3);padding:20px;text-align:center">Sem dados de tráfego pago para o período selecionado.</div>';
     document.getElementById('traf-table').innerHTML='';
@@ -6534,150 +6592,158 @@ function rTraf(){
     return;
   }
 
-  // Totals
-  const totInv=tData.reduce((s,r)=>s+r.inv,0);
-  const totCad=tData.reduce((s,r)=>s+r.cad,0);
-  const totFtd=tData.reduce((s,r)=>s+r.ftd,0);
-  const totFtdAmt=tData.reduce((s,r)=>s+r.ftdAmt,0);
-  const totDepAmt=tData.reduce((s,r)=>s+r.depAmt,0);
-  const totNetDep=tData.reduce((s,r)=>s+r.netDep,0);
-  const totNetPL=tData.reduce((s,r)=>s+r.netPL,0);
-  const custoCad=totCad>0?totInv/totCad:0;
-  const custoFtd=totFtd>0?totInv/totFtd:0;
-  const roas=totInv>0?totNetPL/totInv:0;
-  const convRate=totCad>0?(totFtd/totCad*100):0;
-  const roasNet=totInv>0?totNetDep/totInv:0;
+  const fmt=function(v){return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});};
+  const fN=function(v){return v?Number(v).toLocaleString('pt-BR'):'-';};
 
-  // KPI Cards — same style as Overview .kpi cards
-  const fmt=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  // ── Totais ────────────────────────────────────────────────────
+  const totInv    = tData.reduce(function(s,r){return s+(r.inv||0);},0);
+  const totCad    = tData.reduce(function(s,r){return s+(r.cad||r.cad_meta||0);},0);
+  const totFtd    = tData.reduce(function(s,r){return s+(r.ftd||r.ftd_meta||0);},0);
+  const totFtdAmt = tData.reduce(function(s,r){return s+(r.ftdAmt||r.ftdAmt_meta||0);},0);
+  const totDepAmt = tData.reduce(function(s,r){return s+(r.depAmt||r.depAmt_meta||0);},0);
+  const totNetDep = tData.reduce(function(s,r){return s+(r.netDep||r.netDep_meta||0);},0);
+  const totNetPL  = tData.reduce(function(s,r){return s+(r.netPL||r.netPL_meta||0);},0);
+  const custoCad  = totCad>0 ? totInv/totCad : 0;
+  const custoFtd  = totFtd>0 ? totInv/totFtd : 0;
+  const roas      = totInv>0 ? totNetPL/totInv : 0;
+  const convRate  = totCad>0 ? (totFtd/totCad*100) : 0;
+  const roasNet   = totInv>0 ? totNetDep/totInv : 0;
+
+  // ── KPI Cards ─────────────────────────────────────────────────
   const trafCards=[
     {l:'Investimento Total',v:fmt(totInv),c:'red',s:'Custo total ads'},
     {l:'Net P&L',v:fmt(totNetPL),c:totNetPL>=0?'green':'red',s:totNetPL>=0?'Lucro líquido':'Prejuízo'},
-    {l:'ROAS',v:roas.toFixed(2)+'x',c:roas>=1?'green':'red',s:roas>=1?'Retorno positivo':'Abaixo do break-even'},
+    {l:'ROAS',v:roas.toFixed(2)+'x',c:roas>=1?'green':'red',s:roas>=1?'Retorno positivo':'Abaixo break-even'},
     {l:'Cadastros',v:totCad.toLocaleString('pt-BR'),c:'cyan',s:Math.round(totCad/(tData.length||1))+'/dia média'},
     {l:'FTDs',v:totFtd.toLocaleString('pt-BR'),c:'green',s:Math.round(totFtd/(tData.length||1))+'/dia média'},
     {l:'Conversão CAD→FTD',v:convRate.toFixed(1)+'%',c:convRate>=30?'green':'gold',s:totFtd+' de '+totCad+' cadastros'},
     {l:'Custo / Cadastro',v:fmt(custoCad),c:'gold',s:'Por registro'},
     {l:'Custo / FTD',v:fmt(custoFtd),c:'red',s:'Por primeiro depósito'},
-    {l:'Deposit Amount',v:fmt(totDepAmt),c:'green',s:'Volume total depositos'},
+    {l:'Deposit Amount',v:fmt(totDepAmt),c:'green',s:'Volume total depósitos'},
     {l:'Net Deposit',v:fmt(totNetDep),c:totNetDep>=0?'green':'red',s:'Dep - Saques'},
     {l:'FTD Amount',v:fmt(totFtdAmt),c:'cyan',s:'Volume primeiros dep.'},
     {l:'ROAS Net Dep',v:roasNet.toFixed(2)+'x',c:roasNet>=1?'green':'red',s:roasNet>=1?'Retorno positivo':'Abaixo break-even'}
   ];
-  document.getElementById('kp-traf').innerHTML=trafCards.map(k=>
-    '<div class="kpi '+k.c+'"><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>'
-  ).join('');
+  document.getElementById('kp-traf').innerHTML=trafCards.map(function(k){
+    return '<div class="kpi '+k.c+'"><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>';
+  }).join('');
 
-  // Labels
-  const labels=tData.map(r=>{const p=r.d.split('-');return p[2]+'/'+p[1];});
+  const labels=tData.map(function(r){var p=r.d.split('-');return p[2]+'/'+p[1];});
 
-  // Chart 1: Investimento vs Net P&L
+  // ── Chart 1: Investimento vs Net P&L ──────────────────────────
   const ctx1=document.getElementById('c-traf-inv-pl');
   if(ctx1._chart)ctx1._chart.destroy();
   ctx1._chart=new Chart(ctx1,{type:'bar',data:{labels,datasets:[
-    {label:'Investimento',data:tData.map(r=>r.inv),backgroundColor:'rgba(239,68,68,0.7)',borderRadius:3,order:2},
-    {label:'Net P&L',data:tData.map(r=>r.netPL),backgroundColor:tData.map(r=>r.netPL>=0?'rgba(34,197,94,0.7)':'rgba(239,68,68,0.3)'),borderRadius:3,order:1}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+    {label:'Investimento',data:tData.map(function(r){return r.inv||0;}),backgroundColor:'rgba(239,68,68,0.7)',borderRadius:3,order:2},
+    {label:'Net P&L',data:tData.map(function(r){return r.netPL||r.netPL_meta||0;}),backgroundColor:tData.map(function(r){return (r.netPL||0)>=0?'rgba(34,197,94,0.7)':'rgba(239,68,68,0.3)';}),borderRadius:3,order:1}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:function(v){return 'R$'+v.toLocaleString('pt-BR');}}}}}});
 
-  // Chart 2: ROAS & Custo FTD
+  // ── Chart 2: ROAS & Custo FTD ─────────────────────────────────
   const ctx2=document.getElementById('c-traf-roas');
   if(ctx2._chart)ctx2._chart.destroy();
   ctx2._chart=new Chart(ctx2,{type:'line',data:{labels,datasets:[
-    {label:'ROAS',data:tData.map(r=>r.inv>0?r.netPL/r.inv:0),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',fill:true,tension:0.3,yAxisID:'y'},
-    {label:'Custo/FTD',data:tData.map(r=>r.ftd>0?r.inv/r.ftd:0),borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.1)',fill:false,tension:0.3,yAxisID:'y1'}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{type:'linear',position:'left',ticks:{color:'#f59e0b',callback:v=>v.toFixed(1)+'x'},grid:{color:'rgba(255,255,255,0.05)'}},y1:{type:'linear',position:'right',ticks:{color:'#ef4444',callback:v=>'R$'+Math.round(v)},grid:{drawOnChartArea:false}}}}});
+    {label:'ROAS',data:tData.map(function(r){return r.inv>0?(r.netPL||0)/r.inv:0;}),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',fill:true,tension:0.3,yAxisID:'y'},
+    {label:'Custo/FTD',data:tData.map(function(r){return r.ftd>0?r.inv/r.ftd:0;}),borderColor:'#ef4444',fill:false,tension:0.3,yAxisID:'y1'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{type:'linear',position:'left',ticks:{color:'#f59e0b',callback:function(v){return v.toFixed(1)+'x';}}},y1:{type:'linear',position:'right',ticks:{color:'#ef4444',callback:function(v){return 'R$'+Math.round(v);}},grid:{drawOnChartArea:false}}}}});
 
-  // Chart 3: Cadastros & FTDs
+  // ── Chart 3: Cadastros & FTDs ─────────────────────────────────
   const ctx3=document.getElementById('c-traf-funnel');
   if(ctx3._chart)ctx3._chart.destroy();
   ctx3._chart=new Chart(ctx3,{type:'bar',data:{labels,datasets:[
-    {label:'Cadastros',data:tData.map(r=>r.cad),backgroundColor:'rgba(59,130,246,0.6)',borderRadius:3},
-    {label:'FTDs',data:tData.map(r=>r.ftd),backgroundColor:'rgba(34,197,94,0.7)',borderRadius:3}
+    {label:'Cadastros',data:tData.map(function(r){return r.cad||r.cad_meta||0;}),backgroundColor:'rgba(59,130,246,0.6)',borderRadius:3},
+    {label:'FTDs',data:tData.map(function(r){return r.ftd||r.ftd_meta||0;}),backgroundColor:'rgba(34,197,94,0.7)',borderRadius:3}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888'}}}}});
 
-  // Chart 4: Acumulado
+  // ── Chart 4: Acumulado ────────────────────────────────────────
   let cumInv=0,cumPL=0,cumDep=0;
   const cumInvArr=[],cumPLArr=[],cumDepArr=[];
-  tData.forEach(r=>{cumInv+=r.inv;cumPL+=r.netPL;cumDep+=r.depAmt;cumInvArr.push(cumInv);cumPLArr.push(cumPL);cumDepArr.push(cumDep);});
+  tData.forEach(function(r){cumInv+=(r.inv||0);cumPL+=(r.netPL||r.netPL_meta||0);cumDep+=(r.depAmt||r.depAmt_meta||0);cumInvArr.push(cumInv);cumPLArr.push(cumPL);cumDepArr.push(cumDep);});
   const ctx4=document.getElementById('c-traf-cumul');
   if(ctx4._chart)ctx4._chart.destroy();
   ctx4._chart=new Chart(ctx4,{type:'line',data:{labels,datasets:[
     {label:'Investimento Acum.',data:cumInvArr,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.1)',fill:true,tension:0.3},
     {label:'Net P&L Acum.',data:cumPLArr,borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,0.1)',fill:true,tension:0.3},
     {label:'Depósitos Acum.',data:cumDepArr,borderColor:'#3b82f6',borderDash:[5,5],fill:false,tension:0.3}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:function(v){return 'R$'+(v/1000).toFixed(0)+'k';}}}}}});
 
-  // Chart 5: Depósitos vs Net Deposit
+  // ── Chart 5: Depósitos vs Net Deposit ─────────────────────────
   const ctx5=document.getElementById('c-traf-dep');
   if(ctx5._chart)ctx5._chart.destroy();
   ctx5._chart=new Chart(ctx5,{type:'bar',data:{labels,datasets:[
-    {label:'Deposit Amount',data:tData.map(r=>r.depAmt),backgroundColor:'rgba(59,130,246,0.5)',borderRadius:3},
-    {label:'Net Deposit',data:tData.map(r=>r.netDep),backgroundColor:tData.map(r=>r.netDep>=0?'rgba(34,197,94,0.6)':'rgba(239,68,68,0.5)'),borderRadius:3}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
+    {label:'Deposit Amount',data:tData.map(function(r){return r.depAmt||r.depAmt_meta||0;}),backgroundColor:'rgba(59,130,246,0.5)',borderRadius:3},
+    {label:'Net Deposit',data:tData.map(function(r){return r.netDep||r.netDep_meta||0;}),backgroundColor:tData.map(function(r){return (r.netDep||0)>=0?'rgba(34,197,94,0.6)':'rgba(239,68,68,0.5)';}),borderRadius:3}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:function(v){return 'R$'+(v/1000).toFixed(0)+'k';}}}}}});
 
-  // Chart 6: Custo CAD vs Custo FTD
+  // ── Chart 6: Custo CAD vs Custo FTD ──────────────────────────
   const ctx6=document.getElementById('c-traf-custos');
   if(ctx6._chart)ctx6._chart.destroy();
   ctx6._chart=new Chart(ctx6,{type:'line',data:{labels,datasets:[
-    {label:'Custo/Cadastro',data:tData.map(r=>r.cad>0?r.inv/r.cad:0),borderColor:'#8b5cf6',tension:0.3,fill:false},
-    {label:'Custo/FTD',data:tData.map(r=>r.ftd>0?r.inv/r.ftd:0),borderColor:'#ef4444',tension:0.3,fill:false}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:v=>'R$'+Math.round(v)}}}}});
+    {label:'Custo/Cadastro',data:tData.map(function(r){return (r.cad||r.cad_meta||0)>0?r.inv/(r.cad||r.cad_meta):0;}),borderColor:'#8b5cf6',tension:0.3,fill:false},
+    {label:'Custo/FTD',data:tData.map(function(r){return (r.ftd||r.ftd_meta||0)>0?r.inv/(r.ftd||r.ftd_meta):0;}),borderColor:'#ef4444',tension:0.3,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:function(v){return 'R$'+Math.round(v);}}}}}});
 
-  // Table
+  // ── Tabela ─────────────────────────────────────────────────────
   let html='';
-  const fN2=v=>v?Number(v).toLocaleString('pt-BR'):'-';
-  const fP2=v=>v?Number(v).toFixed(2)+'%':'-';
-  const hasMeta=tData.some(r=>r.imp||r.alc||r.cpm||r.ctr);
-  tData.forEach(r=>{
+  tData.forEach(function(r){
     const dd=r.d.split('-');
-    const roasD=r.inv>0?(r.netPL/r.inv):0;
-    const isApi=apiDates.has(r.d);
-    html+=`<tr style="${isApi?'border-left:2px solid var(--gold)':''}">
-      <td>${dd[2]}/${dd[1]}${isApi?'<span style="font-size:8px;color:var(--gold);margin-left:3px">✏️</span>':''}</td>
-      <td style="color:var(--red)">${fmt(r.inv||0)}</td>
-      <td style="color:var(--text3)">${r.imp?fN2(r.imp):'-'}</td>
-      <td style="color:var(--text3)">${r.alc?fN2(r.alc):'-'}</td>
+    const inv=r.inv||0;
+    const cadMeta=r.cad_meta||0;
+    const ftdMeta=r.ftd_meta||0;
+    const cadBtag=r.cad_btag||0;
+    const ftdBtag=r.ftd_btag||0;
+    const netBtag=r.net_btag||0;
+    const netPL=r.netPL||r.netPL_meta||0;
+    const cacMeta=cadMeta>0?inv/cadMeta:0;
+    const cafdMeta=ftdMeta>0?inv/ftdMeta:0;
+    const roasD=inv>0?netPL/inv:0;
+    const isLog=logDates.has(r.d);
+    const cnt=r.count||0;
+    html+=`<tr style="${isLog?'border-left:2px solid var(--gold)':''}">
+      <td style="white-space:nowrap">${dd[2]}/${dd[1]}${isLog?'<span style="font-size:8px;color:var(--gold);margin-left:4px">✏️'+cnt+'</span>':''}</td>
+      <td style="color:#ef4444;font-weight:700">${fmt(inv)}</td>
+      <td style="color:var(--text3)">${r.imp?fN(r.imp):'-'}</td>
+      <td style="color:var(--text3)">${r.alc?fN(r.alc):'-'}</td>
       <td style="color:var(--text3)">${r.cpm?fmt(r.cpm):'-'}</td>
-      <td style="color:var(--text3)">${r.ctr?fP2(r.ctr):'-'}</td>
+      <td style="color:var(--text3)">${r.ctr?r.ctr.toFixed(2)+'%':'-'}</td>
       <td style="color:var(--text3)">${r.cpc?fmt(r.cpc):'-'}</td>
-      <td style="color:var(--text3)">${r.clk?fN2(r.clk):'-'}</td>
-      <td style="color:var(--text3)">${r.conv?fN2(r.conv):'-'}</td>
-      <td>${r.cad||0}</td>
-      <td>${fmt(r.cad>0?r.inv/r.cad:0)}</td>
-      <td>${r.ftd||0}</td>
-      <td>${fmt(r.ftd>0?r.inv/r.ftd:0)}</td>
-      <td>${fmt(r.ftdAmt||0)}</td>
-      <td>${fmt(r.depAmt||0)}</td>
-      <td style="color:${(r.netDep||0)>=0?'var(--green)':'var(--red)'}">${fmt(r.netDep||0)}</td>
-      <td style="color:${(r.netPL||0)>=0?'var(--green)':'var(--red)'}"><b>${fmt(r.netPL||0)}</b></td>
-      <td style="color:${roasD>=1?'var(--green)':'var(--red)'}"><b>${roasD.toFixed(2)}x</b></td>
+      <td style="color:var(--text3)">${r.clk?fN(r.clk):'-'}</td>
+      <td style="color:var(--text3)">${r.conv?fN(r.conv):'-'}</td>
+      <td style="background:rgba(245,158,11,.04)">${cadMeta||'-'}</td>
+      <td style="background:rgba(245,158,11,.04)">${ftdMeta||'-'}</td>
+      <td style="background:rgba(245,158,11,.04);color:var(--gold)">${cacMeta>0?fmt(cacMeta):'-'}</td>
+      <td style="background:rgba(245,158,11,.04);color:var(--gold)">${cafdMeta>0?fmt(cafdMeta):'-'}</td>
+      <td style="background:rgba(14,165,90,.04)">${cadBtag||'-'}</td>
+      <td style="background:rgba(14,165,90,.04)">${ftdBtag||'-'}</td>
+      <td style="background:rgba(14,165,90,.04);color:${netBtag>=0?'var(--green)':'#ef4444'}">${netBtag?fmt(netBtag):'-'}</td>
+      <td style="color:${roasD>=1?'var(--green)':'#ef4444'}"><b>${roasD>0?roasD.toFixed(2)+'x':'-'}</b></td>
+      <td style="color:var(--text3);font-size:10px">${cnt||'-'}</td>
     </tr>`;
   });
   document.getElementById('traf-table').innerHTML=html;
 
-  // Footer totals
+  // ── Rodapé totais ──────────────────────────────────────────────
+  const totImp=tData.reduce(function(s,r){return s+(r.imp||0);},0);
+  const totAlc=tData.reduce(function(s,r){return s+(r.alc||0);},0);
+  const totClk=tData.reduce(function(s,r){return s+(r.clk||0);},0);
+  const totConv=tData.reduce(function(s,r){return s+(r.conv||0);},0);
+  const totCadMeta=tData.reduce(function(s,r){return s+(r.cad_meta||0);},0);
+  const totFtdMeta=tData.reduce(function(s,r){return s+(r.ftd_meta||0);},0);
   const roasT=totInv>0?totNetPL/totInv:0;
-  const totImp=tData.reduce((s,r)=>s+(r.imp||0),0);
-  const totAlc=tData.reduce((s,r)=>s+(r.alc||0),0);
-  const totClk=tData.reduce((s,r)=>s+(r.clk||0),0);
-  const totConv=tData.reduce((s,r)=>s+(r.conv||0),0);
   document.getElementById('traf-table-foot').innerHTML=`<tr style="font-weight:800;background:rgba(255,215,0,0.08)">
     <td>TOTAL</td>
-    <td style="color:var(--red)">${fmt(totInv)}</td>
-    <td>${totImp?fN2(totImp):'-'}</td><td>${totAlc?fN2(totAlc):'-'}</td>
-    <td>-</td><td>-</td><td>-</td>
-    <td>${totClk?fN2(totClk):'-'}</td><td>${totConv?fN2(totConv):'-'}</td>
-    <td>${totCad}</td>
-    <td>${fmt(custoCad)}</td>
-    <td>${totFtd}</td>
-    <td>${fmt(custoFtd)}</td>
-    <td>${fmt(totFtdAmt)}</td>
-    <td>${fmt(totDepAmt)}</td>
-    <td style="color:${totNetDep>=0?'var(--green)':'var(--red)'}">${fmt(totNetDep)}</td>
-    <td style="color:${totNetPL>=0?'var(--green)':'var(--red)'}"><b>${fmt(totNetPL)}</b></td>
-    <td style="color:${roasT>=1?'var(--green)':'var(--red)'}"><b>${roasT.toFixed(2)}x</b></td>
+    <td style="color:#ef4444">${fmt(totInv)}</td>
+    <td>${totImp?fN(totImp):'-'}</td><td>${totAlc?fN(totAlc):'-'}</td>
+    <td>—</td><td>—</td><td>—</td>
+    <td>${totClk?fN(totClk):'-'}</td><td>${totConv?fN(totConv):'-'}</td>
+    <td style="background:rgba(245,158,11,.06)">${totCadMeta||'-'}</td>
+    <td style="background:rgba(245,158,11,.06)">${totFtdMeta||'-'}</td>
+    <td style="background:rgba(245,158,11,.06);color:var(--gold)">${totCadMeta>0?fmt(totInv/totCadMeta):'-'}</td>
+    <td style="background:rgba(245,158,11,.06);color:var(--gold)">${totFtdMeta>0?fmt(totInv/totFtdMeta):'-'}</td>
+    <td style="background:rgba(14,165,90,.06)">—</td><td style="background:rgba(14,165,90,.06)">—</td><td style="background:rgba(14,165,90,.06)">—</td>
+    <td style="color:${roasT>=1?'var(--green)':'#ef4444'}"><b>${roasT.toFixed(2)}x</b></td>
+    <td>—</td>
   </tr>`;
-  document.getElementById('traf-table-summary').textContent=tData.length+' dias com investimento · Fonte: Focus / Conta Clara';
+  document.getElementById('traf-table-summary').textContent=tData.length+' dias · '+_trafLogs.length+' entradas salvas';
 }
 
 // Net PL matrix: cada safra → quanto Net PL gerou em Week 0, Week 1, Week 2...
@@ -7447,7 +7513,7 @@ function sp(n,el){
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
   else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
-  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='caixa')rCaixa();else if(n==='cohorts')rCohorts();else if(n==='traf')rTraf();else if(n==='analytics')rAnalytics();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
+  else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='caixa')rCaixa();else if(n==='cohorts')rCohorts();else if(n==='traf'){if(!_trafLogsLoaded)initTrafLogs();else rTraf();}else if(n==='analytics')rAnalytics();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
 function sbNav(n,el){
   sp(n,el);
@@ -8025,11 +8091,10 @@ function applyRoleAccess(role){
     if(trafTab) trafTab.classList.add('active');
     const trafSb = document.querySelector('.sb-item[onclick*="traf"]');
     if(trafSb) trafSb.classList.add('active');
-    // Abrir painel de input automaticamente
+    // Inicializar logs do Tráfego automaticamente
     setTimeout(function(){
-      var body = document.getElementById('traf-input-body');
-      if(body) body.style.display='block';
-    }, 500);
+      if(!_trafLogsLoaded) initTrafLogs();
+    }, 400);
   }
   // Badge no header
   const badge = document.getElementById('user-badge');
