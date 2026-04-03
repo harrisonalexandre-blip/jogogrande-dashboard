@@ -6364,6 +6364,9 @@ function initTrafLogs() {
 
   // 2. Sincroniza com Redis em background (não bloqueia UI)
   _syncTrafLogsFromRedis();
+
+  // 3. Carrega dados BTAG de todas as datas em background (1 chamada batch)
+  _loadBtagBatch();
 }
 
 function _setDefaultTrafDate() {
@@ -6575,6 +6578,41 @@ function _renderBtagRow(d) {
   var netEl = document.getElementById('tb-net');    if (netEl) netEl.textContent = 'Net Dep: ' + fmtR(d.netDep);
 }
 
+// ── Auto-load BTAG para todas as datas (1 chamada batch) ─────────────────
+var _btagBatchLoaded = false;
+async function _loadBtagBatch() {
+  if (_btagBatchLoaded) return;
+  try {
+    // Range: primeiro dia do TRAF_DATA até hoje
+    var from = TRAF_DATA.length ? TRAF_DATA[0].d : '2026-03-11';
+    var today = new Date();
+    var to = today.getFullYear() + '-'
+           + String(today.getMonth()+1).padStart(2,'0') + '-'
+           + String(today.getDate()).padStart(2,'0');
+
+    var r = await fetch('/api/trafego-btag?from=' + from + '&to=' + to);
+    if (!r.ok) return;
+    var resp = await r.json();
+    if (!resp.ok || !Array.isArray(resp.data)) return;
+
+    _btagBatchLoaded = true;
+    resp.data.forEach(function(row) {
+      _trafBtagCache[row.date] = {
+        ok: true, date: row.date,
+        cadastros: row.cadastros,
+        ftds: row.ftds,
+        ftdAmt: row.ftdAmt,
+        depAmt: row.depAmt,
+        wdAmt: row.wdAmt,
+        netDep: row.netDep,
+      };
+    });
+    rTraf(); // re-renderiza tabela com colunas BTAG preenchidas
+  } catch(e) {
+    console.warn('_loadBtagBatch error:', e.message);
+  }
+}
+
 
 function rTraf(){
   // Agrega _trafLogs (localStorage-first) por data e mescla com TRAF_DATA histórico
@@ -6587,21 +6625,7 @@ function rTraf(){
   logAgg.forEach(function(r){ merged.push(r); });
   merged.sort(function(a,b){ return a.d.localeCompare(b.d); });
 
-  // Enriquecer TRAF_DATA histórico com dados Phoenix D[] se disponível
-  merged.forEach(function(r){
-    if(!logDates.has(r.d)){
-      var pd = D.find(function(d){ return d.date===r.d; });
-      if(pd){
-        r.cad    = pd.nr  || r.cad    || 0;
-        r.ftd    = pd.ftd || r.ftd    || 0;
-        r.ftdAmt = pd.fda || r.ftdAmt || 0;
-        var ws=pd.ws||0,ds=pd.ds||0,mi=pd.mi||0;
-        r.depAmt = ds || r.depAmt || 0;
-        r.netDep = (ds-(ws-mi)) || r.netDep || 0;
-        r.netPL  = pd.ngr || r.netPL  || 0;
-      }
-    }
-  });
+  // NOTA: TRAF_DATA já contém os valores corretos de Meta Ads (não sobrescrever com Phoenix geral)
 
   // Filtro de período
   const fd=getFilteredData(currentPeriod);
