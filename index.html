@@ -6776,7 +6776,7 @@ function rTraf(){
   const totConv     = tData.reduce(function(s,r){return s+(r.conv||0);},0);
   const totCadMeta  = tData.reduce(function(s,r){return s+(r.cad_meta||r.cad||0);},0);
   const totFtdMeta  = tData.reduce(function(s,r){return s+(r.ftd_meta||r.ftd||0);},0);
-  const totFtdAmt   = tData.reduce(function(s,r){return s+(r.ftdAmt_meta||r.ftdAmt||0);},0);
+  const totFtdAmt2  = tData.reduce(function(s,r){return s+(r.ftdAmt_meta||r.ftdAmt||0);},0);
   const totDepAmt2  = tData.reduce(function(s,r){return s+(r.depAmt_meta||r.depAmt||0);},0);
   const totNetDep2  = tData.reduce(function(s,r){return s+(r.netDep_meta||r.netDep||0);},0);
   const totNetPL2   = tData.reduce(function(s,r){return s+(r.netPL_meta||r.netPL||0);},0);
@@ -6791,7 +6791,7 @@ function rTraf(){
     <td>${totClk?fN(totClk):'-'}</td><td>${totConv?fN(totConv):'-'}</td>
     <td style="${gBg}">${totCadMeta||'-'}</td>
     <td style="${gBg}">${totFtdMeta||'-'}</td>
-    <td style="${gBg};color:var(--cyan)">${fmt(totFtdAmt)}</td>
+    <td style="${gBg};color:var(--cyan)">${fmt(totFtdAmt2)}</td>
     <td style="${gBg};color:var(--cyan)">${fmt(totDepAmt2)}</td>
     <td style="${gBg};color:${totNetDep2>=0?'var(--green)':'#ef4444'}">${fmt(totNetDep2)}</td>
     <td style="${gBg};color:${totNetPL2>=0?'var(--green)':'#ef4444'}">${fmt(totNetPL2)}</td>
