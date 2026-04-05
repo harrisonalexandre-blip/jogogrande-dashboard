@@ -137,6 +137,36 @@ tr:hover .traf-edit-btn{opacity:.7}
 .kpi.gold .kpi-v{color:var(--gold)}.kpi.red .kpi-v{color:var(--red)}
 .kpi.blue .kpi-v{color:var(--blue)}.kpi.cyan .kpi-v{color:var(--cyan)}.kpi.purple .kpi-v{color:var(--purple)}
 .kpi-s{font-size:11px;color:#BBB}
+/* ── Pulse Metrics (Proposta 03) ─────────────────────────────── */
+.kpi{display:flex;align-items:stretch;gap:0}
+.kpi-main{flex:1;min-width:0;text-align:center}
+.kpi-pulse-spark{width:80px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);margin:4px 0 4px 6px;padding-left:6px}
+.kpi-pulse-spark svg{width:100%;height:36px}
+.kpi-pulse-spark .spark-line{fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.kpi-pulse-spark .spark-glow{fill:none;stroke-width:3.5;stroke-linecap:round;filter:blur(3px);opacity:.3}
+.kpi-pulse-spark .spark-area{opacity:.06}
+/* Scan line effect */
+.kpi-pulse-spark .pulse-scan{position:absolute;top:0;left:0;width:3px;height:100%;opacity:.3;border-radius:2px}
+/* Heartbeat speeds by health */
+.kpi-pulse-spark.beat-fast .spark-line{animation:pBeatFast 1.3s ease-in-out infinite}
+.kpi-pulse-spark.beat-fast .pulse-scan{animation:pScanFast 1.3s linear infinite}
+.kpi-pulse-spark.beat-norm .spark-line{animation:pBeatNorm 2.2s ease-in-out infinite}
+.kpi-pulse-spark.beat-norm .pulse-scan{animation:pScanNorm 2.2s linear infinite}
+.kpi-pulse-spark.beat-slow .spark-line{animation:pBeatSlow 3.5s ease-in-out infinite}
+.kpi-pulse-spark.beat-slow .pulse-scan{animation:pScanSlow 3.5s linear infinite}
+@keyframes pBeatFast{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.7;filter:brightness(1.3)}}
+@keyframes pBeatNorm{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.65;filter:brightness(1.2)}}
+@keyframes pBeatSlow{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.45;filter:brightness(1.1)}}
+@keyframes pScanFast{0%{left:0;opacity:.5}100%{left:100%;opacity:0}}
+@keyframes pScanNorm{0%{left:0;opacity:.4}100%{left:100%;opacity:0}}
+@keyframes pScanSlow{0%{left:0;opacity:.25}100%{left:100%;opacity:0}}
+/* Health glow on left stripe */
+.kpi.pulse-healthy::before{background:var(--green)!important;box-shadow:0 0 8px rgba(14,165,90,.4)}
+.kpi.pulse-healthy{border-color:rgba(14,165,90,.2)!important;box-shadow:0 0 20px rgba(14,165,90,.05)}
+.kpi.pulse-warning::before{background:#F59E0B!important;box-shadow:0 0 8px rgba(245,158,11,.4)}
+.kpi.pulse-warning{border-color:rgba(245,158,11,.15)!important;box-shadow:0 0 20px rgba(245,158,11,.04)}
+.kpi.pulse-critical::before{background:var(--red)!important;box-shadow:0 0 8px rgba(255,68,68,.4)}
+.kpi.pulse-critical{border-color:rgba(255,68,68,.15)!important;box-shadow:0 0 20px rgba(255,68,68,.04)}
 .kpi-merged{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;transition:.2s}
 .kpi-merged:hover{border-color:rgba(14,165,90,.25);transform:translateY(-1px)}
 .kpi-merged .kpm-title{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:6px}
@@ -3307,6 +3337,42 @@ function renderHourlyCharts(){
   buildBars('hc-vol','hl-vol',hVol,'#8B5CF6',true);
 }
 
+// ── Pulse Metrics: SVG sparkline generator ──
+function _sparkSVG(data,color){
+  if(!data||data.length<2) return '';
+  var w=80,h=36;
+  var max=Math.max.apply(null,data),min=Math.min.apply(null,data);
+  var range=max-min||1;
+  var pts=[];
+  for(var i=0;i<data.length;i++){
+    var x=(i/(data.length-1))*w;
+    var y=h-((data[i]-min)/range)*(h*.78)-h*.11;
+    pts.push(x.toFixed(1)+','+y.toFixed(1));
+  }
+  var poly=pts.join(' ');
+  var area='0,'+h+' '+poly+' '+w+','+h;
+  return '<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">'+
+    '<polygon class="spark-area" points="'+area+'" fill="'+color+'"/>'+
+    '<polyline class="spark-glow" points="'+poly+'" stroke="'+color+'"/>'+
+    '<polyline class="spark-line" points="'+poly+'" stroke="'+color+'"/>'+
+    '</svg>';
+}
+// ── Pulse health status from delta ──
+function _pulseHealth(curr,prev,inverted){
+  if(!prev||prev===0) return{cls:'beat-norm',status:'pulse-warning',color:'#F59E0B'};
+  var pct=((curr-prev)/Math.abs(prev))*100;
+  if(inverted) pct=-pct; // for metrics where "down" is good
+  if(pct>5) return{cls:'beat-fast',status:'pulse-healthy',color:'#0EA55A'};
+  if(pct>-10) return{cls:'beat-norm',status:'pulse-warning',color:'#F59E0B'};
+  return{cls:'beat-slow',status:'pulse-critical',color:'#FF4444'};
+}
+// ── Extract last N values of a field from D[] for sparkline ──
+function _sparkData(field,n){
+  if(typeof D==='undefined'||!D.length) return [];
+  var src=D.slice(-Math.min(n||14,D.length));
+  return src.map(function(d){return d[field]||0;});
+}
+
 function renderOverview(){
   const data=filteredData;
   const k=calcKPIs(data,currentPeriod);
@@ -3531,12 +3597,22 @@ function renderOverview(){
     if(x.type==='split') return `<div class="kpi green kpi-split-wrap" ${dAttr(x._id)} style="position:relative">${dBtns(x._id)}<div class="kpi-l">Novos Depósitos (FTD)</div><div class="kpi-split"><div class="kpi-split-left"><div class="sp-val" style="color:var(--green)">${fR(x.fda)}</div><div class="sp-lbl">Volume FTD ${x.dltFda||''}</div><div class="sp-sub">${fN(x.ftd)} FTDs</div></div><div class="kpi-split-right"><div class="sp-val" style="color:var(--cyan)">${fR(x.tk)}</div><div class="sp-lbl">Ticket Médio ${x.dltTk||''}</div><div class="sp-sub">por primeiro dep.</div></div></div></div>`;
     // Card: Churn Gauges (no delta — static data)
     if(x.type==='churn'){const c7=x.r7>70?'#FF4444':x.r7>40?'#F59E0B':'#0EA55A';const c30=x.r30>70?'#FF4444':x.r30>40?'#F59E0B':'#0EA55A';const c90=x.r90>30?'#FF4444':x.r90>15?'#F59E0B':'#0EA55A';return `<div class="kpi red kpi-churn" ${dAttr(x._id)} style="position:relative">${dBtns(x._id)}<div class="kpi-l">Churn Rate</div><div class="kpi-churn-gauges"><div class="kpi-gauge">${x.gaugeArc(x.r7,c7)}<div class="kpi-gauge-val" style="color:${c7}">${fP(x.r7)}</div><div class="kpi-gauge-lbl">7 dias</div><div class="kpi-gauge-ct">${fN(x.c7)} players</div></div><div class="kpi-gauge">${x.gaugeArc(x.r30,c30)}<div class="kpi-gauge-val" style="color:${c30}">${fP(x.r30)}</div><div class="kpi-gauge-lbl">30 dias</div><div class="kpi-gauge-ct">${fN(x.c30)} inativos</div></div><div class="kpi-gauge">${x.gaugeArc(x.r90,c90)}<div class="kpi-gauge-val" style="color:${c90}">${fP(x.r90)}</div><div class="kpi-gauge-lbl">90 dias</div><div class="kpi-gauge-ct">${fN(x.c90)} inativos</div></div></div></div>`;}
-    // Default cards — with delta arrow
+    // Default cards — with delta arrow + PULSE METRICS sparkline
     const hasTh=x.thCur!=null;
     const thColor=x.c==='gold'?'var(--gold)':x.c==='red'?'var(--red)':x.c==='green'?'var(--green)':x.c==='blue'?'var(--cyan)':x.c==='purple'?'var(--purple)':'var(--cyan)';
     const thBar=hasTh?`<div class="kpi-thermo-wrap"><div class="kpi-thermo"><div class="kpi-thermo-fill" style="width:${x.thCur.toFixed(1)}%;background:${thColor};opacity:.4"></div><div class="kpi-thermo-tick avg" style="left:${x.thAvg.toFixed(1)}%" title="Média: ${x.thAvgV}"></div><div class="kpi-thermo-tick cur" style="left:${x.thCur.toFixed(1)}%" title="Atual: ${x.thCurV}"></div></div></div>`:'';
     const dltBadge=x.dlt||'';
-    return `<div class="kpi ${x.c}" ${dAttr(x._id)} style="position:relative;${hasTh?'display:flex;flex-direction:column;padding-bottom:0;overflow:hidden':''}">${dBtns(x._id)}<div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v} ${dltBadge}</div><div class="kpi-s">${x.s}</div>${thBar}</div>`;
+    // ── Pulse Metrics: sparkline + health class ──
+    const _sparkFieldMap={ngr:'ngr',vol_dep:'ds',vol_saq:'ws',tk_dep:'ds',tk_saq:'ws',dep_saq:'ds',casino_ggr:'cg',sb_ggr:'sg',wagering:'c_to',uap:'uap',hold_pct:'cg',redep_rate:'nr',mov_interna:'mi',dtp_netcash:'nc',first_dep_avg:'fda',dep_player:'ds',margin_casino:'cg',saq_dep_ratio:'ws',netcash:'nc',bonus:null,dtp_saldo:null};
+    const _sparkField=_sparkFieldMap[x._id]||null;
+    const _sparkD=_sparkField?_sparkData(_sparkField,14):[];
+    const _ph=hasPrev?_pulseHealth(x.raw,pk[_sparkField]||0,x.c==='red'):({cls:'beat-norm',status:'pulse-warning',color:'#F59E0B'});
+    const _sparkColor=x.c==='gold'?'#F59E0B':x.c==='red'?'#FF4444':x.c==='green'?'#0EA55A':x.c==='blue'?'#3B82F6':x.c==='purple'?'#BB86FC':x.c==='cyan'?'#0EA55A':'#0EA55A';
+    const _sparkHtml=_sparkD.length>=2?`<div class="kpi-pulse-spark ${_ph.cls}">${_sparkSVG(_sparkD,_sparkColor)}<div class="pulse-scan" style="background:linear-gradient(180deg,transparent,${_sparkColor},transparent)"></div></div>`:'';
+    if(hasTh){
+      return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative;flex-direction:column;padding-bottom:0;overflow:hidden">${dBtns(x._id)}<div style="display:flex;align-items:stretch;gap:0;width:100%"><div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v} ${dltBadge}</div><div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>${thBar}</div>`;
+    }
+    return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative">${dBtns(x._id)}<div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v} ${dltBadge}</div><div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>`;
   }).join('');
 
   // === Section visibility (respects user layout + period logic) ===
