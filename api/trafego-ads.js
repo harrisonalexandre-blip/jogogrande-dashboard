@@ -100,7 +100,7 @@ async function appendToSheets(entry) {
 // ── Handler ────────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -133,6 +133,34 @@ module.exports = async function handler(req, res) {
       const sheetResult = await appendToSheets(entry).catch(e => ({ ok: false, reason: e.message }));
 
       return res.status(200).json({ ok: true, id: entry.id, count: logs.length, sheets: sheetResult });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
+  // PUT — substitui TODOS os logs de uma data por um único log corrigido
+  if (req.method === 'PUT') {
+    try {
+      const { date, entry } = req.body || {};
+      if (!date || !entry) return res.status(400).json({ error: 'date e entry obrigatórios' });
+
+      let logs = await redisGet();
+      // Remove todos os registros daquela data
+      logs = logs.filter(l => l.d !== date);
+      // Cria entrada única corrigida
+      const corrected = {
+        ...entry,
+        d: date,
+        id: 'edit-' + Date.now() + '-' + Math.random().toString(36).slice(2,5),
+        ts: new Date().toISOString(),
+        _edited: true,
+      };
+      logs.push(corrected);
+      await redisSave(logs);
+
+      // Append no Sheets com marcação de edição (audit trail)
+      const sheetResult = await appendToSheets({ ...corrected, id: 'EDITADO-' + corrected.id }).catch(e => ({ ok:false, reason:e.message }));
+      return res.status(200).json({ ok: true, id: corrected.id, sheets: sheetResult });
     } catch (e) {
       return res.status(500).json({ error: e.message });
     }

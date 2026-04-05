@@ -108,6 +108,18 @@ body.sb-open .hdr{margin-left:0}
 #traf-entry-row input[id="te-cad"]:focus,#traf-entry-row input[id="te-ftd"]:focus,#traf-entry-row input[id="te-netPL"]:focus{background:rgba(245,158,11,.15)!important;border-color:var(--gold)!important}
 .traf-field{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .traf-field label{font-size:10px;color:var(--text3);white-space:nowrap;min-width:110px}
+/* ── Edição inline da tabela ─────────────────────────────────── */
+.traf-edit-btn{background:none;border:none;cursor:pointer;opacity:0;font-size:10px;padding:0 3px;color:var(--gold);transition:.15s;vertical-align:middle;line-height:1}
+tr:hover .traf-edit-btn{opacity:.7}
+.traf-edit-btn:hover{opacity:1!important}
+.traf-row-editing{outline:1.5px solid rgba(245,158,11,.5)!important;background:rgba(245,158,11,.04)!important}
+.traf-cell-inp{width:100%;min-width:52px;background:#1a1a2e!important;border:1.5px solid rgba(245,158,11,.6)!important;color:var(--text)!important;border-radius:5px;font-size:11px;font-family:inherit;font-weight:700;padding:2px 5px;text-align:right;-webkit-appearance:none;box-sizing:border-box}
+.traf-cell-inp:focus{border-color:var(--gold)!important;outline:none;background:rgba(245,158,11,.08)!important}
+.traf-cell-inp.red{border-color:rgba(239,68,68,.7)!important}
+.traf-cell-inp.gold{border-color:rgba(245,158,11,.8)!important;background:rgba(245,158,11,.07)!important}
+.traf-save-btn{background:var(--gold);color:#000;border:none;border-radius:5px;padding:3px 9px;font-size:10px;font-weight:800;cursor:pointer;margin-right:4px;white-space:nowrap}
+.traf-save-btn:disabled{opacity:.5}
+.traf-cancel-btn{background:rgba(255,255,255,.08);color:var(--text3);border:none;border-radius:5px;padding:3px 7px;font-size:10px;cursor:pointer;white-space:nowrap}
 .traf-field input{background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:5px 8px;border-radius:6px;font-size:12px;font-family:inherit;font-weight:700;width:100%;transition:.15s;text-align:right}
 .traf-field input:focus{border-color:var(--gold);outline:none;background:rgba(245,158,11,.05)}
 .traf-field input::placeholder{color:var(--text3);font-weight:400}
@@ -6350,6 +6362,74 @@ const TRAF_DATA=[
 var _trafLogs = [];          // todas as entradas (append-only)
 var _trafBtagCache = {};     // cache { "YYYY-MM-DD": { cadastros, ftds, ... } }
 var _trafLogsLoaded = false;
+var _editingTrafDate = null; // data da linha em modo de edição (null = nenhuma)
+var _lastTrafData    = [];   // snapshot do último tData renderizado (para lookup na edição)
+
+// ── Edição inline ─────────────────────────────────────────────────────────
+function trafRowEditStart(dateStr) {
+  _editingTrafDate = dateStr;
+  rTraf();
+  // Foca no primeiro input da linha após renderização
+  setTimeout(function(){
+    var el = document.getElementById('tei-inv-'+dateStr);
+    if (el) el.focus();
+  }, 50);
+}
+
+function trafRowEditCancel() {
+  _editingTrafDate = null;
+  rTraf();
+}
+
+async function trafRowEditSave(dateStr) {
+  var btn = document.getElementById('tei-save-'+dateStr);
+  if (btn) { btn.textContent='...'; btn.disabled=true; }
+
+  function gv(field) {
+    var el = document.getElementById('tei-'+field+'-'+dateStr);
+    return el ? (parseFloat(el.value)||0) : 0;
+  }
+  function gi(field) {
+    var el = document.getElementById('tei-'+field+'-'+dateStr);
+    return el ? (parseInt(el.value)||0) : 0;
+  }
+
+  var entry = {
+    d: dateStr,
+    inv:          gv('inv'),
+    imp:          gi('imp'),
+    alc:          gi('alc'),
+    clk:          gi('clk'),
+    conv:         gi('conv'),
+    freq:         gv('freq'),
+    cad_meta:     gi('cad'),
+    ftd_meta:     gi('ftd'),
+    ftdAmt_meta:  gv('ftdAmt'),
+    depAmt_meta:  gv('depAmt'),
+    netDep_meta:  gv('netDep'),
+    netPL_meta:   gv('netPL'),
+  };
+
+  // 1. Atualiza localStorage imediatamente (remove entradas antigas da data, adiciona nova)
+  _trafLogs = _trafLogs.filter(function(l){ return l.d !== dateStr; });
+  var newEntry = Object.assign({ id:'edit-'+Date.now(), ts:new Date().toISOString() }, entry);
+  _trafLogs.push(newEntry);
+  _saveTrafToLocalStorage();
+  _editingTrafDate = null;
+  rTraf();
+
+  // 2. Sync com Redis + Sheets em background
+  try {
+    var r = await fetch('/api/trafego-ads', {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ date: dateStr, entry: newEntry })
+    });
+    if (!r.ok) console.warn('trafRowEditSave API error:', r.status);
+  } catch(e) {
+    console.warn('trafRowEditSave sync error:', e.message);
+  }
+}
 
 // ── Inicialização: localStorage primeiro, Redis em background ─────
 function initTrafLogs() {
@@ -6737,6 +6817,7 @@ function rTraf(){
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#999',font:{size:10}}}},scales:{x:{ticks:{color:'#888',font:{size:9}}},y:{ticks:{color:'#888',callback:function(v){return 'R$'+Math.round(v);}}}}}});
 
   // ── Tabela ─────────────────────────────────────────────────────
+  _lastTrafData = tData; // snapshot para lookup de edição
   let html='';
   tData.forEach(function(r){
     const dd=r.d.split('-');
@@ -6749,11 +6830,12 @@ function rTraf(){
     const netDepMeta= r.netDep_meta|| r.netDep || 0;
     const netPLMeta = r.netPL_meta || r.netPL  || 0;
     // BTAG Phoenix
-    const cadBtag    = r.cad_btag    || 0;
-    const ftdBtag    = r.ftd_btag    || 0;
-    const ftdAmtBtag = r.ftdAmt_btag || 0;
-    const depBtag    = r.dep_btag    || 0;
-    const netBtag    = r.net_btag    || 0;
+    var btag = _trafBtagCache[r.d];
+    const cadBtag    = (btag&&btag.cadastros) || r.cad_btag    || 0;
+    const ftdBtag    = (btag&&btag.ftds)      || r.ftd_btag    || 0;
+    const ftdAmtBtag = (btag&&btag.ftdAmt)    || r.ftdAmt_btag || 0;
+    const depBtag    = (btag&&btag.depAmt)    || r.dep_btag    || 0;
+    const netBtag    = (btag&&btag.netDep)    || r.net_btag    || 0;
     // Computed
     const cacMeta  = cadMeta>0  ? inv/cadMeta  : 0;
     const cafdMeta = ftdMeta>0  ? inv/ftdMeta  : 0;
@@ -6761,11 +6843,52 @@ function rTraf(){
     const isLog    = logDates.has(r.d);
     const cnt      = r.count || 0;
     // Color helpers
-    const posClr   = v => v>=0 ? 'var(--green)' : '#ef4444';
+    const posClr   = function(v){ return v>=0 ? 'var(--green)' : '#ef4444'; };
     const goldBg   = 'background:rgba(245,158,11,.04)';
     const greenBg  = 'background:rgba(14,165,90,.04)';
+
+    // ── MODO EDIÇÃO ────────────────────────────────────────────────
+    if (_editingTrafDate === r.d) {
+      html+=`<tr class="traf-row-editing">
+        <td style="white-space:nowrap;font-weight:700;padding:6px 8px">
+          <span style="color:var(--gold);margin-right:4px">✏ ${dd[2]}/${dd[1]}</span>
+          <button class="traf-save-btn" id="tei-save-${r.d}" onclick="trafRowEditSave('${r.d}')">✓ Salvar</button>
+          <button class="traf-cancel-btn" onclick="trafRowEditCancel()">✕</button>
+        </td>
+        <td style="${goldBg}"><input class="traf-cell-inp red" id="tei-inv-${r.d}" type="number" step="0.01" value="${inv}" title="Investimento R$"></td>
+        <td><input class="traf-cell-inp" id="tei-imp-${r.d}" type="number" value="${r.imp||0}" title="Impressões"></td>
+        <td><input class="traf-cell-inp" id="tei-alc-${r.d}" type="number" value="${r.alc||0}" title="Alcance"></td>
+        <td style="color:var(--text3);font-size:10px">auto</td>
+        <td style="color:var(--text3);font-size:10px">auto</td>
+        <td style="color:var(--text3);font-size:10px">auto</td>
+        <td><input class="traf-cell-inp" id="tei-clk-${r.d}" type="number" value="${r.clk||0}" title="Clicks"></td>
+        <td><input class="traf-cell-inp" id="tei-conv-${r.d}" type="number" value="${r.conv||0}" title="Conv BM"></td>
+        <td style="${goldBg}"><input class="traf-cell-inp gold" id="tei-cad-${r.d}" type="number" value="${cadMeta}" title="Cadastros Meta"></td>
+        <td style="${goldBg}"><input class="traf-cell-inp gold" id="tei-ftd-${r.d}" type="number" value="${ftdMeta}" title="FTDs Meta"></td>
+        <td style="${goldBg}"><input class="traf-cell-inp gold" id="tei-ftdAmt-${r.d}" type="number" step="0.01" value="${ftdAmtMeta}" title="FTD Amount"></td>
+        <td style="${goldBg}"><input class="traf-cell-inp gold" id="tei-depAmt-${r.d}" type="number" step="0.01" value="${depAmtMeta}" title="Dep Amount"></td>
+        <td style="${goldBg}"><input class="traf-cell-inp gold" id="tei-netDep-${r.d}" type="number" step="0.01" value="${netDepMeta}" title="Net Deposit"></td>
+        <td style="${goldBg}"><input class="traf-cell-inp gold" id="tei-netPL-${r.d}" type="number" step="0.01" value="${netPLMeta}" title="Net P&L"></td>
+        <td style="color:var(--text3);font-size:10px">auto</td>
+        <td style="color:var(--text3);font-size:10px">auto</td>
+        <td style="${greenBg}">${cadBtag||'-'}</td>
+        <td style="${greenBg}">${ftdBtag||'-'}</td>
+        <td style="${greenBg};color:var(--cyan)">${ftdAmtBtag?fmt(ftdAmtBtag):'-'}</td>
+        <td style="${greenBg};color:var(--cyan)">${depBtag?fmt(depBtag):'-'}</td>
+        <td style="${greenBg};color:${posClr(netBtag)}">${netBtag?fmt(netBtag):'-'}</td>
+        <td style="color:var(--text3);font-size:10px">auto</td>
+        <td style="color:var(--text3);font-size:10px">—</td>
+      </tr>`;
+      return;
+    }
+
+    // ── MODO LEITURA (normal) ──────────────────────────────────────
     html+=`<tr style="${isLog?'border-left:2px solid rgba(245,158,11,.6)':''}">
-      <td style="white-space:nowrap;font-weight:700">${dd[2]}/${dd[1]}${isLog?'<span style="font-size:8px;color:var(--gold);margin-left:4px">✏️${cnt}</span>':''}</td>
+      <td style="white-space:nowrap;font-weight:700">
+        ${dd[2]}/${dd[1]}
+        ${isLog?'<span style="font-size:8px;color:var(--gold);margin-left:3px">✏${cnt}</span>':''}
+        <button class="traf-edit-btn" onclick="trafRowEditStart('${r.d}')" title="Editar linha">✏</button>
+      </td>
       <td style="color:#ef4444;font-weight:700">${fmt(inv)}</td>
       <td style="color:var(--text3)">${r.imp?fN(r.imp):'-'}</td>
       <td style="color:var(--text3)">${r.alc?fN(r.alc):'-'}</td>
