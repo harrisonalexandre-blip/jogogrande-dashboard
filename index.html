@@ -1295,7 +1295,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 
 <!-- CRM Tab: Resumo -->
 <div id="crm-tab-resumo">
-<div id="crm-kpis" class="crm-stats"></div>
+<div id="crm-kpis" class="kg"></div>
 
 <!-- ROW 1: Funil de Depositos (Full Width) -->
 <div class="cb" style="margin-bottom:16px"><div class="ct"><span class="dot g"></span> Funil de Depósitos · Conversão <span style="font-size:9px;color:var(--text3);margin-left:8px">Clique nas barras para ver jogadores</span></div><div style="height:320px"><canvas id="c-crm-funnel"></canvas></div></div>
@@ -1861,7 +1861,7 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   </div>
   <span style="font-size:10px;color:var(--text3)">Att: 27/03/2026 <span id="ga-updated"></span></span>
 </div>
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="ga-top-kpis"></div>
+<div class="kg" id="ga-top-kpis"></div>
 
 <!-- FUNIL PRINCIPAL -->
 <div class="card" style="margin-bottom:16px">
@@ -4120,6 +4120,12 @@ function rAfil(){
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>',l:'Net P&L',v:fR(s.totalNp),s:'Lucro após comissões',c:s.totalNp>=0?'':'red'},
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3m-4 0a2 2 0 0 0-4 0m0 0H3m16 0h-2M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>',l:'Comissões',v:fR(s.totalComm),s:'Pago a afiliados',c:'purple'},
     {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',l:'Margem',v:fP(s.totalNp>0&&s.totalComm>0?(s.totalNp/(s.totalNp+s.totalComm)*100):0),s:'Net P&L / (P&L + Comm)',c:'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>',l:'Turnover (Volume)',v:fR(s.totalVol),s:'Volume apostado pelos afiliados',c:'blue'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',l:'FTD Médio/Afiliado',v:fN(Math.round(s.totalFtd/Math.max(1,s.totalAffs))),s:fN(s.totalFtd)+' FTDs ÷ '+fN(s.totalAffs)+' afils',c:'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>',l:'Ticket 1º Dep',v:fR(s.totalFtd>0?s.totalDep/s.totalFtd:0),s:'Dep médio no FTD por afiliado',c:'cyan'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',l:'Custo / FTD',v:fR(s.totalComm/Math.max(1,s.totalFtd)),s:'Comissão paga por FTD gerado',c:'red'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>',l:'Hold % (Afiliados)',v:fP(s.totalNd>0?(s.totalNp/s.totalNd*100):0),s:'Net P&L / Net Deposits',c:'gold'},
+    {i:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>',l:'Conv. Reg→FTD',v:fP(s.ftdRate),s:fN(s.totalFtd)+' FTDs de '+fN(s.totalRegs)+' registros',c:'blue'},
   ].map(function(k){return '<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>'}).join('');
 
   // Margem por Afiliado (Net P&L - Comissão)
@@ -4292,15 +4298,28 @@ function rAnalytics(){
     :Math.round(gaUsersBase*nDays/28);
   var gaSess28=Math.round(gaUsers28*1.42);
 
-  // ── TOP KPIs (4 cards compactos) ──
+  // ── TOP KPIs (10 cards) ──
+  var gaTicket=GA.summary30d.purchases>0?Math.round(GA.ov.revenue/GA.summary30d.purchases):0;
+  var gaEngRate=GA.trafficTotal.engRate||0;
+  var gaKeyEvents=GA.summary30d.keyEvents||0;
+  var gaPurchases=GA.summary30d.purchases||0;
+  var gaUsers7d=GA.userActivity.d7||0;
+  var gaUsers1d=GA.userActivity.d1||0;
+  var gaBestLTV=GA.ltv.length>0?GA.ltv.slice().sort(function(a,b){return b.v-a.v})[0]:{ch:'—',v:0};
   var topKpis=[
-    {icon:'👁️',v:fN(gaUsers28),l:'Usuários Únicos · '+pPeriodLabel,s:(GA.summary30d.activeUsersGrowth>0?'▲':'▼')+Math.abs(GA.summary30d.activeUsersGrowth)+'% vs mês anterior (GA4)',c:GA.summary30d.activeUsersGrowth>=0?'var(--green)':'var(--red)'},
-    {icon:'🔗',v:GA.ov.engTime,l:'Tempo Médio Sessão',s:'Engajamento por sessão: '+GA.trafficTotal.avgSec+'s',c:'var(--cyan)'},
-    {icon:'💰',v:'R$ '+fN(Math.round(GA.ov.revenue/1000))+'k',l:'Receita Atribuída (GA4 28d)',s:'Receita acumulada 90d: R$ '+fN(Math.round(GA.trafficTotal.rev/1000))+'k',c:'var(--green)'},
-    {icon:'🛒',v:GA.buyer.rate+'%',l:'Taxa Comprador (7d)',s:(GA.buyer.rateGrowth>0?'▲':'▼')+Math.abs(GA.buyer.rateGrowth)+'% vs anterior · '+fN(GA.summary30d.purchases)+' compras (30d)',c:GA.buyer.rateGrowth>=0?'var(--green)':'var(--gold)'}
+    {i:'👁️',v:fN(gaUsers28),l:'Usuários Únicos',s:(GA.summary30d.activeUsersGrowth>0?'▲':'▼')+Math.abs(GA.summary30d.activeUsersGrowth)+'% vs mês anterior (GA4)',c:''},
+    {i:'🔗',v:GA.ov.engTime,l:'Tempo Médio Sessão',s:'Avg engajamento: '+GA.trafficTotal.avgSec+'s · '+gaEngRate+'% eng. rate',c:'cyan'},
+    {i:'💰',v:'R$ '+fN(Math.round(GA.ov.revenue/1000))+'k',l:'Receita (GA4 28d)',s:'Acumulado 90d: R$ '+fN(Math.round(GA.trafficTotal.rev/1000))+'k',c:''},
+    {i:'🛒',v:GA.buyer.rate+'%',l:'Taxa Comprador (7d)',s:(GA.buyer.rateGrowth>0?'▲':'▼')+Math.abs(GA.buyer.rateGrowth)+'% vs anterior · FTP: '+GA.buyer.ftpRate+'%',c:GA.buyer.rateGrowth>=0?'':'gold'},
+    {i:'📡',v:fN(gaSess28),l:'Sessões Estimadas',s:'Usuários × 1.42 · '+pPeriodLabel,c:'blue'},
+    {i:'⚡',v:fN(gaKeyEvents),l:'Key Events (30d)',s:(GA.summary30d.keyEventsGrowth>0?'▲':'▼')+Math.abs(GA.summary30d.keyEventsGrowth)+'% vs anterior',c:GA.summary30d.keyEventsGrowth>=0?'':'red'},
+    {i:'🎯',v:fN(gaPurchases),l:'Compras (30d)',s:(GA.summary30d.purchasesGrowth>0?'▲':'▼')+Math.abs(GA.summary30d.purchasesGrowth)+'% vs anterior',c:'gold'},
+    {i:'💎',v:'R$ '+fN(gaTicket),l:'Ticket Médio (GA4)',s:'Receita / compras · 28d',c:'cyan'},
+    {i:'📅',v:fN(gaUsers7d),l:'Ativos Últimos 7d',s:'Ativos hoje: '+fN(gaUsers1d)+' · 30d: '+fN(GA.userActivity.d30||0),c:'blue'},
+    {i:'🏆',v:gaBestLTV.ch,l:'Melhor LTV 120d',s:'R$ '+fN(gaBestLTV.v)+' / usuário · tráfego orgânico',c:'gold'},
   ];
   document.getElementById('ga-top-kpis').innerHTML=topKpis.map(function(k){
-    return '<div class="card" style="padding:14px 16px;display:flex;align-items:center;gap:12px"><div style="font-size:24px;line-height:1">'+k.icon+'</div><div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:900;color:'+k.c+';line-height:1.1">'+k.v+'</div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin:3px 0">'+k.l+'</div><div style="font-size:10px;color:'+k.c+';opacity:.8">'+k.s+'</div></div></div>';
+    return '<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>';
   }).join('');
 
   // ── FUNIL PRINCIPAL ──
@@ -4548,15 +4567,34 @@ function rCRM(){
     periodTag='No Período';
   }
 
-  // KPIs
+  // KPIs — métricas calculadas
+  var totalDep=cliData.reduce(function(a,c){return a+c.dt},0);
+  var totalDepCount=cliData.reduce(function(a,c){return a+c.dc},0);
+  var avgTicket=totalDepCount>0?totalDep/totalDepCount:0;
+  var loyalPlayers=threePlus.length+sixPlus.length;
+  var loyalRate=cliData.length>0?loyalPlayers/cliData.length*100:0;
+  var avgNGR=cliData.length>0?totalNGR/cliData.length:0;
+  var avgWR=cliData.length>0?cliData.reduce(function(a,c){return a+c.wr},0)/cliData.length:0;
+  var mids=cliData.filter(function(c){return c.tr==='Mid'});
+  var lows=cliData.filter(function(c){return c.tr==='Low'});
+  var vipDep=vips.reduce(function(a,c){return a+c.dt},0);
+  var vipNGR=vips.reduce(function(a,c){return a+c.ngr},0);
   document.getElementById('crm-kpis').innerHTML=[
-    {v:fN(pFTD),l:'1º Depósito (FTD)',s:periodTag+(currentPeriod==='lifetime'?' · todos os dados':' · novos jogadores'),cl:'var(--green)'},
-    {v:fN(pRedep),l:'Dep. Recorrentes',s:currentPeriod==='lifetime'?(pConv+'% redeposit rate'):(fN(pRedep)+' de '+(pRedep+pFTD)+' deps totais'),cl:'var(--gold)'},
-    {v:pConv+'%',l:'Taxa Recorrência',s:currentPeriod==='lifetime'?(fN(pRedep)+' de '+fN(pFTD)+' voltaram'):(fN(pFTD)+' novos + '+fN(pRedep)+' recorrentes'),cl:pConv>=30?'var(--green)':'var(--gold)'},
-    {v:fN(hots.length),l:'Ativos (≤7d)',s:fP(hots.length/CLI.length*100)+' engajados',cl:'var(--green)'},
-    {v:fR(totalNGR),l:'NGR Total ('+cliLabel+')',s:'Ticket médio: '+fR(cliData.reduce((a,c)=>a+c.dt,0)/(cliData.reduce((a,c)=>a+c.dc,0)||1)),cl:'var(--cyan)'},
-    {v:fN(vips.length)+' VIP · '+fN(highs.length)+' High',l:'Tiers Premium · '+cliData.length+' clientes',s:fR(vips.reduce((a,c)=>a+c.dt,0))+' em dep VIP',cl:'var(--purple)'},
-  ].map(k=>'<div class="crm-stat"><div class="lbl">'+k.l+'</div><div class="val" style="color:'+k.cl+'">'+k.v+'</div><div class="sub">'+k.s+'</div></div>').join('');
+    {i:'🎯',v:fN(pFTD),l:'1º Depósito (FTD)',s:periodTag+(currentPeriod==='lifetime'?' · todos os dados':' · novos jogadores'),c:'gold'},
+    {i:'🔄',v:fN(pRedep),l:'Dep. Recorrentes',s:currentPeriod==='lifetime'?(pConv+'% redeposit rate'):(fN(pRedep)+' de '+(pRedep+pFTD)+' deps totais'),c:'blue'},
+    {i:'📈',v:pConv+'%',l:'Taxa Recorrência',s:currentPeriod==='lifetime'?(fN(pRedep)+' de '+fN(pFTD)+' voltaram'):(fN(pFTD)+' novos + '+fN(pRedep)+' recorrentes'),c:pConv>=30?'':'gold'},
+    {i:'🔥',v:fN(hots.length),l:'Ativos (≤7d)',s:fP(hots.length/Math.max(1,cliData.length)*100)+' da base ativa',c:''},
+    {i:'💰',v:fR(totalNGR),l:'NGR Total',s:'Ticket médio dep: '+fR(avgTicket),c:'cyan'},
+    {i:'👑',v:fN(vips.length)+' VIP · '+fN(highs.length)+' High',l:'Tiers Premium',s:fR(vipDep)+' dep VIP total',c:'purple'},
+    {i:'👥',v:fN(cliData.length),l:'Base Ativa (Período)',s:fN(CLI.length)+' total lifetime',c:'blue'},
+    {i:'🌡️',v:fN(warms.length),l:'Mornos (8-30d)',s:fP(warms.length/Math.max(1,cliData.length)*100)+' da base',c:'gold'},
+    {i:'❄️',v:fN(colds.length),l:'Frios/Perdidos',s:fP(colds.length/Math.max(1,cliData.length)*100)+' churn risk',c:'red'},
+    {i:'💳',v:fR(totalDep),l:'Volume Depósitos',s:fN(totalDepCount)+' transações no período',c:''},
+    {i:'🏅',v:fP(loyalRate),l:'Taxa Lealdade',s:fN(loyalPlayers)+' jogadores com ≥3 deps',c:'gold'},
+    {i:'📊',v:fR(avgNGR),l:'NGR Médio/Jogador',s:'VIP NGR médio: '+fR(vipNGR/Math.max(1,vips.length)),c:'cyan'},
+    {i:'🎲',v:fP(avgWR),l:'Win Rate Médio',s:'% saque vs depósito · base ativa',c:'red'},
+    {i:'🏢',v:fN(mids.length)+' Mid · '+fN(lows.length)+' Low',l:'Tiers Standard',s:fR(mids.reduce(function(a,c){return a+c.dt},0))+' dep Mid total',c:''},
+  ].map(function(k){return '<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>'}).join('');
 
   // 1. Deposit Funnel Bar Chart — period-aware
   var funnelLabels, funnelData, funnelColors;
@@ -6743,23 +6781,42 @@ function rTraf(){
   const convRate  = totCad>0 ? (totFtd/totCad*100) : 0;
   const roasNet   = totInv>0 ? totNetDep/totInv : 0;
 
+  // Métricas de mídia (impressões, alcance, clicks, freq)
+  const totImp    = tData.reduce(function(s,r){return s+(r.imp||0);},0);
+  const totAlc    = tData.reduce(function(s,r){return s+(r.alc||0);},0);
+  const totClk    = tData.reduce(function(s,r){return s+(r.clk||0);},0);
+  const totConvBM = tData.reduce(function(s,r){return s+(r.conv||0);},0);
+  const totFreqSum= tData.reduce(function(s,r){return s+(r.freq||0);},0);
+  const avgFreq   = tData.length>0?totFreqSum/tData.length:0;
+  const ctr       = totImp>0?totClk/totImp*100:0;
+  const cpm       = totImp>0?totInv/totImp*1000:0;
+  const cpc       = totClk>0?totInv/totClk:0;
+  const nDaysTraf = tData.length||1;
+
   // ── KPI Cards ─────────────────────────────────────────────────
   const trafCards=[
-    {l:'Investimento Total',v:fmt(totInv),c:'red',s:'Custo total ads'},
-    {l:'Net P&L',v:fmt(totNetPL),c:totNetPL>=0?'green':'red',s:totNetPL>=0?'Lucro líquido':'Prejuízo'},
-    {l:'ROAS',v:roas.toFixed(2)+'x',c:roas>=1?'green':'red',s:roas>=1?'Retorno positivo':'Abaixo break-even'},
-    {l:'Cadastros',v:totCad.toLocaleString('pt-BR'),c:'cyan',s:Math.round(totCad/(tData.length||1))+'/dia média'},
-    {l:'FTDs',v:totFtd.toLocaleString('pt-BR'),c:'green',s:Math.round(totFtd/(tData.length||1))+'/dia média'},
-    {l:'Conversão CAD→FTD',v:convRate.toFixed(1)+'%',c:convRate>=30?'green':'gold',s:totFtd+' de '+totCad+' cadastros'},
-    {l:'Custo / Cadastro',v:fmt(custoCad),c:'gold',s:'Por registro'},
-    {l:'Custo / FTD',v:fmt(custoFtd),c:'red',s:'Por primeiro depósito'},
-    {l:'Deposit Amount',v:fmt(totDepAmt),c:'green',s:'Volume total depósitos'},
-    {l:'Net Deposit',v:fmt(totNetDep),c:totNetDep>=0?'green':'red',s:'Dep - Saques'},
-    {l:'FTD Amount',v:fmt(totFtdAmt),c:'cyan',s:'Volume primeiros dep.'},
-    {l:'ROAS Net Dep',v:roasNet.toFixed(2)+'x',c:roasNet>=1?'green':'red',s:roasNet>=1?'Retorno positivo':'Abaixo break-even'}
+    {i:'💸',l:'Investimento Total',v:fmt(totInv),c:'red',s:'Custo total ads · '+nDaysTraf+'d'},
+    {i:'💰',l:'Net P&L',v:fmt(totNetPL),c:totNetPL>=0?'green':'red',s:totNetPL>=0?'Lucro líquido':'Prejuízo'},
+    {i:'📈',l:'ROAS',v:roas.toFixed(2)+'x',c:roas>=1?'green':'red',s:roas>=1?'Retorno positivo':'Abaixo break-even'},
+    {i:'👤',l:'Cadastros',v:totCad.toLocaleString('pt-BR'),c:'cyan',s:Math.round(totCad/nDaysTraf)+'/dia média'},
+    {i:'🎯',l:'FTDs',v:totFtd.toLocaleString('pt-BR'),c:'green',s:Math.round(totFtd/nDaysTraf)+'/dia média'},
+    {i:'🔁',l:'Conversão CAD→FTD',v:convRate.toFixed(1)+'%',c:convRate>=30?'green':'gold',s:totFtd+' de '+totCad+' cadastros'},
+    {i:'🏷️',l:'Custo / Cadastro',v:fmt(custoCad),c:'gold',s:'Por registro convertido'},
+    {i:'💳',l:'Custo / FTD',v:fmt(custoFtd),c:'red',s:'Por primeiro depósito'},
+    {i:'🏦',l:'Deposit Amount',v:fmt(totDepAmt),c:'green',s:'Volume total depósitos'},
+    {i:'↔️',l:'Net Deposit',v:fmt(totNetDep),c:totNetDep>=0?'green':'red',s:'Dep - Saques'},
+    {i:'⭐',l:'FTD Amount',v:fmt(totFtdAmt),c:'cyan',s:'Volume primeiros dep.'},
+    {i:'📊',l:'ROAS Net Dep',v:roasNet.toFixed(2)+'x',c:roasNet>=1?'green':'red',s:roasNet>=1?'Retorno positivo':'Abaixo break-even'},
+    {i:'👁️',l:'Impressões',v:totImp>0?fN(totImp):'—',c:'blue',s:totImp>0?'Total de exibições do anúncio':'Preencha campo Impr. no formulário'},
+    {i:'📡',l:'Alcance',v:totAlc>0?fN(totAlc):'—',c:'blue',s:totAlc>0?'Usuários únicos atingidos':'—'},
+    {i:'🖱️',l:'Clicks',v:totClk>0?fN(totClk):'—',c:'cyan',s:totClk>0?('CTR: '+ctr.toFixed(2)+'%'):'—'},
+    {i:'💲',l:'CPM',v:totImp>0?fmt(cpm):'—',c:'gold',s:'Custo por mil impressões'},
+    {i:'🖱️',l:'CPC',v:totClk>0?fmt(cpc):'—',c:'gold',s:'Custo por click'},
+    {i:'✅',l:'Conv. BM',v:totConvBM>0?fN(totConvBM):'—',c:'green',s:'Conversões Meta Business Mgr'},
+    {i:'🔁',l:'Frequência Média',v:avgFreq>0?avgFreq.toFixed(1)+'x':'—',c:'purple',s:'Exibições por usuário único'},
   ];
   document.getElementById('kp-traf').innerHTML=trafCards.map(function(k){
-    return '<div class="kpi '+k.c+'"><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>';
+    return '<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>';
   }).join('');
 
   const labels=tData.map(function(r){var p=r.d.split('-');return p[2]+'/'+p[1];});
