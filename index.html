@@ -2764,7 +2764,7 @@ function applyCustomPeriod(){
   var ap=document.querySelector('.page.active');
   if(ap){var id=ap.id.replace('pg-','');RD[id]=true;
     if(id==='ov')renderOverview();else if(id==='perf')rPerf();
-    else if(id==='hist')rHist();else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='afil')rAfil();else if(id==='crm')rCRM();else if(id==='recon')rRecon();}
+    else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='afil')rAfil();else if(id==='crm')rCRM();else if(id==='recon')rRecon();}
 }
 
 function getPeriodLabel(period){
@@ -2827,7 +2827,7 @@ function setTime(period,el){
   const ap=document.querySelector('.page.active');
   if(ap){const id=ap.id.replace('pg-','');RD[id]=true;
     if(id==='ov')renderOverview();else if(id==='perf')rPerf();
-    else if(id==='hist')rHist();else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='afil')rAfil();else if(id==='crm')rCRM();else if(id==='recon')rRecon();
+    else if(id==='fin')rFin();else if(id==='soc')rSoc();else if(id==='afil')rAfil();else if(id==='crm')rCRM();else if(id==='recon')rRecon();
     else if(id==='casino')rCasino();else if(id==='alertas')rAlertas();else if(id==='btag')rBtag();else if(id==='saldos')rSaldos();else if(id==='cohorts')rCohorts();else if(id==='traf'){if(!_trafLogsLoaded)initTrafLogs();else rTraf();}else if(id==='analytics')rAnalytics();}
 }
 
@@ -3934,6 +3934,7 @@ function rPerf(){
   mc('c-gp',{type:'line',data:{labels:lb,datasets:[{label:'Casino GGR %',
     data:fM.map(m=>m.c_to>0?m.cg/m.c_to*100:0),borderColor:C.c,backgroundColor:C.cA,borderWidth:2,fill:true,tension:.35,pointRadius:5}]},
     options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v.toFixed(1)+'%'}}}}});
+  rHist();
 }
 
 // ═══ HISTÓRICO ═══
@@ -7943,8 +7944,8 @@ function filterGames(){
 
 // ═══ SECURITY: Mapa de permissões por role ═══
 const ROLE_PAGES={
-  admin:['ov','perf','hist','fin','soc','afil','crm','recon','casino','alertas','btag','saldos','caixa','cohorts','traf','analytics','acessos'],
-  socio:['ov','perf','hist','fin','soc','afil','crm','recon','casino','alertas','btag','saldos','caixa','cohorts','traf','analytics'],
+  admin:['ov','perf','fin','soc','afil','crm','recon','casino','alertas','btag','saldos','caixa','cohorts','traf','analytics','acessos'],
+  socio:['ov','perf','fin','soc','afil','crm','recon','casino','alertas','btag','saldos','caixa','cohorts','traf','analytics'],
   crm:['crm']
 };
 function canAccess(page){
@@ -7964,7 +7965,7 @@ function sp(n,el){
   if(el)el.classList.add('active');
   RD[n]=true;
   if(n==='ov')renderOverview();else if(n==='perf')rPerf();
-  else if(n==='hist')rHist();else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
+  else if(n==='fin')rFin();else if(n==='soc')rSoc();else if(n==='afil')rAfil();else if(n==='crm')rCRM();else if(n==='recon')rRecon();
   else if(n==='casino')rCasino();else if(n==='alertas')rAlertas();else if(n==='btag')rBtag();else if(n==='saldos')rSaldos();else if(n==='caixa')rCaixa();else if(n==='cohorts')rCohorts();else if(n==='traf'){if(!_trafLogsLoaded)initTrafLogs();else rTraf();}else if(n==='analytics')rAnalytics();else if(n==='acessos'){loadAuthUsers().then(()=>renderUserList());}}
 
 function sbNav(n,el){
@@ -8373,7 +8374,6 @@ async function refreshLive(){
       const id=ap.id.replace('pg-','');
       if(id==='ov')renderOverview();
       else if(id==='perf')rPerf();
-      else if(id==='hist')rHist();
       else if(id==='fin')rFin();
       else if(id==='soc')rSoc();
     }
