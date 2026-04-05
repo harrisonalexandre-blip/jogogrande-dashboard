@@ -129,27 +129,29 @@ tr:hover .traf-edit-btn{opacity:.7}
 .traf-field input::placeholder{color:var(--text3);font-weight:400}
 .traf-auto .traf-auto-val{font-size:13px;font-weight:800;color:var(--text);text-align:right;min-width:100px}
 /* KPIs */
-.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;transition:.2s;text-align:center}
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;position:relative;overflow:hidden;transition:.2s;text-align:center}
 .kpi:hover{border-color:rgba(14,165,90,.25);transform:translateY(-1px)}
 .kpi::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green)}
 .kpi.gold::before{background:var(--gold)}.kpi.red::before{background:var(--red)}
 .kpi.blue::before{background:var(--blue)}.kpi.cyan::before{background:var(--cyan)}.kpi.purple::before{background:var(--purple)}
-.kpi-i{font-size:20px;margin-bottom:6px}
-.kpi-l{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;font-weight:700}
-.kpi-v{font-size:22px;font-weight:900;line-height:1;margin-bottom:3px;color:var(--green)}
+.kpi-i{font-size:15px;margin-bottom:2px}
+.kpi-l{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;font-weight:700}
+.kpi-v{font-size:17px;font-weight:900;line-height:1;margin-bottom:2px;color:var(--green)}
 .kpi.gold .kpi-v{color:var(--gold)}.kpi.red .kpi-v{color:var(--red)}
 .kpi.blue .kpi-v{color:var(--blue)}.kpi.cyan .kpi-v{color:var(--cyan)}.kpi.purple .kpi-v{color:var(--purple)}
-.kpi-s{font-size:11px;color:#BBB}
+.kpi-s{font-size:10px;color:#BBB}
+.kpi-s:empty{display:none}
 /* ── Pulse Metrics (Proposta 03) ─────────────────────────────── */
-.kpi{display:flex;align-items:stretch;gap:0}
-.kpi-main{flex:1;min-width:0;text-align:center;display:flex;flex-direction:column;justify-content:center}
-/* Compact padding & fonts when sparkline is present */
-.kpi:has(.kpi-pulse-spark){padding:9px 12px}
-.kpi-main .kpi-i{font-size:15px;margin-bottom:2px}
+.kpi{display:flex;align-items:center;justify-content:center;gap:0}
+.kpi-main{flex:1;min-width:0;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
+/* Compact padding when sparkline is present */
+.kpi:has(.kpi-pulse-spark){padding:8px 12px}
+.kpi-main .kpi-i{font-size:14px;margin-bottom:1px}
 .kpi-main .kpi-l{margin-bottom:1px}
-.kpi-main .kpi-v{font-size:17px;margin-bottom:1px}
-.kpi-main .kpi-s{font-size:10px}
+.kpi-main .kpi-v{font-size:16px;margin-bottom:1px}
+.kpi-main .kpi-s{font-size:9px}
+.kpi-main .kpi-s:empty{display:none}
 .kpi-pulse-spark{width:68px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);margin:3px 0 3px 6px;padding-left:6px}
 .kpi-pulse-spark svg{width:100%;height:28px}
 .kpi-pulse-spark .spark-line{fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -190,7 +192,7 @@ tr:hover .traf-edit-btn{opacity:.7}
 /* Sidebar glass */
 .sidebar{backdrop-filter:blur(16px);background:rgba(13,13,18,.85)!important}
 /* ── Metas & Targets (Proposta 06) ─────────────────────────────── */
-.kpi-dlt-row{text-align:right;padding:0 10px 0 0;margin-top:-1px;line-height:1}
+.kpi-dlt-row{text-align:center;padding:0 6px;margin-top:1px;line-height:1}
 /* Modal Metas */
 .metas-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
 .metas-overlay.open{display:flex}
