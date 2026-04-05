@@ -152,8 +152,9 @@ tr:hover .traf-edit-btn{opacity:.7}
 .kpi-main .kpi-v{font-size:16px;margin-bottom:1px}
 .kpi-main .kpi-s{font-size:9px}
 .kpi-main .kpi-s:empty{display:none}
-.kpi-pulse-spark{width:68px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);margin:3px 0 3px 6px;padding-left:6px}
-.kpi-pulse-spark svg{width:100%;height:28px}
+.kpi-pulse-spark{width:72px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);margin:2px 0 2px 6px;padding-left:6px}
+.kpi-pulse-spark svg{width:100%;height:26px}
+.spark-dlt{font-size:9px;margin-top:1px;white-space:nowrap;line-height:1;position:relative;z-index:1}
 .kpi-pulse-spark .spark-line{fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .kpi-pulse-spark .spark-glow{fill:none;stroke-width:3.5;stroke-linecap:round;filter:blur(3px);opacity:.3}
 .kpi-pulse-spark .spark-area{opacity:.06}
@@ -3694,16 +3695,16 @@ function renderOverview(){
     const _sparkD=_sparkField?_sparkData(_sparkField,14):[];
     const _ph=hasPrev?_pulseHealth(x.raw,pk[_sparkField]||0,x.c==='red'):({cls:'beat-norm',status:'pulse-warning',color:'#F59E0B'});
     const _sparkColor=x.c==='gold'?'#F59E0B':x.c==='red'?'#FF4444':x.c==='green'?'#0EA55A':x.c==='blue'?'#3B82F6':x.c==='purple'?'#BB86FC':x.c==='cyan'?'#0EA55A':'#0EA55A';
-    const _sparkHtml=_sparkD.length>=2?`<div class="kpi-pulse-spark ${_ph.cls}">${_sparkSVG(_sparkD,_sparkColor)}<div class="pulse-scan" style="background:linear-gradient(180deg,transparent,${_sparkColor},transparent)"></div></div>`:'';
+    // Delta dentro do sparkline (abaixo do gráfico) ou inline no valor
+    const _dltInSpark=(dltBadge&&_sparkD.length>=2)?'<div class="spark-dlt">'+dltBadge+'</div>':'';
+    const _sparkHtml=_sparkD.length>=2?`<div class="kpi-pulse-spark ${_ph.cls}">${_sparkSVG(_sparkD,_sparkColor)}<div class="pulse-scan" style="background:linear-gradient(180deg,transparent,${_sparkColor},transparent)"></div>${_dltInSpark}</div>`:'';
     const _metaBarHtml=_metaBar(x._id,x.raw);
-    // Delta: se tem sparkline, mostra abaixo do spark; senão, inline no valor
     const _valHtml=`<div class="kpi-v">${x.v}${_sparkD.length>=2?'':' '+dltBadge}</div>`;
-    const _dltRow=(_sparkD.length>=2&&dltBadge)?'<div class="kpi-dlt-row">'+dltBadge+'</div>':'';
     if(hasTh){
-      return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative;flex-direction:column;padding-bottom:0;overflow:hidden">${dBtns(x._id)}<div style="display:flex;align-items:stretch;gap:0;width:100%"><div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div>${_valHtml}<div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>${_dltRow}${thBar}${_metaBarHtml}</div>`;
+      return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative;flex-direction:column;padding-bottom:0;overflow:hidden">${dBtns(x._id)}<div style="display:flex;align-items:stretch;gap:0;width:100%"><div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div>${_valHtml}<div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>${thBar}${_metaBarHtml}</div>`;
     }
-    if(_metaBarHtml||_dltRow){
-      return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative;flex-direction:column;padding-bottom:0;overflow:hidden">${dBtns(x._id)}<div style="display:flex;align-items:stretch;gap:0;width:100%"><div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div>${_valHtml}<div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>${_dltRow}${_metaBarHtml}</div>`;
+    if(_metaBarHtml){
+      return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative;flex-direction:column;padding-bottom:0;overflow:hidden">${dBtns(x._id)}<div style="display:flex;align-items:stretch;gap:0;width:100%"><div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div>${_valHtml}<div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>${_metaBarHtml}</div>`;
     }
     return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative">${dBtns(x._id)}<div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div>${_valHtml}<div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>`;
   }).join('');
