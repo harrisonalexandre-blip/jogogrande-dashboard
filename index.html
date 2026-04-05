@@ -6782,15 +6782,15 @@ function rTraf(){
   const roasNet   = totInv>0 ? totNetDep/totInv : 0;
 
   // Métricas de mídia (impressões, alcance, clicks, freq)
-  const totImp    = tData.reduce(function(s,r){return s+(r.imp||0);},0);
-  const totAlc    = tData.reduce(function(s,r){return s+(r.alc||0);},0);
-  const totClk    = tData.reduce(function(s,r){return s+(r.clk||0);},0);
-  const totConvBM = tData.reduce(function(s,r){return s+(r.conv||0);},0);
-  const totFreqSum= tData.reduce(function(s,r){return s+(r.freq||0);},0);
-  const avgFreq   = tData.length>0?totFreqSum/tData.length:0;
-  const ctr       = totImp>0?totClk/totImp*100:0;
-  const cpm       = totImp>0?totInv/totImp*1000:0;
-  const cpc       = totClk>0?totInv/totClk:0;
+  const kImp      = tData.reduce(function(s,r){return s+(r.imp||0);},0);
+  const kAlc      = tData.reduce(function(s,r){return s+(r.alc||0);},0);
+  const kClk      = tData.reduce(function(s,r){return s+(r.clk||0);},0);
+  const kConvBM   = tData.reduce(function(s,r){return s+(r.conv||0);},0);
+  const kFreqSum  = tData.reduce(function(s,r){return s+(r.freq||0);},0);
+  const kAvgFreq  = tData.length>0?kFreqSum/tData.length:0;
+  const kCtr      = kImp>0?kClk/kImp*100:0;
+  const kCpm      = kImp>0?totInv/kImp*1000:0;
+  const kCpc      = kClk>0?totInv/kClk:0;
   const nDaysTraf = tData.length||1;
 
   // ── KPI Cards ─────────────────────────────────────────────────
@@ -6807,13 +6807,13 @@ function rTraf(){
     {i:'↔️',l:'Net Deposit',v:fmt(totNetDep),c:totNetDep>=0?'green':'red',s:'Dep - Saques'},
     {i:'⭐',l:'FTD Amount',v:fmt(totFtdAmt),c:'cyan',s:'Volume primeiros dep.'},
     {i:'📊',l:'ROAS Net Dep',v:roasNet.toFixed(2)+'x',c:roasNet>=1?'green':'red',s:roasNet>=1?'Retorno positivo':'Abaixo break-even'},
-    {i:'👁️',l:'Impressões',v:totImp>0?fN(totImp):'—',c:'blue',s:totImp>0?'Total de exibições do anúncio':'Preencha campo Impr. no formulário'},
-    {i:'📡',l:'Alcance',v:totAlc>0?fN(totAlc):'—',c:'blue',s:totAlc>0?'Usuários únicos atingidos':'—'},
-    {i:'🖱️',l:'Clicks',v:totClk>0?fN(totClk):'—',c:'cyan',s:totClk>0?('CTR: '+ctr.toFixed(2)+'%'):'—'},
-    {i:'💲',l:'CPM',v:totImp>0?fmt(cpm):'—',c:'gold',s:'Custo por mil impressões'},
-    {i:'🖱️',l:'CPC',v:totClk>0?fmt(cpc):'—',c:'gold',s:'Custo por click'},
-    {i:'✅',l:'Conv. BM',v:totConvBM>0?fN(totConvBM):'—',c:'green',s:'Conversões Meta Business Mgr'},
-    {i:'🔁',l:'Frequência Média',v:avgFreq>0?avgFreq.toFixed(1)+'x':'—',c:'purple',s:'Exibições por usuário único'},
+    {i:'👁️',l:'Impressões',v:kImp>0?fN(kImp):'—',c:'blue',s:kImp>0?'Total de exibições do anúncio':'Preencha campo Impr. no formulário'},
+    {i:'📡',l:'Alcance',v:kAlc>0?fN(kAlc):'—',c:'blue',s:kAlc>0?'Usuários únicos atingidos':'—'},
+    {i:'🖱️',l:'Clicks',v:kClk>0?fN(kClk):'—',c:'cyan',s:kClk>0?('CTR: '+kCtr.toFixed(2)+'%'):'—'},
+    {i:'💲',l:'CPM',v:kImp>0?fmt(kCpm):'—',c:'gold',s:'Custo por mil impressões'},
+    {i:'🖱️',l:'CPC',v:kClk>0?fmt(kCpc):'—',c:'gold',s:'Custo por click'},
+    {i:'✅',l:'Conv. BM',v:kConvBM>0?fN(kConvBM):'—',c:'green',s:'Conversões Meta Business Mgr'},
+    {i:'🔁',l:'Frequência Média',v:kAvgFreq>0?kAvgFreq.toFixed(1)+'x':'—',c:'purple',s:'Exibições por usuário único'},
   ];
   document.getElementById('kp-traf').innerHTML=trafCards.map(function(k){
     return '<div class="kpi '+k.c+'"><div class="kpi-i">'+k.i+'</div><div class="kpi-l">'+k.l+'</div><div class="kpi-v">'+k.v+'</div><div class="kpi-s">'+k.s+'</div></div>';
