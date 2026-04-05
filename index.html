@@ -3454,7 +3454,7 @@ function _metaBar(cardId,curValue){
   var cls=pacePct>=95?'on-track':pacePct>=75?'atencao':'behind';
   var barW=Math.min(pct,100);
   var paceLabel=Math.round(dayOfMonth/daysInMonth*100);
-  return '<div class="kpi-meta-bar"><div class="kpi-meta-labels"><span class="kpi-meta-lbl">META \u00b7 '+paceLabel+'% do m\u00eas</span><span class="kpi-meta-pct '+cls+'">'+pct+'%</span></div><div class="kpi-meta-track"><div class="kpi-meta-fill '+cls+'" style="width:'+barW+'%"></div></div></div>';
+  return '<div class="kpi-meta-bar"><div class="kpi-meta-labels"><span class="kpi-meta-lbl">META MENSAL</span><span class="kpi-meta-pct '+cls+'">'+pct+'%</span></div><div class="kpi-meta-track"><div class="kpi-meta-fill '+cls+'" style="width:'+barW+'%"></div></div></div>';
 }
 
 function renderOverview(){
