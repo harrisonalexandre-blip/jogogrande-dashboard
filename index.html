@@ -1295,18 +1295,13 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   <div class="cb"><div class="ct"><span class="dot c"></span>Split GGR por Canal</div><canvas id="c-dn"></canvas></div>
 </div>
 <div class="cg cgf"><div class="cb"><div class="ct"><span class="dot p"></span>Margem Casino GGR % (sobre Turnover)</div><canvas id="c-gp"></canvas></div></div>
-</div>
-
-<!-- ═══ PAGE: HISTÓRICO ═══ -->
-<div id="pg-hist" class="page">
-<p class="sec">Histórico Mensal · Nov/2025 → Mar/2026 (D0 ao Atual)</p>
+<p class="sec" style="margin-top:28px">Histórico Mensal · Evolução por Período</p>
 <div class="cg cg2">
   <div class="cb"><div class="ct"><span class="dot g"></span>NGR por Mês (R$)</div><canvas id="c-mngr"></canvas></div>
   <div class="cb"><div class="ct"><span class="dot gl"></span>Volume Depósitos por Mês (R$)</div><canvas id="c-mds"></canvas></div>
 </div>
-<div class="cg cg2">
+<div class="cg cgf">
   <div class="cb"><div class="ct"><span class="dot b"></span>Registros & FTD por Mês</div><canvas id="c-mrf"></canvas></div>
-  <div class="cb"><div class="ct"><span class="dot c"></span>NetCash por Mês (R$)</div><canvas id="c-mnc"></canvas></div>
 </div>
 <div class="tb"><div class="th"><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:6px;vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Tabela Mensal Consolidada</h3></div>
 <table><thead><tr><th>Mês</th><th>Regs</th><th>FTD</th><th>Conv%</th><th>Vol.Dep R$</th><th>Vol.Saq R$</th><th>Mov.Int R$</th><th>NetCash R$</th><th>Casino GGR R$</th><th>NGR R$</th><th>Turnover Casino R$</th></tr></thead>
@@ -3954,9 +3949,6 @@ function rHist(){
   mc('c-mrf',{type:'bar',data:{labels:lb,datasets:[
     {label:'Registros',data:fM.map(m=>m.nr),backgroundColor:C.bA,borderColor:C.b,borderWidth:1.5,borderRadius:4},
     {label:'FTD',data:fM.map(m=>m.ftd),backgroundColor:C.gA,borderColor:C.g,borderWidth:1.5,borderRadius:4}]},options:CD});
-  mc('c-mnc',{type:'line',data:{labels:lb,datasets:[{label:'NetCash R$',data:fM.map(m=>m.nc),
-    borderColor:C.c,backgroundColor:C.cA,borderWidth:2.5,fill:true,tension:.3,pointRadius:5}]},
-    options:{...CD,scales:{...CD.scales,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>fR(v)}}}}});
   document.getElementById('mtb').innerHTML=fM.map(m=>`<tr><td><strong>${m.ml}</strong></td><td>${fN(m.nr)}</td><td>${fN(m.ftd)}</td>
     <td>${fP(m.conv)}</td><td>${m.ds>0?fR(m.ds):'—'}</td><td>${m.ws>0?fR(m.ws):'—'}</td><td style="color:var(--purple);font-weight:700">${(m.mi||0)>0?fR(m.mi):'—'}</td><td>${m.nc!==0?mk(m.nc):'—'}</td>
     <td>${mk(m.cg)}</td><td>${mk(m.ngr)}</td><td>${m.c_to>0?fR(m.c_to):'—'}</td></tr>`).join('')}
