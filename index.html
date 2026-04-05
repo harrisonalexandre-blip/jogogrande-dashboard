@@ -824,8 +824,9 @@ body.light .kpi-minute-bars .m-bar{background:rgba(59,130,246,.25)}
 body.light .kpi-funnel-side{background:rgba(0,0,0,.06)}
 body.light .kpi-funnel-convbar{background:rgba(0,0,0,.06)}
 /* Split card */
-.kpi-split-wrap{grid-column:span 2;min-width:320px}
-.kpi-split{display:flex;gap:0;justify-content:center}
+.kpi-split-wrap{grid-column:span 2;min-width:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.kpi-split-wrap .kpi-l{width:100%;text-align:center;margin-bottom:10px}
+.kpi-split{display:flex;gap:0;justify-content:center;width:100%}
 .kpi-split-left,.kpi-split-right{flex:1;padding:0 8px;text-align:center}
 .kpi-split-left{border-right:1px solid var(--border)}
 .kpi-split-right{padding-left:12px}
