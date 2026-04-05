@@ -139,9 +139,15 @@ tr:hover .traf-edit-btn{opacity:.7}
 .kpi-s{font-size:11px;color:#BBB}
 /* ── Pulse Metrics (Proposta 03) ─────────────────────────────── */
 .kpi{display:flex;align-items:stretch;gap:0}
-.kpi-main{flex:1;min-width:0;text-align:center}
-.kpi-pulse-spark{width:80px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);margin:4px 0 4px 6px;padding-left:6px}
-.kpi-pulse-spark svg{width:100%;height:36px}
+.kpi-main{flex:1;min-width:0;text-align:center;display:flex;flex-direction:column;justify-content:center}
+/* Compact padding & fonts when sparkline is present */
+.kpi:has(.kpi-pulse-spark){padding:9px 12px}
+.kpi-main .kpi-i{font-size:15px;margin-bottom:2px}
+.kpi-main .kpi-l{margin-bottom:1px}
+.kpi-main .kpi-v{font-size:17px;margin-bottom:1px}
+.kpi-main .kpi-s{font-size:10px}
+.kpi-pulse-spark{width:68px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-left:1px solid rgba(255,255,255,.04);margin:3px 0 3px 6px;padding-left:6px}
+.kpi-pulse-spark svg{width:100%;height:28px}
 .kpi-pulse-spark .spark-line{fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .kpi-pulse-spark .spark-glow{fill:none;stroke-width:3.5;stroke-linecap:round;filter:blur(3px);opacity:.3}
 .kpi-pulse-spark .spark-area{opacity:.06}
