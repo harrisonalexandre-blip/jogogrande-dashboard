@@ -190,6 +190,24 @@ tr:hover .traf-edit-btn{opacity:.7}
 /* Sidebar glass */
 .sidebar{backdrop-filter:blur(16px);background:rgba(13,13,18,.85)!important}
 /* ── Metas & Targets (Proposta 06) ─────────────────────────────── */
+.kpi-dlt-row{text-align:right;padding:0 10px 0 0;margin-top:-1px;line-height:1}
+/* Modal Metas */
+.metas-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.metas-overlay.open{display:flex}
+.metas-modal{background:#141420;border:1px solid rgba(245,158,11,.2);border-radius:16px;padding:28px 32px;width:480px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.metas-modal h2{font-size:16px;color:var(--gold);margin:0 0 18px;font-weight:700;display:flex;align-items:center;gap:8px}
+.metas-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.metas-row label{flex:1;font-size:12px;color:var(--text2);font-weight:600}
+.metas-row input{width:120px;background:var(--bg2);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#fff;padding:7px 10px;font-size:13px;text-align:right;font-family:inherit}
+.metas-row input:focus{outline:none;border-color:var(--gold)}
+.metas-btns{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.metas-btns button{padding:8px 18px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.metas-btns .meta-save{background:var(--gold);color:#000}
+.metas-btns .meta-save:hover{filter:brightness(1.15)}
+.metas-btns .meta-cancel{background:rgba(255,255,255,.08);color:var(--text2)}
+.metas-btns .meta-cancel:hover{background:rgba(255,255,255,.14)}
+.metas-btns .meta-reset{background:rgba(255,68,68,.15);color:#FF4444;margin-right:auto}
+.metas-btns .meta-reset:hover{background:rgba(255,68,68,.25)}
 .kpi-meta-bar{width:100%;padding:4px 6px 5px;border-top:1px solid rgba(255,255,255,.04);margin-top:2px}
 .kpi-meta-labels{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
 .kpi-meta-lbl{font-size:7.5px;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
@@ -1086,6 +1104,10 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
     <div class="sb-item" data-roles="admin" onclick="sbNav('acessos',this)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       <span class="sb-label">Acessos</span>
+    </div>
+    <div class="sb-item" data-roles="admin,socio" onclick="openMetasModal()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+      <span class="sb-label">Metas</span>
     </div>
   </div>
   <div class="sb-toggle" onclick="toggleSidebar()" title="Expandir/Recolher menu">
@@ -2605,7 +2627,7 @@ let HOURLY={"date":"2026-04-05","regs":[8,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 
 // ═══ METAS MENSAIS ═══
 // Targets mensais configuráveis — persistidos em localStorage
-const METAS_DEFAULT={ngr:300000,vol_dep:800000,vol_saq:600000,casino_ggr:200000,wagering:8000000,netcash:100000,uap:600,redep_rate:35,ftd_split:800};
+const METAS_DEFAULT={ngr:300000,vol_dep:800000,casino_ggr:200000,wagering:8000000,netcash:100000,uap:600,redep_rate:35,ftd_split:800};
 let METAS=(()=>{try{const s=localStorage.getItem('jg_metas');return s?{...METAS_DEFAULT,...JSON.parse(s)}:METAS_DEFAULT;}catch(e){return METAS_DEFAULT;}})();
 function saveMetas(){try{localStorage.setItem('jg_metas',JSON.stringify(METAS));}catch(e){}}
 
@@ -3411,7 +3433,7 @@ function _sparkData(field,n){
 }
 // ── Meta bar: progresso MTD vs meta mensal ──
 // Mapeamento card ID → campo em D[] para acumular MTD
-const _metaFieldMap={ngr:'ngr',vol_dep:'ds',vol_saq:'ws',casino_ggr:'cg',wagering:'c_to',netcash:'nc',uap:'uap'};
+const _metaFieldMap={ngr:'ngr',vol_dep:'ds',casino_ggr:'cg',wagering:'c_to',netcash:'nc',uap:'uap',ftd_split:'ftd'};
 function _metaBar(cardId,curValue){
   if(!METAS[cardId]) return '';
   var target=METAS[cardId];
@@ -3588,21 +3610,21 @@ function renderOverview(){
   // Map of all card data by ID
   const kpiMap={
     online:{type:'online',l:'Online Agora',v:gaRtVal,raw:1,always:true,dlt:''},
-    funnel:{type:'funnel',l:'Cadastros → FTD',nr:k.nr,ftd:k.ftd,conv:funnelPct,raw:k.nr,always:true,avgFtd:avgFtdDay,maxFtd:maxFtdDay,curFtd:curFtdDay,avgNr:avgNrDay,maxNr:maxNrDay,curNr:curNrDay,dltNr:_d(k.nr,pk.nr),dltFtd:_d(k.ftd,pk.ftd)},
-    vol_dep:Object.assign({i:svgI('<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>'),l:'Vol. Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold',raw:k.ds,dlt:_d(k.ds,pk.ds)},_th(_curDsDay,_avgDsDay,_maxDsDay,fR)),
-    tk_dep:Object.assign({i:svgI('<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="8" y1="5" x2="8" y2="19"/>'),l:'Ticket Médio Dep.',v:fR(tkDep),s:'valor médio por depósito',c:'gold',raw:tkDep,dlt:_d(tkDep,prevTkDep)},_th(_curTkDep,_avgTkDep,_maxTkDep,fR)),
+    funnel:{type:'funnel',l:'Visits → Cadastro → FTD',vis:(function(){var g=typeof GA!=='undefined'?GA:null;if(!g||!g.userActivity)return 0;if(currentPeriod==='today'||currentPeriod==='yesterday')return g.userActivity.d1;if(currentPeriod==='week')return g.userActivity.d7;return g.userActivity.d30;})(),nr:k.nr,ftd:k.ftd,conv:funnelPct,raw:k.nr,always:true,avgFtd:avgFtdDay,maxFtd:maxFtdDay,curFtd:curFtdDay,avgNr:avgNrDay,maxNr:maxNrDay,curNr:curNrDay,dltNr:_d(k.nr,pk.nr),dltFtd:_d(k.ftd,pk.ftd)},
+    vol_dep:{i:svgI('<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>'),l:'Depósitos',v:fR(k.ds),s:`${fN(k.nd)} transações`,c:'gold',raw:k.ds,dlt:_d(k.ds,pk.ds)},
+    tk_dep:{i:svgI('<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="8" y1="5" x2="8" y2="19"/>'),l:'Ticket Dep.',v:fR(tkDep),s:'',c:'gold',raw:tkDep,dlt:_d(tkDep,prevTkDep)},
     ftd_split:{type:'split',l:'FTD + Ticket',fda:k.fda,ftd:k.ftd,tk:tkFtd,raw:k.fda,dltFda:_d(k.fda,pk.fda),dltTk:_d(tkFtd,prevTkFtd)},
-    vol_saq:Object.assign({i:svgI('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>'),l:'Vol. Saques',v:fR(k.ws-k.mi),s:`${fN(k.nw||0)} transações`,c:'red',raw:k.ws-k.mi,dlt:_d(k.ws-k.mi,pk.ws-pk.mi,true)},_th(_curWsDay,_avgWsDay,_maxWsDay,fR)),
-    tk_saq:Object.assign({i:svgI('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>'),l:'Ticket Médio Saq.',v:fR(tkSaq),s:'valor médio por saque',c:'red',raw:tkSaq,dlt:_d(tkSaq,prevTkSaq,true)},_th(_curTkSaq,_avgTkSaq,_maxTkSaq,fR)),
-    dep_saq:Object.assign({i:svgI('<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'),l:'% Dep/Saq',v:fP(depSaqPct),s:`Saques = ${fP(depSaqPct)} dos depósitos`,c:depSaqPct<80?'green':depSaqPct<95?'gold':'red',raw:k.ds,dlt:_d(depSaqPct,prevDepSaq,true)},_th(_curDepSaq,_avgDepSaq,_maxDepSaq,fP)),
-    ngr:Object.assign({i:svgI('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'),l:'NGR',v:fR(k.ngr),s:pLabel,c:'',raw:k.ngr,dlt:_d(k.ngr,pk.ngr)},_th(_curNgrDay,_avgNgrDay,_maxNgrDay,fR)),
-    netcash:{i:svgI('<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/>'),l:'NetCash (DTP)',v:fR(netcashDisplay),s:hasReconData?`Dep ${fR(reconDtpDep)} · Saq API ${fR(reconDtpSaqAPI)} · Ret: ${fP(dtpRetencao)}`:`Phoenix DB (sem dados RECON ainda)`,c:netcashDisplay>=0?'green':'red',raw:netcashDisplay,dlt:_d(netcashDisplay,prevReconDtpNcSemMI)},
+    vol_saq:{i:svgI('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>'),l:'Saques',v:fR(k.ws-k.mi),s:`${fN(k.nw||0)} transações`,c:'red',raw:k.ws-k.mi,dlt:_d(k.ws-k.mi,pk.ws-pk.mi,true)},
+    tk_saq:{i:svgI('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>'),l:'Ticket Saque',v:fR(tkSaq),s:'',c:'red',raw:tkSaq,dlt:_d(tkSaq,prevTkSaq,true)},
+    dep_saq:{i:svgI('<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'),l:'% Dep/Saq',v:fP(depSaqPct),s:'',c:depSaqPct<80?'green':depSaqPct<95?'gold':'red',raw:k.ds,dlt:_d(depSaqPct,prevDepSaq,true)},
+    ngr:{i:svgI('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'),l:'NGR',v:fR(k.ngr),s:currentPeriod==='today'?'':pLabel,c:'',raw:k.ngr,dlt:_d(k.ngr,pk.ngr)},
+    netcash:{i:svgI('<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/><path d="M9 4v4"/><path d="M15 4v4"/><circle cx="12" cy="15" r="2"/>'),l:'NetCash (DTP)',v:fR(netcashDisplay),s:hasReconData?`Dep ${fR(reconDtpDep)} · Saq API ${fR(reconDtpSaqAPI)} · Ret: ${fP(dtpRetencao)}`:`DTP · sem conciliação`,c:netcashDisplay>=0?'green':'red',raw:netcashDisplay,dlt:_d(netcashDisplay,prevReconDtpNcSemMI)},
     churn:{type:'churn',l:'Churn',r7:CHURN.r7,c7:CHURN.c7,r30:CHURN.r30,c30:CHURN.c30,r90:CHURN.r90,c90:CHURN.c90,total:CHURN.total,gaugeArc:gaugeArc,raw:CHURN.r7,always:true,dlt:''},
-    wagering:Object.assign({i:svgI('<circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/>'),l:'Volume (Wagering)',v:fR(totalVol),s:`Casino ${fR(k.c_to)} · SB ${fR(k.sb_to)} · Phoenix DB`,c:'purple',raw:totalVol,always:true,dlt:_d(totalVol,prevTotalVol)},_th(_curVolDay,_avgVolDay,_maxVolDay,fR)),
+    wagering:{i:svgI('<circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/>'),l:'Wagering',v:fR(totalVol),s:'',c:'purple',raw:totalVol,always:true,dlt:_d(totalVol,prevTotalVol)},
     // ── Extra cards ──
     sb_ggr:Object.assign({i:svgI('<circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/>'),l:'Sportsbook GGR',v:fR(k.sg),s:'Esportes',c:'blue',raw:k.sg,dlt:_d(k.sg,pk.sg)},_th(_curSgDay,_avgSgDay,_maxSgDay,fR)),
     casino_ggr:Object.assign({i:svgI('<rect x="1" y="1" width="22" height="22" rx="4"/><rect x="5" y="5" width="6" height="6" rx="1"/><rect x="13" y="5" width="6" height="6" rx="1"/><rect x="5" y="13" width="6" height="6" rx="1"/><rect x="13" y="13" width="6" height="6" rx="1"/>'),l:'Casino GGR',v:fR(k.cg),s:'Gross Gaming Revenue',c:'gold',raw:k.cg,dlt:_d(k.cg,pk.cg)},_th(_curCgDay,_avgCgDay,_maxCgDay,fR)),
-    hold_pct:{i:svgI('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'),l:'Hold % (GGR/TO)',v:fP(holdPct),s:`GGR ${fR(k.cg+k.sg)} / TO ${fR(totalVol)}`,c:holdPct>5?'green':holdPct>2?'gold':'red',raw:holdPct,dlt:_d(holdPct,prevHoldPct)},
+    hold_pct:{i:svgI('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'),l:'Hold % (GGR/TO)',v:fP(holdPct),s:'',c:holdPct>5?'green':holdPct>2?'gold':'red',raw:holdPct,dlt:_d(holdPct,prevHoldPct)},
     bonus:{i:svgI('<path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"/><rect x="2" y="7" width="20" height="5" rx="2"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'),l:'Bônus Concedidos',v:fR(0),s:'bonus total',c:'purple',raw:0,dlt:''},
     uap:{i:svgI('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),l:'Jogadores Ativos (UAP)',v:fN(k.uap),s:`${fN(cliActive)} ativos ≤7d de ${fN(totalCli)}`,c:'blue',raw:k.uap,dlt:_d(k.uap,pk.uap)},
     redep_rate:{i:svgI('<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36M20.49 15a9 9 0 0 1-14.85 3.36"/>'),l:'Redeposit Rate',v:fP(redepRate),s:isLifetime?`${fN(CRM_X.funnel[1].p)} de ${fN(funnelTotalDep)} jogadores redepositaram`:`${fN(k.nd-k.ftd)} redeposits de ${fN(k.nd)} deps`,c:redepRate>30?'green':redepRate>15?'gold':'red',raw:redepRate,dlt:_d(redepRate,prevRedepRate)},
@@ -3649,12 +3671,12 @@ function renderOverview(){
   document.getElementById('kov').innerHTML=visKpis.map(x=>{
     // Card: Online Agora — Signal Gauge
     if(x.type==='online') return `<div class="kpi kpi-online" id="ga-rt-kpi" ${dAttr(x._id)} style="position:relative;display:flex;flex-direction:column">${dBtns(x._id)}<div class="kpi-online-header"><div class="kpi-l" style="margin:0">Visitantes</div><div class="kpi-online-ts" id="ga-rt-updated">--:--</div></div><div class="kpi-visitors-body"><div class="kpi-visitors-num" id="ga-rt-count" style="color:#22c55e">${x.v}</div><div class="kpi-visitors-status" id="ga-rt-status" style="color:#22c55e">—</div><svg id="ga-rt-speedometer" viewBox="0 0 100 60" style="display:block;margin:4px auto 0;width:88px;height:50px;overflow:visible"><path d="M 12,54 A 38,38 0 0,1 88,54" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="11" stroke-linecap="round"/><path d="M 12,54 A 38,38 0 0,1 88,54" fill="none" stroke="#ef4444" stroke-width="8" stroke-linecap="butt" stroke-dasharray="22 99" stroke-dashoffset="0.5" opacity=".6"/><path d="M 12,54 A 38,38 0 0,1 88,54" fill="none" stroke="#f97316" stroke-width="8" stroke-linecap="butt" stroke-dasharray="22 99" stroke-dashoffset="-23" opacity=".6"/><path d="M 12,54 A 38,38 0 0,1 88,54" fill="none" stroke="#eab308" stroke-width="8" stroke-linecap="butt" stroke-dasharray="22 99" stroke-dashoffset="-46" opacity=".6"/><path d="M 12,54 A 38,38 0 0,1 88,54" fill="none" stroke="#84cc16" stroke-width="8" stroke-linecap="butt" stroke-dasharray="22 99" stroke-dashoffset="-69" opacity=".6"/><path d="M 12,54 A 38,38 0 0,1 88,54" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="butt" stroke-dasharray="22 99" stroke-dashoffset="-92" opacity=".6"/><path id="ga-rt-arc-fill" d="M 12,54 A 38,38 0 0,1 88,54" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-dasharray="0 120" opacity="0.18"/><line x1="50" y1="54" x2="50" y2="19" stroke="rgba(255,255,255,.9)" stroke-width="1.8" stroke-linecap="round" id="ga-rt-needle" style="transform-origin:50px 54px;transform:rotate(-90deg);transition:transform .65s cubic-bezier(.4,0,.2,1)"/><circle cx="50" cy="54" r="3.5" fill="rgba(20,20,40,.95)" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/><circle cx="50" cy="54" r="1.3" fill="rgba(255,255,255,.75)"/><text id="ga-rt-speedlabel" x="50" y="50" text-anchor="middle" font-size="5.5" fill="#666" font-family="monospace">-- km/h</text><text x="10" y="60" text-anchor="middle" font-size="3.8" fill="#444">0</text><text x="50" y="16" text-anchor="middle" font-size="3.8" fill="#444">150</text><text x="90" y="60" text-anchor="middle" font-size="3.8" fill="#444">300</text></svg></div></div>`;
-    // Card: Funnel Cadastros → FTD
-    if(x.type==='funnel'){const pct=x.nr>0?(x.ftd/x.nr*100):0;
-      const nrMax=x.maxNr||1,ftdMax=x.maxFtd||1;
-      const nrPct=Math.min(100,x.curNr/nrMax*100);
-      const ftdPct=Math.min(100,x.curFtd/ftdMax*100);
-      return `<div class="kpi blue kpi-funnel" ${dAttr(x._id)} style="position:relative">${dBtns(x._id)}<div class="kpi-l">Cadastros → FTD</div><div class="kpi-funnel-body"><div class="kpi-funnel-side" title="Cadastros: ${fN(x.curNr)} / max ${fN(x.maxNr)}"><div class="kpi-funnel-side-fill" style="height:${nrPct}%;background:rgba(59,130,246,.5)"></div><div class="kpi-funnel-side-mark" style="bottom:${nrPct}%"></div></div><div class="kpi-funnel-center"><div class="kpi-funnel-nums"><div class="fn-item"><div class="fn-val" style="color:#3B82F6">${fN(x.nr)} ${x.dltNr||''}</div><div class="fn-lbl">Cadastros</div></div><div class="fn-arrow">→</div><div class="fn-item"><div class="fn-val" style="color:var(--green)">${fN(x.ftd)} ${x.dltFtd||''}</div><div class="fn-lbl">FTD</div></div></div><div class="kpi-funnel-conv-txt">${fP(pct)} conversão</div></div><div class="kpi-funnel-side" title="FTD: ${fN(x.curFtd)} / max ${fN(x.maxFtd)}"><div class="kpi-funnel-side-fill" style="height:${ftdPct}%;background:rgba(16,185,129,.5)"></div><div class="kpi-funnel-side-mark" style="bottom:${ftdPct}%"></div></div></div><div class="kpi-funnel-convbar"><div class="kpi-funnel-convbar-fill" style="width:${Math.min(pct,100)}%;background:linear-gradient(90deg,#3B82F6,var(--green))"></div><div class="kpi-funnel-convbar-mark" style="left:calc(${Math.min(pct,100)}% - 1.5px)"></div></div></div>`;}
+    // Card: Funnel Visits → Cadastro → FTD (3 stages)
+    if(x.type==='funnel'){const cadFtdPct=x.nr>0?(x.ftd/x.nr*100):0;
+      const visCadPct=x.vis>0?(x.nr/x.vis*100):0;
+      const visTotal=x.vis>0?fN(x.vis):'--';
+      const fullPct=x.vis>0?(x.ftd/x.vis*100):0;
+      return `<div class="kpi blue kpi-funnel" ${dAttr(x._id)} style="position:relative">${dBtns(x._id)}<div class="kpi-l" style="margin-bottom:4px">Visits → Cadastro → FTD</div><div class="kpi-funnel-nums" style="display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap"><div class="fn-item"><div class="fn-val" style="color:#8B8BFF;font-size:16px">${visTotal}</div><div class="fn-lbl">Visits</div></div><div class="fn-arrow" style="display:flex;flex-direction:column;align-items:center;gap:0"><span style="font-size:11px;color:var(--text3)">→</span><span style="font-size:8px;color:#8B8BFF">${fP(visCadPct)}</span></div><div class="fn-item"><div class="fn-val" style="color:#3B82F6;font-size:16px">${fN(x.nr)} ${x.dltNr||''}</div><div class="fn-lbl">Cadastros</div></div><div class="fn-arrow" style="display:flex;flex-direction:column;align-items:center;gap:0"><span style="font-size:11px;color:var(--text3)">→</span><span style="font-size:8px;color:var(--green)">${fP(cadFtdPct)}</span></div><div class="fn-item"><div class="fn-val" style="color:var(--green);font-size:16px">${fN(x.ftd)} ${x.dltFtd||''}</div><div class="fn-lbl">FTD</div></div></div><div class="kpi-funnel-convbar" style="margin-top:6px"><div class="kpi-funnel-convbar-fill" style="width:${Math.min(fullPct*5,100)}%;background:linear-gradient(90deg,#8B8BFF,#3B82F6,var(--green))"></div></div><div style="text-align:center;font-size:8px;color:var(--text3);margin-top:3px">${fP(fullPct)} conversão total</div></div>`;}
     // Card: Split FTD + Ticket
     if(x.type==='split') return `<div class="kpi green kpi-split-wrap" ${dAttr(x._id)} style="position:relative">${dBtns(x._id)}<div class="kpi-l">Novos Depósitos (FTD)</div><div class="kpi-split"><div class="kpi-split-left"><div class="sp-val" style="color:var(--green)">${fR(x.fda)}</div><div class="sp-lbl">Volume FTD ${x.dltFda||''}</div><div class="sp-sub">${fN(x.ftd)} FTDs</div></div><div class="kpi-split-right"><div class="sp-val" style="color:var(--cyan)">${fR(x.tk)}</div><div class="sp-lbl">Ticket Médio ${x.dltTk||''}</div><div class="sp-sub">por primeiro dep.</div></div></div></div>`;
     // Card: Churn Gauges (no delta — static data)
@@ -3665,20 +3687,23 @@ function renderOverview(){
     const thBar=hasTh?`<div class="kpi-thermo-wrap"><div class="kpi-thermo"><div class="kpi-thermo-fill" style="width:${x.thCur.toFixed(1)}%;background:${thColor};opacity:.4"></div><div class="kpi-thermo-tick avg" style="left:${x.thAvg.toFixed(1)}%" title="Média: ${x.thAvgV}"></div><div class="kpi-thermo-tick cur" style="left:${x.thCur.toFixed(1)}%" title="Atual: ${x.thCurV}"></div></div></div>`:'';
     const dltBadge=x.dlt||'';
     // ── Pulse Metrics: sparkline + health class ──
-    const _sparkFieldMap={ngr:'ngr',vol_dep:'ds',vol_saq:'ws',tk_dep:'ds',tk_saq:'ws',dep_saq:'ds',casino_ggr:'cg',sb_ggr:'sg',wagering:'c_to',uap:'uap',hold_pct:'cg',redep_rate:'nr',mov_interna:'mi',dtp_netcash:'nc',first_dep_avg:'fda',dep_player:'ds',margin_casino:'cg',saq_dep_ratio:'ws',netcash:'nc',bonus:null,dtp_saldo:null};
+    const _sparkFieldMap={ngr:'ngr',vol_dep:'ds',vol_saq:'ws',tk_dep:'ds',tk_saq:null,dep_saq:'ds',casino_ggr:'cg',sb_ggr:'sg',wagering:'c_to',uap:'uap',hold_pct:'cg',redep_rate:'nr',mov_interna:'mi',dtp_netcash:'nc',first_dep_avg:'fda',dep_player:'ds',margin_casino:'cg',saq_dep_ratio:'ws',netcash:'nc',bonus:null,dtp_saldo:null};
     const _sparkField=_sparkFieldMap[x._id]||null;
     const _sparkD=_sparkField?_sparkData(_sparkField,14):[];
     const _ph=hasPrev?_pulseHealth(x.raw,pk[_sparkField]||0,x.c==='red'):({cls:'beat-norm',status:'pulse-warning',color:'#F59E0B'});
     const _sparkColor=x.c==='gold'?'#F59E0B':x.c==='red'?'#FF4444':x.c==='green'?'#0EA55A':x.c==='blue'?'#3B82F6':x.c==='purple'?'#BB86FC':x.c==='cyan'?'#0EA55A':'#0EA55A';
     const _sparkHtml=_sparkD.length>=2?`<div class="kpi-pulse-spark ${_ph.cls}">${_sparkSVG(_sparkD,_sparkColor)}<div class="pulse-scan" style="background:linear-gradient(180deg,transparent,${_sparkColor},transparent)"></div></div>`:'';
     const _metaBarHtml=_metaBar(x._id,x.raw);
+    // Delta: se tem sparkline, mostra abaixo do spark; senão, inline no valor
+    const _valHtml=`<div class="kpi-v">${x.v}${_sparkD.length>=2?'':' '+dltBadge}</div>`;
+    const _dltRow=(_sparkD.length>=2&&dltBadge)?'<div class="kpi-dlt-row">'+dltBadge+'</div>':'';
     if(hasTh){
-      return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative;flex-direction:column;padding-bottom:0;overflow:hidden">${dBtns(x._id)}<div style="display:flex;align-items:stretch;gap:0;width:100%"><div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v} ${dltBadge}</div><div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>${thBar}${_metaBarHtml}</div>`;
+      return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative;flex-direction:column;padding-bottom:0;overflow:hidden">${dBtns(x._id)}<div style="display:flex;align-items:stretch;gap:0;width:100%"><div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div>${_valHtml}<div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>${_dltRow}${thBar}${_metaBarHtml}</div>`;
     }
-    if(_metaBarHtml){
-      return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative;flex-direction:column;padding-bottom:0;overflow:hidden">${dBtns(x._id)}<div style="display:flex;align-items:stretch;gap:0;width:100%"><div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v} ${dltBadge}</div><div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>${_metaBarHtml}</div>`;
+    if(_metaBarHtml||_dltRow){
+      return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative;flex-direction:column;padding-bottom:0;overflow:hidden">${dBtns(x._id)}<div style="display:flex;align-items:stretch;gap:0;width:100%"><div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div>${_valHtml}<div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>${_dltRow}${_metaBarHtml}</div>`;
     }
-    return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative">${dBtns(x._id)}<div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div><div class="kpi-v">${x.v} ${dltBadge}</div><div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>`;
+    return `<div class="kpi ${x.c} ${_sparkD.length>=2?_ph.status:''}" ${dAttr(x._id)} style="position:relative">${dBtns(x._id)}<div class="kpi-main"><div class="kpi-i">${x.i}</div><div class="kpi-l">${x.l}</div>${_valHtml}<div class="kpi-s">${x.s}</div></div>${_sparkHtml}</div>`;
   }).join('');
 
   // === Section visibility (respects user layout + period logic) ===
@@ -8866,4 +8891,43 @@ function formatAIResponse(text){
 
 </script>
 </div><!-- /main-wrap -->
+<!-- ═══ MODAL: CONFIGURAÇÃO DE METAS ═══ -->
+<div class="metas-overlay" id="metas-overlay" onclick="if(event.target===this)closeMetasModal()">
+<div class="metas-modal">
+<h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg> Configurar Metas Mensais</h2>
+<div id="metas-fields"></div>
+<div class="metas-btns">
+<button class="meta-reset" onclick="resetMetas()">Restaurar Padrão</button>
+<button class="meta-cancel" onclick="closeMetasModal()">Cancelar</button>
+<button class="meta-save" onclick="saveMetasModal()">Salvar Metas</button>
+</div>
+</div>
+</div>
+<script>
+const METAS_LABELS={ngr:'NGR (Net Gaming Revenue)',vol_dep:'Volume Depósitos',casino_ggr:'Casino GGR',wagering:'Wagering Total',netcash:'Net Cash',uap:'Jogadores Ativos (UAP)',redep_rate:'Redeposit Rate (%)',ftd_split:'FTDs (Primeiro Depósito)'};
+function openMetasModal(){
+  var el=document.getElementById('metas-fields');
+  el.innerHTML=Object.keys(METAS_LABELS).map(function(k){
+    var lbl=METAS_LABELS[k];
+    var val=METAS[k]||METAS_DEFAULT[k]||0;
+    return '<div class="metas-row"><label>'+lbl+'</label><input type="number" id="meta-'+k+'" value="'+val+'" step="any"></div>';
+  }).join('');
+  document.getElementById('metas-overlay').classList.add('open');
+}
+function closeMetasModal(){document.getElementById('metas-overlay').classList.remove('open');}
+function saveMetasModal(){
+  Object.keys(METAS_LABELS).forEach(function(k){
+    var inp=document.getElementById('meta-'+k);
+    if(inp) METAS[k]=parseFloat(inp.value)||0;
+  });
+  saveMetas();
+  closeMetasModal();
+  if(typeof renderOverview==='function') renderOverview();
+}
+function resetMetas(){
+  Object.keys(METAS_DEFAULT).forEach(function(k){METAS[k]=METAS_DEFAULT[k];});
+  saveMetas();
+  openMetasModal();
+}
+</script>
 </body></html>
