@@ -2144,6 +2144,9 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
 <div id="pg-traf" class="page">
 <p class="sec">Tráfego Interno · Custo Ads vs Retorno <span style="background:var(--goldA);color:var(--gold);font-size:10px;font-weight:800;padding:3px 10px;border-radius:6px;margin-left:10px;letter-spacing:1px;vertical-align:middle">CONTA CLARA</span></p>
 
+<!-- KPI Cards — topo da página -->
+<div class="kg" id="kp-traf" style="margin-bottom:20px"></div>
+
 <!-- ═══ NOVA ENTRADA — Linha de Planilha ═══ -->
 <div id="traf-entry-panel" style="margin-bottom:18px;border:1.5px solid rgba(245,158,11,.3);border-radius:14px;overflow:hidden">
   <!-- Header -->
@@ -2285,8 +2288,6 @@ body.light #kpi-editor-panel{border-color:rgba(0,0,0,.1)}
   </div>
 </div>
 
-<!-- KPI Cards -->
-<div class="kg" id="kp-traf"></div>
 <!-- Charts row 1 -->
 <div class="cg cg2">
   <div class="cb"><div class="ct"><span class="dot g"></span>Investimento vs Net P&L Diário (R$)</div><canvas id="c-traf-inv-pl"></canvas></div>
@@ -2833,6 +2834,31 @@ const KPI_CATALOG=[
   {id:'mov_interna',label:'Mov Interna (Pix+Cripto)',icon:'🔄',default:false},
   {id:'dtp_netcash',label:'DigiToPay NetCash',icon:'💳',default:false},
   {id:'dtp_saldo',label:'Saldo DigiToPay',icon:'💵',default:true},
+  // ── CRM ──
+  {id:'crm_base_ativa',label:'Base Ativa (CRM)',icon:'👥',default:false},
+  {id:'crm_mornos',label:'Mornos CRM (8-30d)',icon:'🌡️',default:false},
+  {id:'crm_frios',label:'Frios/Perdidos CRM',icon:'❄️',default:false},
+  {id:'crm_ngr_medio',label:'NGR Médio/Jogador',icon:'📊',default:false},
+  {id:'crm_lealdade',label:'Taxa Lealdade (≥3 Dep)',icon:'🏅',default:false},
+  {id:'crm_total_dep',label:'Volume Dep. CRM',icon:'💳',default:false},
+  // ── Afiliados ──
+  {id:'aff_total',label:'Total Afiliados',icon:'🤝',default:false},
+  {id:'aff_ftds',label:'FTDs Afiliados',icon:'🎯',default:false},
+  {id:'aff_netpl',label:'Net P&L Afiliados',icon:'💹',default:false},
+  {id:'aff_comm',label:'Comissões Afiliados',icon:'💸',default:false},
+  {id:'aff_margem',label:'Margem Afiliados',icon:'📐',default:false},
+  // ── Tráfego Ads ──
+  {id:'traf_inv',label:'Investimento Ads',icon:'💰',default:false},
+  {id:'traf_roas',label:'ROAS Ads',icon:'📈',default:false},
+  {id:'traf_custo_ftd',label:'Custo/FTD Ads',icon:'💲',default:false},
+  {id:'traf_cad',label:'Cadastros Ads',icon:'👤',default:false},
+  {id:'traf_conv',label:'Conversão CAD→FTD Ads',icon:'🔁',default:false},
+  // ── Analytics ──
+  {id:'ga_users',label:'Usuários Únicos (GA4)',icon:'👁️',default:false},
+  {id:'ga_revenue',label:'Receita GA4',icon:'💰',default:false},
+  {id:'ga_compras',label:'Compras GA4 (30d)',icon:'🛒',default:false},
+  {id:'ga_ticket',label:'Ticket Médio GA4',icon:'💎',default:false},
+  {id:'ga_buyer',label:'Taxa Comprador (GA4)',icon:'🎯',default:false},
 ];
 function getKpiLayout(){
   try{const s=localStorage.getItem('jg_kpi_layout');if(s)return JSON.parse(s);}catch(e){}
@@ -3459,6 +3485,31 @@ function renderOverview(){
     mov_interna:{i:svgI('<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36M20.49 15a9 9 0 0 1-14.85 3.36"/>'),l:'Mov Interna (Pix+Cripto)',v:fR(miDisplay),s:`${fN(miNDisplay)} transações${!hasReconData?' · Phoenix DB':''}`,c:'purple',raw:miDisplay,dlt:_d(miDisplay,prevReconMi)},
     dtp_netcash:{i:svgI('<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><path d="M7 15h0M12 15h0"/>'),l:'DTP NetCash Total',v:fR(reconDtpNc),s:`Inclui MI · Dep ${fR(reconDtpDep)} · Saq total ${fR(reconDtpSaq)}`,c:reconDtpNc>=0?'green':'red',raw:reconDtpNc,dlt:_d(reconDtpNc,prevReconDtpNc)},
     dtp_saldo:{i:svgI('<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M12 14v2"/><path d="M8 14h8"/>'),l:'Saldo Disponível · DTP',v:fR(DTP_BAL.ready),s:`Bloqueado: ${fR(DTP_BAL.blocked)} · Atualiz. ${DTP_BAL.ts}`,c:DTP_BAL.ready>0?'green':'red',raw:DTP_BAL.ready},
+    // ── CRM cards (dados lifetime do CLI) ──
+    crm_base_ativa:(function(){const cl=typeof CLI!=='undefined'?CLI:[];const h=cl.filter(c=>c.st2==='hot'||c.st2==='active').length;return{i:'👥',l:'Base Ativa (CRM)',v:fN(cl.length),s:fN(h)+' ativos ≤7d · lifetime',c:'blue',raw:cl.length,dlt:''};})(),
+    crm_mornos:(function(){const cl=typeof CLI!=='undefined'?CLI:[];const n=cl.filter(c=>c.st2==='warm').length;return{i:'🌡️',l:'Mornos (8-30d)',v:fN(n),s:fP(cl.length?n/cl.length*100:0)+' da base',c:'gold',raw:n,dlt:''};})(),
+    crm_frios:(function(){const cl=typeof CLI!=='undefined'?CLI:[];const n=cl.filter(c=>c.st2==='cold'||c.st2==='lost').length;return{i:'❄️',l:'Frios/Perdidos',v:fN(n),s:fP(cl.length?n/cl.length*100:0)+' churn risk',c:'red',raw:n,dlt:''};})(),
+    crm_ngr_medio:(function(){const cl=typeof CLI!=='undefined'?CLI:[];const ngr=cl.reduce((a,c)=>a+c.ngr,0);const avg=cl.length?ngr/cl.length:0;return{i:'📊',l:'NGR Médio/Jogador',v:fR(avg),s:'Lifetime · '+fN(cl.length)+' clientes',c:'cyan',raw:avg,dlt:''};})(),
+    crm_lealdade:(function(){const cl=typeof CLI!=='undefined'?CLI:[];const loyal=cl.filter(c=>c.dc>=3).length;const pct=cl.length?loyal/cl.length*100:0;return{i:'🏅',l:'Taxa Lealdade',v:fP(pct),s:fN(loyal)+' com ≥3 depósitos',c:'gold',raw:pct,dlt:''};})(),
+    crm_total_dep:(function(){const cl=typeof CLI!=='undefined'?CLI:[];const d=cl.reduce((a,c)=>a+c.dt,0);const cnt=cl.reduce((a,c)=>a+c.dc,0);return{i:'💳',l:'Volume Dep. CRM',v:fR(d),s:'Lifetime · '+fN(cnt)+' transações',c:'',raw:d,dlt:''};})(),
+    // ── Afiliados ──
+    aff_total:(function(){const affs=typeof AFF!=='undefined'&&AFF.affs?AFF.affs:[];return{i:'🤝',l:'Total Afiliados',v:fN(affs.length),s:'Parceiros ativos',c:'',raw:affs.length,dlt:''};})(),
+    aff_ftds:(function(){const affs=typeof AFF!=='undefined'&&AFF.affs?AFF.affs:[];const t=affs.reduce((a,x)=>a+(x.ftd||0),0);const r=affs.reduce((a,x)=>a+(x.rg||0),0);return{i:'🎯',l:'FTDs Afiliados',v:fN(t),s:'Conv: '+fP(r>0?t/r*100:0),c:'gold',raw:t,dlt:''};})(),
+    aff_netpl:(function(){const affs=typeof AFF!=='undefined'&&AFF.affs?AFF.affs:[];const n=affs.reduce((a,x)=>a+(x.np||0),0);return{i:'💹',l:'Net P&L Afiliados',v:fR(n),s:'Lucro após comissões',c:n>=0?'':'red',raw:n,dlt:''};})(),
+    aff_comm:(function(){const affs=typeof AFF!=='undefined'&&AFF.affs?AFF.affs:[];const c=affs.reduce((a,x)=>a+(x.cm||0),0);return{i:'💸',l:'Comissões Pagas',v:fR(c),s:'Pago a afiliados',c:'purple',raw:c,dlt:''};})(),
+    aff_margem:(function(){const affs=typeof AFF!=='undefined'&&AFF.affs?AFF.affs:[];const np=affs.reduce((a,x)=>a+(x.np||0),0);const cm=affs.reduce((a,x)=>a+(x.cm||0),0);const m=np>0&&cm>0?np/(np+cm)*100:0;return{i:'📐',l:'Margem Afiliados',v:fP(m),s:'P&L / (P&L + Comissões)',c:'gold',raw:m,dlt:''};})(),
+    // ── Tráfego Ads (filtrado pelo período global) ──
+    traf_inv:(function(){const td=typeof TRAF_DATA!=='undefined'?TRAF_DATA:[];const pS=filteredData.length?filteredData[0].date:null;const pE=filteredData.length?filteredData[filteredData.length-1].date:null;const rows=pS&&pE?td.filter(r=>r.d>=pS&&r.d<=pE):td;const t=rows.reduce((a,r)=>a+(r.inv||0),0);return{i:'💸',l:'Investimento Ads',v:fR(t),s:rows.length+'d · Meta Ads',c:'red',raw:t,dlt:''};})(),
+    traf_roas:(function(){const td=typeof TRAF_DATA!=='undefined'?TRAF_DATA:[];const pS=filteredData.length?filteredData[0].date:null;const pE=filteredData.length?filteredData[filteredData.length-1].date:null;const rows=pS&&pE?td.filter(r=>r.d>=pS&&r.d<=pE):td;const inv=rows.reduce((a,r)=>a+(r.inv||0),0);const pl=rows.reduce((a,r)=>a+(r.netPL||r.netPL_meta||0),0);const r=inv>0?pl/inv:0;return{i:'📈',l:'ROAS Ads',v:r.toFixed(2)+'x',s:r>=1?'Retorno positivo':'Abaixo do break-even',c:r>=1?'':'red',raw:r,dlt:''};})(),
+    traf_custo_ftd:(function(){const td=typeof TRAF_DATA!=='undefined'?TRAF_DATA:[];const pS=filteredData.length?filteredData[0].date:null;const pE=filteredData.length?filteredData[filteredData.length-1].date:null;const rows=pS&&pE?td.filter(r=>r.d>=pS&&r.d<=pE):td;const inv=rows.reduce((a,r)=>a+(r.inv||0),0);const ftd=rows.reduce((a,r)=>a+(r.ftd_meta||r.ftd||0),0);const cf=ftd>0?inv/ftd:0;return{i:'💲',l:'Custo/FTD Ads',v:fR(cf),s:'Por primeiro depósito',c:'red',raw:cf,dlt:''};})(),
+    traf_cad:(function(){const td=typeof TRAF_DATA!=='undefined'?TRAF_DATA:[];const pS=filteredData.length?filteredData[0].date:null;const pE=filteredData.length?filteredData[filteredData.length-1].date:null;const rows=pS&&pE?td.filter(r=>r.d>=pS&&r.d<=pE):td;const c=rows.reduce((a,r)=>a+(r.cad_meta||r.cad||0),0);return{i:'👤',l:'Cadastros Ads',v:fN(c),s:Math.round(c/Math.max(1,rows.length))+'/dia média',c:'cyan',raw:c,dlt:''};})(),
+    traf_conv:(function(){const td=typeof TRAF_DATA!=='undefined'?TRAF_DATA:[];const pS=filteredData.length?filteredData[0].date:null;const pE=filteredData.length?filteredData[filteredData.length-1].date:null;const rows=pS&&pE?td.filter(r=>r.d>=pS&&r.d<=pE):td;const c=rows.reduce((a,r)=>a+(r.cad_meta||r.cad||0),0);const f=rows.reduce((a,r)=>a+(r.ftd_meta||r.ftd||0),0);const pct=c>0?f/c*100:0;return{i:'🔁',l:'Conv. CAD→FTD Ads',v:fP(pct),s:fN(f)+' FTDs de '+fN(c)+' cads',c:pct>=30?'':'gold',raw:pct,dlt:''};})(),
+    // ── Analytics GA4 ──
+    ga_users:(function(){const u=typeof GA!=='undefined'?GA.ov.users:0;const g=typeof GA!=='undefined'?GA.summary30d.activeUsersGrowth:0;return{i:'👁️',l:'Usuários Únicos (GA4)',v:fN(u),s:(g>0?'▲':'▼')+Math.abs(g)+'% vs mês anterior',c:g>=0?'':'red',raw:u,dlt:''};})(),
+    ga_revenue:(function(){const r=typeof GA!=='undefined'?GA.ov.revenue:0;const r90=typeof GA!=='undefined'?GA.trafficTotal.rev:0;return{i:'💰',l:'Receita GA4 (28d)',v:fR(r),s:'Acumulado 90d: '+fR(r90),c:'',raw:r,dlt:''};})(),
+    ga_compras:(function(){const p=typeof GA!=='undefined'?GA.summary30d.purchases:0;const g=typeof GA!=='undefined'?GA.summary30d.purchasesGrowth:0;return{i:'🛒',l:'Compras GA4 (30d)',v:fN(p),s:(g>0?'▲':'▼')+Math.abs(g)+'% vs anterior',c:'gold',raw:p,dlt:''};})(),
+    ga_ticket:(function(){const r=typeof GA!=='undefined'?GA.ov.revenue:0;const p=typeof GA!=='undefined'?GA.summary30d.purchases:0;const t=p>0?Math.round(r/p):0;return{i:'💎',l:'Ticket Médio GA4',v:'R$ '+fN(t),s:'Receita / compras · 28d',c:'cyan',raw:t,dlt:''};})(),
+    ga_buyer:(function(){const b=typeof GA!=='undefined'?GA.buyer.rate:0;const g=typeof GA!=='undefined'?GA.buyer.rateGrowth:0;return{i:'🎯',l:'Taxa Comprador (GA4)',v:b+'%',s:(g>0?'▲':'▼')+Math.abs(g)+'% vs anterior · FTP: '+(typeof GA!=='undefined'?GA.buyer.ftpRate:0)+'%',c:g>=0?'':'gold',raw:b,dlt:''};})(),
   };
   // Build ordered visible list
   const kpiOrder=getKpiOrder();
