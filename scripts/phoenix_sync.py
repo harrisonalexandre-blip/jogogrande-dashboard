@@ -574,12 +574,13 @@ def get_aff_name(aid):
 # Each metric is queried independently and merged in Python to avoid row duplication
 phoenix_aff_days = {}
 try:
-    # Common CTE: aff_ids mapping
+    # Common CTE: aff_ids mapping (GROUP BY client_id to avoid duplicates)
     AFF_IDS_CTE = f"""
         SELECT client_id,
-               extractAllGroupsVertical(btag, 'aff_id=([0-9]+)')[1][1] as aff_id
+               any(extractAllGroupsVertical(btag, 'aff_id=([0-9]+)')[1][1]) as aff_id
         FROM {CH_DB}.client
         WHERE btag != '' AND is_test = false
+        GROUP BY client_id
     """
 
     # Helper: {(aff_id, date_str): value}

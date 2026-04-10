@@ -96,15 +96,19 @@ FROM project_176.client
 WHERE toDate(toTimezone(registration_time,'${TZ}'))='${today}' AND is_test=false
 GROUP BY h ORDER BY h FORMAT JSON`;
 
-    // ─── Query 3: Hourly FTDs ───
-    const q3 = `SELECT toHour(toTimezone(d.create_time,'${TZ}')) AS h, count(DISTINCT d.client_id) AS n
-FROM project_176.deposits d
-WHERE toDate(toTimezone(d.create_time,'${TZ}'))='${today}' AND d.status='PAID'
-  AND d.client_id IN (
+    // ─── Query 3: Hourly FTDs (assign each FTD to hour of FIRST deposit only) ───
+    const q3 = `WITH ftd_clients AS (
     SELECT client_id FROM project_176.deposits WHERE status='PAID'
     GROUP BY client_id HAVING min(toDate(toTimezone(create_time,'${TZ}')))='${today}'
-  )
-GROUP BY h ORDER BY h FORMAT JSON`;
+),
+ftd_first_hour AS (
+    SELECT d.client_id, toHour(toTimezone(min(d.create_time),'${TZ}')) AS h
+    FROM project_176.deposits d
+    JOIN ftd_clients fc ON d.client_id = fc.client_id
+    WHERE toDate(toTimezone(d.create_time,'${TZ}'))='${today}' AND d.status='PAID'
+    GROUP BY d.client_id
+)
+SELECT h, count() AS n FROM ftd_first_hour GROUP BY h ORDER BY h FORMAT JSON`;
 
     // ─── Query 4: Hourly casino volume ───
     const q4 = `SELECT toHour(toTimezone(spin_date,'${TZ}')) AS h,
